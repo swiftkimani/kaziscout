@@ -23,6 +23,7 @@ import { HeuristicEvaluator } from './scoring/heuristic.js';
 import { AlertService } from './services/alerts.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
+import { CvImportService } from './services/cv-import.js';
 import { DocumentService } from './services/documents.js';
 import { EvaluationService } from './services/evaluation.js';
 import { MarkdownService } from './services/markdown.js';
@@ -154,6 +155,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     markdownService,
     applyService,
     documentService,
+    cvImportService: new CvImportService({ ai, desktop }),
     aiModel: ai?.model,
     now,
   });
