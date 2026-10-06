@@ -87,40 +87,74 @@ describe('ProfilePage', () => {
     expect(await screen.findByText('Too long')).toBeTruthy();
   });
 
-  it('fills the form from an imported CV, shows the follow-up questions, and saves nothing yet', async () => {
+  const IMPORT = {
+    data: {
+      draft: { ...SAVED, targetTitles: [], cvText: 'Wanjiru Kamau, Data Analyst…' },
+      questions: [
+        {
+          field: 'targetTitles',
+          question: 'Which job titles are you looking for?',
+          suggestion: 'Data Analyst',
+        },
+        { field: 'isRemoteOk', question: 'Are you open to remote work?', suggestion: 'yes' },
+      ],
+      readBy: 'rules',
+      characters: 629,
+    },
+  };
+
+  async function importCv(user: ReturnType<typeof userEvent.setup>) {
+    const file = new File(['%PDF-1.4 sample'], 'cv.pdf', { type: 'application/pdf' });
+    await user.upload(await screen.findByLabelText('CV file'), file);
+  }
+
+  it('asks the follow-up questions one at a time after a CV import, then saves the answers', async () => {
     const requests = stubApi({
       'GET /v1/profile': { data: null },
       'GET /v1/meta': META,
-      'POST /v1/profile/import': {
-        data: {
-          draft: { ...SAVED, targetTitles: [], cvText: 'Wanjiru Kamau, Data Analyst…' },
-          questions: [
-            {
-              field: 'targetTitles',
-              question: 'Which job titles are you looking for?',
-              suggestion: 'Data Analyst',
-            },
-            { field: 'isRemoteOk', question: 'Are you open to remote work?', suggestion: 'yes' },
-          ],
-          readBy: 'rules',
-          characters: 629,
-        },
-      },
+      'POST /v1/profile/import': IMPORT,
+      'PUT /v1/profile': (body) => ({ status: 200, json: { data: body, rescored: 7 } }),
     });
     const user = userEvent.setup();
     renderApp(<ProfilePage />);
+    await importCv(user);
 
-    const file = new File(['%PDF-1.4 sample'], 'cv.pdf', { type: 'application/pdf' });
-    await user.upload(await screen.findByLabelText('CV file'), file);
-
-    expect(await screen.findByText(/A few things to confirm/)).toBeTruthy();
-    expect(screen.getByText('Which job titles are you looking for?')).toBeTruthy();
-    expect(screen.getByText('Suggested: Data Analyst')).toBeTruthy();
-    expect(screen.getByLabelText('Full name')).toHaveProperty('value', 'Wanjiru Kamau');
-    expect(screen.getByLabelText('Skills')).toHaveProperty('value', 'SQL');
-    const sent = requests.find((request) => request.path === '/v1/profile/import')?.body;
-    expect(sent).toMatchObject({ filename: 'cv.pdf', contentBase64: expect.any(String) });
+    expect(
+      await screen.findByRole('heading', { name: 'Which job titles are you looking for?' }),
+    ).toBeTruthy();
+    expect(screen.getByText('Question 1 of 2')).toBeTruthy();
+    expect(screen.getByLabelText('Your answer')).toHaveProperty('value', 'Data Analyst');
     expect(requests.some((request) => request.method === 'PUT')).toBe(false);
+
+    await user.type(screen.getByLabelText('Your answer'), ', BI Developer');
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await user.click(await screen.findByRole('button', { name: 'No, on-site only' }));
+    await user.click(screen.getByRole('button', { name: 'Save profile' }));
+
+    expect(await screen.findByText('Profile saved. 7 jobs re-scored.')).toBeTruthy();
+    expect(requests.find((request) => request.method === 'PUT')?.body).toMatchObject({
+      fullName: 'Wanjiru Kamau',
+      targetTitles: ['Data Analyst', 'BI Developer'],
+      isRemoteOk: false,
+      skills: ['SQL'],
+    });
+  });
+
+  it('lets the person leave the questions for the full form, keeping what was read', async () => {
+    stubApi({
+      'GET /v1/profile': { data: null },
+      'GET /v1/meta': META,
+      'POST /v1/profile/import': IMPORT,
+    });
+    const user = userEvent.setup();
+    renderApp(<ProfilePage />);
+    await importCv(user);
+
+    await user.click(await screen.findByRole('button', { name: 'Edit everything in one form' }));
+
+    expect(await screen.findByLabelText('Full name')).toHaveProperty('value', 'Wanjiru Kamau');
+    expect(screen.getByLabelText('Roles you want')).toHaveProperty('value', 'Data Analyst');
+    expect(screen.getByText(/A few things to confirm/)).toBeTruthy();
   });
 
   it("reads the CV from the desktop clipboard when desktop assist is on, and shows the server's reason on failure", async () => {
