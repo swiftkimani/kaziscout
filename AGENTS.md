@@ -46,6 +46,8 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
 - **Every job links back** to its original posting and names its board.
 - **No model lock-in.** AI features must work with any OpenAI-compatible server, including local
   ones, and the product must stay fully usable with no model at all.
+- **A CV import drafts; the person confirms.** `POST /v1/profile/import` never saves. Contact
+  details are copied from the CV text by pattern, not taken from a model's reply.
 - **AI-written documents reword, never invent.** Keep that rule in the prompt in
   `server/src/services/documents.ts`; nothing may be written that is not in the person's CV.
 - **Never listen beyond loopback without `ACCESS_TOKEN`.** The startup check in `main.ts` stays.

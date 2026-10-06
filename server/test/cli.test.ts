@@ -38,10 +38,18 @@ const boards: Board[] = [
 let db: Db;
 let app: FastifyInstance;
 
+/** Answers the CLI's questions in order; tests set it to play the person at the keyboard. */
+let answers: string[] | undefined;
+
 async function kazi(...argv: string[]): Promise<{ code: number; out: string; err: string }> {
   const out: string[] = [];
   const err: string[] = [];
-  const code = await runCli(argv, app, { out: (l) => out.push(l), err: (l) => err.push(l) });
+  const queue = answers;
+  const code = await runCli(argv, app, {
+    out: (l) => out.push(l),
+    err: (l) => err.push(l),
+    ask: queue ? () => Promise.resolve(queue.shift() ?? '') : undefined,
+  });
   return { code, out: out.join('\n'), err: err.join('\n') };
 }
 
@@ -51,6 +59,7 @@ async function firstJobId(): Promise<string> {
 }
 
 beforeEach(async () => {
+  answers = undefined;
   db = openDb(':memory:');
   migrate(db);
   app = await buildApp({
@@ -204,6 +213,32 @@ describe('kazi', () => {
       code: 1,
       err: 'An assessment needs --score, --verdict and --model.',
     });
+  });
+
+  it('sets up the profile from a CV file by asking follow-up questions', async () => {
+    const cvPath = new URL('./fixtures/sample-cv.pdf', import.meta.url).pathname;
+    // Roles typed in; countries and remote accepted as suggested by pressing Enter.
+    answers = ['Data Analyst, BI Developer', '', ''];
+
+    const result = await kazi('cv', cvPath);
+    const profile = await kazi('profile');
+
+    expect(result.out).toContain('Name:      Wanjiru Kamau');
+    expect(result.out).toContain('Profile saved.');
+    expect(profile.out).toContain('Roles:     Data Analyst, BI Developer');
+    expect(profile.out).toContain('Countries: KE · open to remote');
+    expect(profile.out).toContain('Contact:   wanjiru.kamau@example.com · +254 712 345 678');
+  });
+
+  it('saves what the CV states and lists the open questions when no one can be asked', async () => {
+    const cvPath = new URL('./fixtures/sample-cv.txt', import.meta.url).pathname;
+
+    const result = await kazi('cv', cvPath);
+
+    expect(result.code).toBe(0);
+    expect(result.out).toContain('Profile saved.');
+    expect(result.out).toContain('Which job titles are you looking for?');
+    expect(result.out).toContain('--roles "Job Title, Another"');
   });
 
   it('saves a job to the tracker and lists it', async () => {

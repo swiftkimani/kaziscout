@@ -14,13 +14,17 @@ for the full list.
 
 ## First run
 
-1. `./kazi profile`. If it says there is no profile, ask the person for their name, the job
-   titles they want, their main skills, the countries they can work in (two-letter codes) and
-   whether remote work suits them, then:
-   `./kazi profile --name "…" --roles "A, B" --skills "X, Y" --countries KE`
-2. Ask for their CV as a text or Markdown file and load it: `./kazi profile --cv-file path/to/cv.md`.
+1. `./kazi profile`. If there is a profile with a CV, skip to step 4.
+2. Ask the person where their CV is (PDF, Word, text or Markdown) and run `./kazi cv <path>`.
+   It saves what the CV states and prints the questions the CV left open.
+3. **Ask the person those follow-up questions**, one at a time, in your own words: the job
+   titles they want (suggest some from the CV), the countries they can work in, and whether
+   remote work suits them. Save each answer:
+   `./kazi profile --roles "A, B" --countries KE,UG` (add `--onsite-only` if they do not want
+   remote work). Read the CV yourself with `./kazi profile --show-cv` and ask about anything
+   else that would change which jobs fit, such as seniority or fields they want to avoid.
    Without a CV you can rank jobs but you cannot assess them properly; say so.
-3. `./kazi scan` reads every source. It takes about a minute.
+4. `./kazi scan` reads every source. It takes about a minute.
 
 ## What the person asks for, and what you do
 

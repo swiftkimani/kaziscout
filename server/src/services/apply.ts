@@ -10,6 +10,7 @@ import type { Profile } from '../scoring/types.js';
  */
 export interface DesktopAssistant {
   copyToClipboard(text: string): Promise<void>;
+  readClipboard(): Promise<string>;
   close(): Promise<void>;
 }
 

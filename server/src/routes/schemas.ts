@@ -32,6 +32,17 @@ export const evaluateBody = z.object({
   evaluator: z.enum(['heuristic', 'ai']).default('heuristic'),
 });
 
+/** A CV to import: an uploaded file, pasted text, or the desktop clipboard. */
+export const cvImportBody = z.union([
+  z.object({
+    filename: z.string().trim().min(1).max(200),
+    // Base64 of the file. Ten megabytes of file is about 13.4 million characters.
+    contentBase64: z.string().min(1).max(14_000_000),
+  }),
+  z.object({ text: z.string().min(1).max(100_000) }),
+  z.object({ clipboard: z.literal(true) }),
+]);
+
 export const addJobBody = z.object({ url: z.string().trim().min(1).max(2000) });
 
 /** An assessment written by an outside agent. Same shape the built-in AI evaluator must return. */

@@ -1,3 +1,4 @@
+import { createInterface } from 'node:readline/promises';
 import { buildApp } from './app.js';
 import { loadBoards } from './boards/registry.js';
 import { runCli } from './cli/run.js';
@@ -23,10 +24,17 @@ const db = openDb(config.DATABASE_PATH);
 migrate(db);
 const app = await buildApp({ config, db, boards: loadBoards() });
 
+// Questions are only asked when a person is at the keyboard; scripts and AI tools get a list.
+const prompt = process.stdin.isTTY
+  ? createInterface({ input: process.stdin, output: process.stdout })
+  : undefined;
+
 const exitCode = await runCli(process.argv.slice(2), app, {
   out: (line) => process.stdout.write(`${line}\n`),
   err: (line) => process.stderr.write(`${line}\n`),
+  ask: prompt ? (question) => prompt.question(question) : undefined,
 });
+prompt?.close();
 await app.close();
 db.close();
 process.exitCode = exitCode;

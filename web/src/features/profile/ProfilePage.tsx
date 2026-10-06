@@ -1,12 +1,9 @@
-import { useState, type FormEvent } from 'react';
-import { ApiError } from '../../api/client';
-import { useMeta, useProfile, useSaveProfile } from '../../api/queries';
-import type { Profile } from '../../api/types';
-import { Button } from '../../components/ui/Button';
+import { useState } from 'react';
+import { useProfile } from '../../api/queries';
+import type { CvImport, FollowUpQuestion, Profile } from '../../api/types';
 import { ErrorState, Skeleton } from '../../components/ui/Feedback';
-import { Checkbox, TextAreaField, TextField } from '../../components/ui/Field';
-import { useToast } from '../../components/ui/Toast';
-import { CountryPicker } from './CountryPicker';
+import { ImportCvPanel } from './ImportCvPanel';
+import { ProfileForm } from './ProfileForm';
 
 const EMPTY_PROFILE: Profile = {
   fullName: '',
@@ -20,118 +17,38 @@ const EMPTY_PROFILE: Profile = {
   isRemoteOk: true,
 };
 
-function splitList(text: string): string[] {
-  return text
-    .split(/[,\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function ProfileForm({ initial }: { initial: Profile }) {
-  const meta = useMeta();
-  const save = useSaveProfile();
-  const toast = useToast();
-  const [profile, setProfile] = useState(initial);
-  // Lists are edited as free text and split on save, so typing a comma doesn't fight the cursor.
-  const [skillsText, setSkillsText] = useState(initial.skills.join(', '));
-  const [titlesText, setTitlesText] = useState(initial.targetTitles.join('\n'));
-  const [nameError, setNameError] = useState('');
-
-  const fieldErrors = save.error instanceof ApiError ? save.error.fieldErrors : {};
-  const validateName = (name: string) => setNameError(name.trim() ? '' : 'Enter your name');
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    if (!profile.fullName.trim()) return validateName(profile.fullName);
-    save.mutate(
-      { ...profile, skills: splitList(skillsText), targetTitles: splitList(titlesText) },
-      {
-        onSuccess: (result) => toast.success(`Profile saved. ${result.rescored} jobs re-scored.`),
-        onError: (error) => toast.error(error, "Couldn't save your profile. Try again."),
-      },
-    );
-  };
-
+/** The questions a CV import left open, shown above the form that answers them. */
+function FollowUps({ result }: { result: CvImport }) {
   return (
-    <form className="stack form" onSubmit={submit} noValidate>
-      <TextField
-        label="Full name"
-        autoComplete="name"
-        value={profile.fullName}
-        error={nameError || fieldErrors.fullName}
-        onChange={(event) => setProfile({ ...profile, fullName: event.target.value })}
-        onBlur={(event) => validateName(event.target.value)}
-      />
-      <TextField
-        label="Email address"
-        type="email"
-        autoComplete="email"
-        hint="Optional. Goes into your application pack so forms can be filled in."
-        value={profile.email}
-        error={fieldErrors.email}
-        onChange={(event) => setProfile({ ...profile, email: event.target.value })}
-      />
-      <TextField
-        label="Phone number"
-        type="tel"
-        autoComplete="tel"
-        hint="Optional. Include the country code, for example +254 712 345 678."
-        value={profile.phone}
-        error={fieldErrors.phone}
-        onChange={(event) => setProfile({ ...profile, phone: event.target.value })}
-      />
-      <TextField
-        label="Headline"
-        hint="One line on what you do, for example: Full-stack developer, 3 years."
-        value={profile.headline}
-        error={fieldErrors.headline}
-        onChange={(event) => setProfile({ ...profile, headline: event.target.value })}
-      />
-      <TextAreaField
-        label="Roles you want"
-        hint="One job title per line. Jobs with similar titles score higher."
-        rows={3}
-        value={titlesText}
-        error={fieldErrors.targetTitles}
-        onChange={(event) => setTitlesText(event.target.value)}
-      />
-      <TextAreaField
-        label="Skills"
-        hint="Separate with commas. Jobs that mention them score higher."
-        rows={3}
-        value={skillsText}
-        error={fieldErrors.skills}
-        onChange={(event) => setSkillsText(event.target.value)}
-      />
-      <CountryPicker
-        meta={meta.data}
-        selected={profile.countries}
-        onChange={(countries) => setProfile((current) => ({ ...current, countries }))}
-      />
-      <Checkbox
-        label="I'm open to remote work"
-        checked={profile.isRemoteOk}
-        onChange={(event) => setProfile({ ...profile, isRemoteOk: event.target.checked })}
-      />
-      <TextAreaField
-        label="CV"
-        hint="Paste your CV as plain text. It stays on this computer unless you ask an AI model to assess a job."
-        rows={12}
-        value={profile.cvText}
-        error={fieldErrors.cvText}
-        onChange={(event) => setProfile({ ...profile, cvText: event.target.value })}
-      />
-      <div>
-        <Button type="submit" variant="primary" isBusy={save.isPending}>
-          {save.isPending ? 'Saving profile' : 'Save profile'}
-        </Button>
-      </div>
-    </form>
+    <section className="panel followups" aria-labelledby="followups-heading" role="status">
+      <h2 id="followups-heading">
+        Read your CV {result.readBy === 'ai' ? 'with the AI model' : ''}. A few things to confirm
+      </h2>
+      <ul className="points">
+        {result.questions.map(({ field, question, suggestion }: FollowUpQuestion) => (
+          <li key={field}>
+            {question}
+            {suggestion && <span className="muted"> Suggested: {suggestion}</span>}
+          </li>
+        ))}
+      </ul>
+      <p className="muted">Check the fields below, answer these, then save.</p>
+    </section>
   );
 }
 
 export function ProfilePage() {
   const profile = useProfile();
+  // Each import gets a number so the form below is rebuilt from the new draft.
+  const [imported, setImported] = useState<{ result: CvImport; count: number } | null>(null);
+
+  const draftOver = (saved: Profile | null): Profile => {
+    if (!imported) return saved ?? EMPTY_PROFILE;
+    const { draft } = imported.result;
+    // Roles are the person's choice, so ones already saved outlive a new CV that suggests none.
+    const keepRoles = draft.targetTitles.length === 0 && saved;
+    return keepRoles ? { ...draft, targetTitles: saved.targetTitles } : draft;
+  };
 
   return (
     <div className="stack">
@@ -149,7 +66,17 @@ export function ProfilePage() {
       {profile.isError && (
         <ErrorState error={profile.error} onRetry={() => void profile.refetch()} />
       )}
-      {profile.isSuccess && <ProfileForm initial={profile.data ?? EMPTY_PROFILE} />}
+      {profile.isSuccess && (
+        <>
+          <ImportCvPanel
+            onImported={(result) =>
+              setImported((previous) => ({ result, count: (previous?.count ?? 0) + 1 }))
+            }
+          />
+          {imported && <FollowUps result={imported.result} />}
+          <ProfileForm key={imported?.count ?? 0} initial={draftOver(profile.data)} />
+        </>
+      )}
     </div>
   );
 }

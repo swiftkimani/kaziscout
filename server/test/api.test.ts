@@ -67,6 +67,9 @@ class FakeDesktop implements DesktopAssistant {
     this.clipboard = text;
     return Promise.resolve();
   }
+  readClipboard(): Promise<string> {
+    return Promise.resolve(this.clipboard);
+  }
   close(): Promise<void> {
     return Promise.resolve();
   }
@@ -78,12 +81,14 @@ class FakeAi implements AiClient {
   requests: GenerateRequest<unknown>[] = [];
   generate<T>(request: GenerateRequest<T>): Promise<T> {
     this.requests.push(request);
-    return Promise.resolve(
-      request.schema.parse({
-        coverLetter: 'Dear hiring team at Solvo Global,',
-        tailoredCv: '# Wanjiru Kamau',
-      }),
-    );
+    const reply = request.schema.safeParse({
+      coverLetter: 'Dear hiring team at Solvo Global,',
+      tailoredCv: '# Wanjiru Kamau',
+    });
+    // Like the real clients, a reply that does not fit the requested shape is an upstream error.
+    return reply.success
+      ? Promise.resolve(reply.data)
+      : Promise.reject(new UpstreamError('fake-model returned a reply that could not be read.'));
   }
 }
 
@@ -494,6 +499,50 @@ describe('jobs added by hand and assessed from outside', () => {
       method: 'PUT',
       url: `/v1/jobs/${jobId}/evaluation`,
       payload: { score: 4, model: 'terminal-agent' },
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+});
+
+describe('CV import', () => {
+  const cvBytes = readFileSync(new URL('./fixtures/sample-cv.pdf', import.meta.url));
+
+  it('drafts a profile from an uploaded PDF without saving it', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/profile/import',
+      payload: { filename: 'cv.pdf', contentBase64: cvBytes.toString('base64') },
+    });
+    const saved = await app.inject({ method: 'GET', url: '/v1/profile' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      data: {
+        draft: { fullName: 'Wanjiru Kamau', email: 'wanjiru.kamau@example.com', countries: ['KE'] },
+        questions: expect.arrayContaining([expect.objectContaining({ field: 'targetTitles' })]),
+      },
+    });
+    expect(saved.json()).toEqual({ data: null });
+  });
+
+  it('reads the CV from the clipboard when asked to', async () => {
+    desktop.clipboard = readFileSync(new URL('./fixtures/sample-cv.txt', import.meta.url), 'utf8');
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/profile/import',
+      payload: { clipboard: true },
+    });
+
+    expect(response.json()).toMatchObject({ data: { draft: { fullName: 'Wanjiru Kamau' } } });
+  });
+
+  it('rejects a file type it cannot read', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/profile/import',
+      payload: { filename: 'cv.pages', contentBase64: 'AAAA' },
     });
 
     expect(response.statusCode).toBe(400);

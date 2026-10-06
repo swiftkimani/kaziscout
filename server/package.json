@@ -5,7 +5,7 @@
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "dev": "tsx watch --env-file-if-exists=../.env src/main.ts",
+    "dev": "tsx watch --env-file-if-exists=../.env src/main.ts --dev",
     "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
     "start": "node --env-file-if-exists=../.env dist/main.js",
     "test": "vitest run",
@@ -23,7 +23,9 @@
     "fast-xml-parser": "^5.11.2",
     "fastify": "^5.12.5",
     "linkedom": "^0.18.13",
+    "mammoth": "^1.13.0",
     "turndown": "^7.2.4",
+    "unpdf": "^1.8.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {

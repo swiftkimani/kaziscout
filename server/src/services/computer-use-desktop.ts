@@ -31,6 +31,13 @@ export class ComputerUseDesktop implements DesktopAssistant {
     assertOk(await client.writeClipboard(text), 'write to the clipboard');
   }
 
+  async readClipboard(): Promise<string> {
+    const client = await this.connect();
+    const result = await client.readClipboard();
+    assertOk(result, 'read the clipboard');
+    return result.content.find((block) => block.type === 'text')?.text ?? '';
+  }
+
   async close(): Promise<void> {
     if (!this.client) return;
     const client = await this.client;

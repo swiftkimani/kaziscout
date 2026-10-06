@@ -380,6 +380,12 @@
   column-gap: var(--space-4);
 }
 
+.followups {
+  max-width: var(--measure);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 .country-picker {
   display: flex;
   flex-direction: column;
