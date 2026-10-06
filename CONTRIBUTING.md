@@ -30,9 +30,13 @@ regenerated `docs/BOARDS.md` with your change.
 ## Licence of contributions
 
 KaziScout is licensed under AGPL-3.0-or-later and the maintainer also offers commercial licences
-(see [NOTICE](NOTICE) and [ADR-0005](docs/adr/0005-agpl-licence.md)). The contributor agreement
-that makes this possible is not written yet. Until it is, please open an issue before starting
-work on anything large, so your effort is not left waiting on it.
+(see [NOTICE](NOTICE) and [ADR-0005](docs/adr/0005-agpl-licence.md)). So that both stay possible,
+contributors agree to the [Contributor Licence Agreement](CLA.md). You keep your copyright; you
+grant the maintainer the right to license your contribution.
+
+To agree, add this line to the description of your first pull request:
+
+> I have read the KaziScout Contributor Licence Agreement (CLA.md, version 0.1) and I agree to it.
 
 ## Reporting a security problem
 
