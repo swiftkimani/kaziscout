@@ -113,3 +113,17 @@ export interface ApplicationDocuments {
   model: string;
   createdAt: string;
 }
+
+export interface FollowUpQuestion {
+  field: keyof Profile;
+  question: string;
+  suggestion?: string;
+}
+
+/** A profile drafted from a CV, with the questions the CV left open. Not saved yet. */
+export interface CvImport {
+  draft: Profile;
+  questions: FollowUpQuestion[];
+  readBy: 'ai' | 'rules';
+  characters: number;
+}
