@@ -44,6 +44,28 @@ describe('pageToMarkdown', () => {
   });
 });
 
+describe('pageToMarkdown on pages with consent banners', () => {
+  const BANNER_PAGE = `<html><head><title>Product Manager - Acme</title></head><body>
+<a href="#main-content">Skip to main content</a>
+<div class="cookie-banner" role="dialog"><h2>This website uses cookies to ensure you get the best experience.</h2>
+<p>Acme and our selected partners use cookies and similar technologies that are necessary to present this website, and to ensure you get the best experience of it. If you consent to it, we will also use cookies for analytics purposes.</p>
+<p>You can withdraw and manage your consent at any time, by clicking Manage cookies at the bottom of each website page.</p></div>
+<div id="main-content"><h1>Product Manager</h1>
+<p>Our client is looking for a Product Manager to join their growth team, reporting to the Head of Product, and to shape the tools that partners rely on every day.</p>
+<h2>Requirements</h2><ul><li>Three years in product</li><li>Comfortable reading JavaScript</li></ul>
+<p>You will work closely with design, engineering and analytics to define requirements, support discovery and deliver features that help partners manage their inventory.</p></div>
+</body></html>`;
+
+  it('drops the cookie banner and skip link and keeps the posting', () => {
+    const markdown = pageToMarkdown(BANNER_PAGE);
+
+    expect(markdown).toContain('Our client is looking for a Product Manager');
+    expect(markdown).toContain('- Three years in product');
+    expect(markdown).not.toMatch(/cookie/i);
+    expect(markdown).not.toContain('Skip to main content');
+  });
+});
+
 describe('htmlToText', () => {
   it('flattens markup to one line of plain text', () => {
     expect(htmlToText('<p>Hello <b>world</b></p><ul><li><a href="/x">Apply</a></li></ul>')).toBe(
