@@ -3,6 +3,12 @@ import { loadBoards } from './boards/registry.js';
 import { loadConfig } from './config.js';
 import { migrate, openDb } from './db/client.js';
 
+// "pnpm dev" passes --dev. On your own machine, desktop assist (clipboard through
+// computer-use-mcp) is on unless you have set DESKTOP_ASSIST_ENABLED yourself.
+if (process.argv.includes('--dev') && process.env.DESKTOP_ASSIST_ENABLED === undefined) {
+  process.env.DESKTOP_ASSIST_ENABLED = 'true';
+}
+
 const config = loadConfig();
 
 const LOOPBACK_HOSTS = new Set(['127.0.0.1', '::1', 'localhost']);

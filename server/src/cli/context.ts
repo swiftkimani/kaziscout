@@ -4,6 +4,8 @@ import type { parseArgs } from 'node:util';
 export interface CliIo {
   out: (line: string) => void;
   err: (line: string) => void;
+  /** Asks the person a question and returns what they type. Absent when no one is there to ask. */
+  ask?: (question: string) => Promise<string>;
 }
 
 /** A problem to show the person as one line, with a non-zero exit code. */
