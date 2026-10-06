@@ -58,7 +58,8 @@ These need something only the owner can supply.
    ReliefWeb provider.
 5. Try the agent skill on one real application form, with the owner watching.
 
-Can be done by anyone:
+Can be done by anyone (a longer list of automation and interface ideas is in
+`docs/ROADMAP.md`):
 
 6. Expose KaziScout's own tools as an MCP server so agents need no HTTP calls.
 7. More source types from career-ops, each verified against a real employer first.
