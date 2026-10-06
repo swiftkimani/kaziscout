@@ -11,6 +11,8 @@ export interface RawJob {
   /** Body as the board supplies it; HTML or plain text. */
   bodyHtml: string;
   postedAt?: Date;
+  /** When applications close, if the source states it. */
+  closesAt?: Date;
   isRemote: boolean;
 }
 

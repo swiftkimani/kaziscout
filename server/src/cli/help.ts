@@ -2,6 +2,8 @@ export const HELP = `KaziScout in the terminal
 
 Usage: ./kazi <command> [options]
 
+  today                  What needs you today: new matches, closing soon, follow-ups
+  gaps                   Skills most often asked for in jobs you nearly match
   scan [board-id]        Scan every source, or one board
   jobs                   List jobs, best fit first
       --search <text>    Match title or company
@@ -18,6 +20,11 @@ Usage: ./kazi <command> [options]
   pack <job-id>          The application pack for a job
   track <job-id>         Save a job to the tracker
   tracker                What you are tracking, by status
+  hide <job-id>          Dismiss a job so it leaves your lists (unhide <job-id> restores it)
+  follow <job-link>      Follow the employer behind a job link (Greenhouse, Lever, Ashby,
+                         Workable, SmartRecruiters, Workday, Recruitee, Teamtailor)
+  unfollow <source-id>   Stop following an employer
+  find-feed <board-url>  Look for a public feed on a job board (for adding boards)
   boards                 Sources and their status
       --scanned          Only the ones scanned automatically
   md <url>               Convert a web page to Markdown

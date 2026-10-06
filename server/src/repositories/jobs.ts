@@ -14,11 +14,14 @@ export interface Job {
   summary: string;
   descriptionMd?: string;
   postedAt?: string;
+  closesAt?: string;
   listedAt: string;
   firstSeenAt: string;
   score?: number;
   evaluation?: Evaluation;
   evaluatedAt?: string;
+  /** True once the person has dismissed the job. */
+  isHidden: boolean;
 }
 
 export interface NewJob {
@@ -33,6 +36,7 @@ export interface NewJob {
   summary: string;
   descriptionMd?: string;
   postedAt?: Date;
+  closesAt?: Date;
 }
 
 export interface JobFilter {
@@ -41,6 +45,10 @@ export interface JobFilter {
   countryCode?: string;
   isRemote?: boolean;
   minScore?: number;
+  /** 'visible' (the default) leaves hidden jobs out; 'hidden' lists only those. */
+  visibility?: 'visible' | 'hidden';
+  /** Leave out jobs already in the tracker, for triage. */
+  untrackedOnly?: boolean;
   sort: 'newest' | 'score';
   limit: number;
   cursor?: string;
@@ -52,7 +60,7 @@ export interface JobPage {
 }
 
 const JOB_COLUMNS = `id, board_id, title, company, location, country_code, is_remote, url, summary,
-  description_md, posted_at, listed_at, first_seen_at, score, evaluation_json, evaluated_at`;
+  description_md, posted_at, closes_at, listed_at, first_seen_at, score, evaluation_json, evaluated_at, hidden_at`;
 
 type Row = Record<string, unknown>;
 
@@ -74,12 +82,25 @@ function toJob(row: Row): Job {
     summary: String(row.summary),
     descriptionMd: optional(row.description_md),
     postedAt: optional(row.posted_at),
+    closesAt: optional(row.closes_at),
     listedAt: String(row.listed_at),
     firstSeenAt: String(row.first_seen_at),
     score: typeof row.score === 'number' ? row.score : undefined,
     evaluation: evaluationJson ? (JSON.parse(evaluationJson) as Evaluation) : undefined,
     evaluatedAt: optional(row.evaluated_at),
+    isHidden: row.hidden_at !== null,
   };
+}
+
+/**
+ * A key that is equal for two postings of the same role: the title and company with case,
+ * punctuation and spacing removed. Undefined without a company, because a bare title such as
+ * "Accountant" is shared by unrelated jobs.
+ */
+export function matchKey(title: string, company: string | undefined): string | undefined {
+  const squash = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const employer = squash(company ?? '');
+  return employer ? `${squash(title)}|${employer}` : undefined;
 }
 
 /** Stable id for a posting, so re-scanning a board updates rows instead of duplicating them. */
@@ -115,13 +136,16 @@ export class JobRepository {
     this.db
       .prepare(
         `INSERT INTO jobs (id, board_id, external_id, title, company, location, country_code,
-           is_remote, url, summary, description_md, posted_at, first_seen_at, last_seen_at, listed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           is_remote, url, summary, description_md, posted_at, first_seen_at, last_seen_at, listed_at,
+           closes_at, match_key)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT (id) DO UPDATE SET
            title = excluded.title, company = excluded.company, location = excluded.location,
            country_code = excluded.country_code, is_remote = excluded.is_remote,
            url = excluded.url, summary = excluded.summary,
            description_md = COALESCE(excluded.description_md, jobs.description_md),
+           closes_at = COALESCE(excluded.closes_at, jobs.closes_at),
+           match_key = excluded.match_key,
            last_seen_at = excluded.last_seen_at`,
       )
       .run(
@@ -140,6 +164,8 @@ export class JobRepository {
         seenAt,
         seenAt,
         postedAt ?? seenAt,
+        job.closesAt?.toISOString() ?? null,
+        matchKey(job.title, job.company) ?? null,
       );
     return { id, isNew: existing === undefined };
   }
@@ -151,8 +177,13 @@ export class JobRepository {
 
   /** Keyset-paginated listing; the cursor carries the sort value and id of the last row. */
   list(filter: JobFilter): JobPage {
-    const where: string[] = [];
+    const where: string[] = [
+      filter.visibility === 'hidden' ? 'hidden_at IS NOT NULL' : 'hidden_at IS NULL',
+      // A role posted on several boards is listed once, as the copy seen first.
+      'duplicate_of IS NULL',
+    ];
     const params: (string | number)[] = [];
+    if (filter.untrackedOnly) where.push('id NOT IN (SELECT job_id FROM applications)');
     const sortColumn = filter.sort === 'score' ? 'COALESCE(score, 0)' : 'listed_at';
 
     if (filter.search) {
@@ -215,8 +246,108 @@ export class JobRepository {
       .run(evaluation.score, JSON.stringify(evaluation), now.toISOString(), id);
   }
 
+  /**
+   * Points each of the given jobs at an earlier posting of the same role on another board, when
+   * there is one. Returns how many were marked as duplicates.
+   */
+  markDuplicates(jobIds: string[]): number {
+    const findOriginal = this.db.prepare(
+      `SELECT o.id FROM jobs j JOIN jobs o
+         ON o.match_key = j.match_key AND o.id <> j.id AND o.board_id <> j.board_id
+        AND o.duplicate_of IS NULL
+       WHERE j.id = ? AND j.match_key IS NOT NULL AND j.duplicate_of IS NULL
+       ORDER BY o.first_seen_at, o.id LIMIT 1`,
+    );
+    const mark = this.db.prepare('UPDATE jobs SET duplicate_of = ? WHERE id = ?');
+    let marked = 0;
+    for (const id of jobIds) {
+      const original = findOriginal.get(id);
+      if (!original) continue;
+      mark.run(String(original.id), id);
+      marked += 1;
+    }
+    return marked;
+  }
+
+  /** The other boards carrying the same role as this job. */
+  listCopiesOf(id: string): { boardId: string; url: string }[] {
+    return this.db
+      .prepare('SELECT board_id, url FROM jobs WHERE duplicate_of = ? ORDER BY board_id')
+      .all(id)
+      .map((row) => ({ boardId: String(row.board_id), url: String(row.url) }));
+  }
+
+  /** Hides or restores a job. Returns false when there is no such job. */
+  setHidden(id: string, isHidden: boolean, now: Date): boolean {
+    return (
+      this.db
+        .prepare('UPDATE jobs SET hidden_at = ? WHERE id = ?')
+        .run(isHidden ? now.toISOString() : null, id).changes > 0
+    );
+  }
+
   saveDescription(id: string, markdown: string): void {
     this.db.prepare('UPDATE jobs SET description_md = ? WHERE id = ?').run(markdown, id);
+  }
+
+  /** Strong matches first seen since `since`, best first. */
+  listNewStrong(since: Date, minScore: number, limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE first_seen_at >= ? AND score >= ? AND hidden_at IS NULL AND duplicate_of IS NULL
+         ORDER BY score DESC, id DESC LIMIT ?`,
+      )
+      .all(since.toISOString(), minScore, limit)
+      .map(toJob);
+  }
+
+  /** Jobs closing between two moments that are worth acting on: a fair match, or already tracked. */
+  listClosingSoon(from: Date, until: Date, minScore: number, limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE closes_at >= ? AND closes_at <= ? AND hidden_at IS NULL AND duplicate_of IS NULL
+           AND (score >= ? OR id IN (SELECT job_id FROM applications WHERE status = 'saved'))
+         ORDER BY closes_at, id LIMIT ?`,
+      )
+      .all(from.toISOString(), until.toISOString(), minScore, limit)
+      .map(toJob);
+  }
+
+  /** Visible jobs scoring from `min` up to but not including `max`, best first. */
+  listScoredBetween(min: number, max: number, limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE score >= ? AND score < ? AND hidden_at IS NULL AND duplicate_of IS NULL
+         ORDER BY score DESC, id DESC LIMIT ?`,
+      )
+      .all(min, max, limit)
+      .map(toJob);
+  }
+
+  /** How many jobs an AI model has assessed since `since`. */
+  countAiAssessedSince(since: Date): number {
+    const row = this.db
+      .prepare(
+        `SELECT COUNT(*) AS total FROM jobs
+         WHERE evaluated_at >= ? AND json_extract(evaluation_json, '$.evaluator') = 'ai'`,
+      )
+      .get(since.toISOString());
+    return Number(row?.total ?? 0);
+  }
+
+  /** Tracked jobs that state a closing date, soonest first. */
+  listTrackedWithDeadline(limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE closes_at IS NOT NULL AND id IN (SELECT job_id FROM applications)
+         ORDER BY closes_at, id LIMIT ?`,
+      )
+      .all(limit)
+      .map(toJob);
   }
 
   listCountryCodes(): string[] {

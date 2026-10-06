@@ -7,6 +7,7 @@ import { EvaluationPanel } from './EvaluationPanel';
 import { DocumentsPanel } from './DocumentsPanel';
 import { describePlace, formatListedAt } from './format';
 import { JobActions } from './JobActions';
+import { RequirementsPanel } from './RequirementsPanel';
 
 export function JobDetailPage() {
   const { id = '' } = useParams();
@@ -48,6 +49,13 @@ export function JobDetailPage() {
           <p className="row">
             <Badge>{board?.name ?? data.boardId}</Badge>
             {data.application && <Badge tone="info">In tracker: {data.application.status}</Badge>}
+            {(data.alsoOn ?? []).map((copy) => (
+              <a key={copy.boardId} href={copy.url} target="_blank" rel="noreferrer">
+                Also on{' '}
+                {boards.data?.find((candidate) => candidate.id === copy.boardId)?.name ??
+                  copy.boardId}
+              </a>
+            ))}
             <a href={data.url} target="_blank" rel="noreferrer" className="row">
               Open original posting
               <ExternalLink size={14} aria-hidden />
@@ -74,6 +82,7 @@ export function JobDetailPage() {
         </section>
         <div className="stack">
           <EvaluationPanel evaluation={data.evaluation} />
+          <RequirementsPanel requirements={data.requirements ?? []} />
           <DocumentsPanel jobId={data.id} aiModel={meta.data?.features.aiModel ?? null} />
         </div>
       </div>

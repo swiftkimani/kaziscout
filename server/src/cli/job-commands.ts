@@ -43,8 +43,17 @@ export const show: Command = async ({ io, need, call }) => {
     const { evaluator, model, verdict, strengths, gaps } = job.evaluation;
     const by = evaluator === 'ai' ? `assessed by ${model ?? 'AI'}` : 'keyword score';
     io.out(`\nFit ${formatScore(job.score)} of 5 (${by}): ${verdict}`);
+    const parts = job.evaluation.breakdown;
+    if (parts) {
+      const percent = (value: number) => `${Math.round(value * 100)}%`;
+      io.out(
+        `  title ${percent(parts.title)} · skills ${percent(parts.skills)} · location ${percent(parts.location)} · freshness ${percent(parts.freshness)}`,
+      );
+    }
+    for (const warning of job.evaluation.warnings ?? []) io.out(`  ! ${warning}`);
     for (const item of strengths) io.out(`  + ${item}`);
     for (const item of gaps) io.out(`  - ${item}`);
+    if (job.evaluation.advice) io.out(`  ${job.evaluation.advice}`);
   } else {
     io.out('\nNot scored yet. Create a profile to score jobs: ./kazi profile --name "Your Name" …');
   }
@@ -52,14 +61,21 @@ export const show: Command = async ({ io, need, call }) => {
 };
 
 export const add: Command = async ({ io, need, call }) => {
-  const { data: job } = await call<{ data: ApiJob }>('POST', '/v1/jobs', {
-    url: need('a posting link'),
-  });
+  const link = need('a posting link');
+  const { data: job, suggestedSource } = await call<{
+    data: ApiJob;
+    suggestedSource: { name: string; link: string } | null;
+  }>('POST', '/v1/jobs', { url: link });
   io.out(`Added: ${job.title}`);
   io.out(
     `Fit ${formatScore(job.score)} of 5${job.evaluation ? `: ${job.evaluation.verdict}` : ' (no profile yet)'}`,
   );
   io.out(`\nSee it with: ./kazi show ${job.id}`);
+  if (suggestedSource) {
+    io.out(
+      `\n${suggestedSource.name} posts its openings where KaziScout can read them.\nFollow all of them with: ./kazi follow ${link}`,
+    );
+  }
 };
 
 export const assess: Command = async ({ io, values, need, call }) => {
@@ -84,6 +100,16 @@ export const pack: Command = async ({ io, need, call }) => {
   const id = encodeURIComponent(need('a job id'));
   const { data } = await call<{ data: { pack: string } }>('GET', `/v1/jobs/${id}/application-pack`);
   io.out(data.pack);
+};
+
+export const hide: Command = async ({ io, need, call }) => {
+  await call('PUT', `/v1/jobs/${encodeURIComponent(need('a job id'))}/hidden`);
+  io.out('Hidden. It will not appear in your lists again. Undo with: ./kazi unhide <ID>');
+};
+
+export const unhide: Command = async ({ io, need, call }) => {
+  await call('DELETE', `/v1/jobs/${encodeURIComponent(need('a job id'))}/hidden`);
+  io.out('Restored to your lists.');
 };
 
 export const track: Command = async ({ io, need, call }) => {

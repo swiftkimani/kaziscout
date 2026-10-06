@@ -3,11 +3,14 @@ import { type Board, isScannable } from '../boards/registry.js';
 import { runInTransaction, type Db } from '../db/client.js';
 import { AppError, NotFoundError, ValidationError } from '../errors.js';
 import { fragmentToMarkdown, htmlToText } from '../extract/html-to-markdown.js';
+import { findClosingDate } from '../providers/closing-date.js';
 import { providerFor } from '../providers/index.js';
 import type { ProviderContext, RawJob } from '../providers/types.js';
 import type { BoardScan, BoardScanRepository } from '../repositories/board-scans.js';
 import type { JobRepository, NewJob } from '../repositories/jobs.js';
+import type { AutoAssessor } from './auto-assessor.js';
 import type { EvaluationService } from './evaluation.js';
+import type { PostingCompleter } from './posting-completer.js';
 
 const SUMMARY_LENGTH = 320;
 // Boards are independent sites, so a few can be read at once without burdening any one of them.
@@ -57,6 +60,7 @@ export function normaliseJob(board: Board, raw: RawJob): NewJob {
     summary: summarise(text),
     descriptionMd: fragmentToMarkdown(raw.bodyHtml) || undefined,
     postedAt: raw.postedAt,
+    closesAt: raw.closesAt ?? findClosingDate(text),
   };
 }
 
@@ -78,10 +82,15 @@ export class ScanService {
   constructor(
     private readonly deps: {
       db: Db;
-      boards: Board[];
+      /** Asked on every scan, so an employer followed a moment ago is included. */
+      boards: () => Board[];
       jobs: JobRepository;
       scans: BoardScanRepository;
       evaluation: EvaluationService;
+      /** Fetches full postings for promising jobs that arrive without a description. */
+      completer?: PostingCompleter;
+      /** Has the AI model assess new strong matches, within a daily limit. */
+      autoAssessor?: AutoAssessor;
       providerContext: ProviderContext;
       logger: ScanLogger;
       now?: () => Date;
@@ -98,7 +107,7 @@ export class ScanService {
   }
 
   private async scanOne(boardId: string): Promise<{ scan: BoardScan; newIds: string[] }> {
-    const board = this.deps.boards.find((candidate) => candidate.id === boardId);
+    const board = this.deps.boards().find((candidate) => candidate.id === boardId);
     if (!board) throw new NotFoundError('That board');
     const provider = providerFor(board);
     if (!provider || !isScannable(board)) {
@@ -119,7 +128,10 @@ export class ScanService {
           .filter((result) => result.isNew)
           .map((result) => result.id),
       );
+      this.deps.jobs.markDuplicates(newIds);
       await this.deps.evaluation.scoreNewJobs(newIds);
+      await this.deps.completer?.complete(newIds);
+      await this.deps.autoAssessor?.assess(newIds);
       scan = {
         boardId,
         startedAt: startedAt.toISOString(),
@@ -157,7 +169,7 @@ export class ScanService {
     const scans: BoardScan[] = [];
     const newJobIds: string[] = [];
     await runWithConcurrency(
-      this.deps.boards.filter(isScannable),
+      this.deps.boards().filter(isScannable),
       BOARD_CONCURRENCY,
       async (board) => {
         const result = await this.scanOne(board.id);

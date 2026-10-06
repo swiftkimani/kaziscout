@@ -75,6 +75,7 @@ export const BOARD = {
   status: 'live',
   checkedAt: '2026-10-06',
   isScannable: true,
+  isFollowed: false,
   jobCount: 2,
   lastScan: null,
 };
@@ -94,6 +95,7 @@ export const JOB = {
   evaluation: {
     score: 4.6,
     evaluator: 'heuristic',
+    breakdown: { title: 1, skills: 0.5, location: 1, freshness: 1 },
     verdict: 'Strong match. Worth applying.',
     strengths: ['Mentions React'],
     gaps: [],

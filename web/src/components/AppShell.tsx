@@ -1,8 +1,18 @@
-import { BriefcaseBusiness, FileText, Globe, KanbanSquare, UserRound } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  FileText,
+  Globe,
+  KanbanSquare,
+  ListChecks,
+  Sunrise,
+  UserRound,
+} from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useSession, useSignOut } from '../api/queries';
 
 const NAV_ITEMS = [
+  { to: '/today', label: 'Today', icon: Sunrise },
+  { to: '/review', label: 'Review', icon: ListChecks },
   { to: '/jobs', label: 'Jobs', icon: BriefcaseBusiness },
   { to: '/boards', label: 'Boards', icon: Globe },
   { to: '/tracker', label: 'Tracker', icon: KanbanSquare },
@@ -20,7 +30,7 @@ export function AppShell() {
         Skip to content
       </a>
       <aside className="shell__sidebar">
-        <NavLink to="/jobs" className="shell__brand">
+        <NavLink to="/today" className="shell__brand">
           <img src="/favicon.svg" alt="" width={32} height={32} />
           <span>KaziScout</span>
         </NavLink>

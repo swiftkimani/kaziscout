@@ -4,11 +4,15 @@ export interface Evaluation {
   score: number;
   evaluator: 'heuristic' | 'ai';
   model?: string;
+  /** Each part of the keyword score from 0 to 1. Absent on AI assessments. */
+  breakdown?: { title: number; skills: number; location: number; freshness: number };
   verdict: string;
   strengths: string[];
   gaps: string[];
   matchedSkills: string[];
   pitch?: string;
+  warnings?: string[];
+  advice?: string;
 }
 
 export const APPLICATION_STATUSES = [
@@ -44,13 +48,25 @@ export interface Job {
   summary: string;
   descriptionMd?: string;
   postedAt?: string;
+  /** When applications close, if the posting says. */
+  closesAt?: string;
   listedAt: string;
   score?: number;
   evaluation?: Evaluation;
+  isHidden?: boolean;
+}
+
+export interface Requirement {
+  skill: string;
+  inProfile: boolean;
 }
 
 export interface JobDetail extends Job {
   application: Application | null;
+  /** Skills the posting names, each marked as shown or not by the profile and CV. */
+  requirements?: Requirement[];
+  /** Other boards carrying this same role. */
+  alsoOn?: { boardId: string; url: string }[];
 }
 
 export interface BoardScan {
@@ -74,6 +90,8 @@ export interface Board {
   checkedAt: string;
   note?: string;
   isScannable: boolean;
+  /** An employer the person added, as opposed to one shipped in the registry. */
+  isFollowed: boolean;
   jobCount: number;
   lastScan: BoardScan | null;
 }
@@ -126,4 +144,20 @@ export interface CvImport {
   questions: FollowUpQuestion[];
   readBy: 'ai' | 'rules';
   characters: number;
+}
+
+export interface Today {
+  newStrong: Job[];
+  closingSoon: Job[];
+  followUps: Application[];
+  failedSources: { id: string; name: string; errorMessage: string }[];
+}
+
+export interface SkillGapReport {
+  gaps: {
+    skill: string;
+    jobs: number;
+    examples: { id: string; title: string; company?: string }[];
+  }[];
+  jobsConsidered: number;
 }

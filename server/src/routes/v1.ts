@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { AFRICAN_COUNTRIES, COUNTRIES } from '../boards/countries.js';
-import { type Board, isScannable } from '../boards/registry.js';
+import { isScannable } from '../boards/registry.js';
 import { NotFoundError } from '../errors.js';
 import type { ApplicationRepository } from '../repositories/applications.js';
 import type { BoardScanRepository } from '../repositories/board-scans.js';
@@ -10,8 +10,13 @@ import type { ApplyService } from '../services/apply.js';
 import type { CvImportService } from '../services/cv-import.js';
 import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
+import { toCalendar } from '../services/calendar.js';
+import type { FeedFinder } from '../services/feed-finder.js';
+import type { InsightService } from '../services/insights.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
+import type { SourceCatalog, SourceService } from '../services/sources.js';
+import type { TodayService } from '../services/today.js';
 import {
   addJobBody,
   applicationCreateBody,
@@ -28,7 +33,8 @@ import {
 } from './schemas.js';
 
 export interface RouteDeps {
-  boards: Board[];
+  catalog: SourceCatalog;
+  sourceService: SourceService;
   jobs: JobRepository;
   applications: ApplicationRepository;
   profiles: ProfileRepository;
@@ -39,6 +45,9 @@ export interface RouteDeps {
   applyService: ApplyService;
   documentService: DocumentService;
   cvImportService: CvImportService;
+  todayService: TodayService;
+  insightService: InsightService;
+  feedFinder: FeedFinder;
   /** Name of the configured AI model, if any. */
   aiModel?: string;
   now?: () => Date;
@@ -64,11 +73,16 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     },
   }));
 
+  app.get('/v1/today', () => ({ data: deps.todayService.get() }));
+
+  app.get('/v1/insights/skill-gaps', () => ({ data: deps.insightService.skillGaps() }));
+
   app.get('/v1/boards', () => {
     const lastScans = deps.scans.latestByBoard();
     const jobCounts = deps.jobs.countByBoard();
     return {
-      data: deps.boards.map((board) => ({
+      data: deps.catalog.all().map((board) => ({
+        isFollowed: deps.catalog.isFollowed(board.id),
         ...board,
         isScannable: isScannable(board),
         jobCount: jobCounts.get(board.id) ?? 0,
@@ -92,6 +106,8 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
       countryCode: query.country,
       isRemote: query.remote === undefined ? undefined : query.remote === 'true',
       minScore: query.minScore,
+      visibility: query.hidden === 'only' ? 'hidden' : 'visible',
+      untrackedOnly: query.untracked === 'true',
       sort: query.sort,
       limit: query.limit,
       cursor: query.cursor,
@@ -105,7 +121,30 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     void reply.code(201).header('location', `/v1/jobs/${job.id}`);
     // Score it straight away if there is a profile to score against.
     await deps.evaluationService.scoreNewJobs([job.id]);
-    return { data: deps.jobs.findById(job.id) };
+    return {
+      data: deps.jobs.findById(job.id),
+      // When the link is from a hiring system KaziScout reads, offer to follow that employer.
+      suggestedSource: deps.catalog.suggestFor(url) ?? null,
+    };
+  });
+
+  app.post('/v1/sources', EXPENSIVE, async (request, reply) => {
+    const { url } = parse(addJobBody, request.body);
+    void reply.code(201);
+    return { data: await deps.sourceService.follow(url) };
+  });
+
+  // Tries the usual feed addresses on a board. For maintainers adding a board to the registry.
+  app.post('/v1/sources/find-feed', EXPENSIVE, async (request) => {
+    const { url } = parse(addJobBody, request.body);
+    return { data: await deps.feedFinder.find(url) };
+  });
+
+  app.delete('/v1/sources/:id', (request, reply) => {
+    const { id } = parse(idParam, request.params);
+    deps.sourceService.unfollow(id);
+    void reply.code(204);
+    return null;
   });
 
   app.put('/v1/jobs/:id/evaluation', (request) => {
@@ -118,7 +157,27 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     const { id } = parse(idParam, request.params);
     const job = deps.jobs.findById(id);
     if (!job) throw new NotFoundError('That job');
-    return { data: { ...job, application: deps.applications.findByJobId(id) ?? null } };
+    return {
+      data: {
+        ...job,
+        application: deps.applications.findByJobId(id) ?? null,
+        requirements: deps.insightService.requirementsFor(job),
+        // Other boards carrying this same role.
+        alsoOn: deps.jobs.listCopiesOf(id),
+      },
+    };
+  });
+
+  app.put('/v1/jobs/:id/hidden', (request) => {
+    const { id } = parse(idParam, request.params);
+    if (!deps.jobs.setHidden(id, true, now())) throw new NotFoundError('That job');
+    return { data: deps.jobs.findById(id) };
+  });
+
+  app.delete('/v1/jobs/:id/hidden', (request) => {
+    const { id } = parse(idParam, request.params);
+    if (!deps.jobs.setHidden(id, false, now())) throw new NotFoundError('That job');
+    return { data: deps.jobs.findById(id) };
   });
 
   app.post('/v1/jobs/:id/evaluate', EXPENSIVE, async (request) => {
@@ -179,6 +238,12 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
         bytes: Buffer.from(body.contentBase64, 'base64'),
       }),
     };
+  });
+
+  // Closing dates of tracked jobs, for any calendar app to import or subscribe to.
+  app.get('/v1/calendar.ics', (_request, reply) => {
+    void reply.header('content-type', 'text/calendar; charset=utf-8');
+    return toCalendar(deps.jobs.listTrackedWithDeadline(TRACKER_PAGE_SIZE), now());
   });
 
   app.get('/v1/applications', () => ({ data: deps.applications.list(TRACKER_PAGE_SIZE) }));

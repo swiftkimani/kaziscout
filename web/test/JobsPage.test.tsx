@@ -86,6 +86,63 @@ describe('JobsPage', () => {
     ).toBeTruthy();
   });
 
+  it('adds a job from a link and offers to follow its employer', async () => {
+    const requests = stubApi({
+      ...base,
+      'GET /v1/jobs?sort=newest': { data: [], next_cursor: null },
+      'POST /v1/jobs': () => ({
+        status: 201,
+        json: {
+          data: { ...JOB, id: 'added', title: 'Data Engineer' },
+          suggestedSource: { name: 'Acme', link: 'https://job-boards.greenhouse.io/acme/jobs/1' },
+        },
+      }),
+      'POST /v1/sources': () => ({
+        status: 201,
+        json: {
+          data: { board: BOARD, scan: { boardId: 'x', outcome: 'ok', jobsFound: 12, jobsNew: 12 } },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    renderApp(<JobsPage />);
+
+    await user.type(
+      screen.getByLabelText('Add a job you found yourself'),
+      'https://job-boards.greenhouse.io/acme/jobs/1',
+    );
+    await user.click(screen.getByRole('button', { name: 'Add job' }));
+    await user.click(await screen.findByRole('button', { name: 'Follow all Acme openings' }));
+
+    expect(await screen.findByText('Following Acme: 12 openings found.')).toBeTruthy();
+    expect(requests.find((request) => request.path === '/v1/sources')?.body).toEqual({
+      url: 'https://job-boards.greenhouse.io/acme/jobs/1',
+    });
+  });
+
+  it("shows the server's reason when a link cannot be added", async () => {
+    stubApi({
+      ...base,
+      'GET /v1/jobs?sort=newest': { data: [], next_cursor: null },
+      'POST /v1/jobs': () => ({
+        status: 400,
+        json: {
+          error: {
+            code: 'UNSAFE_URL',
+            message: "That address can't be fetched: it is not a valid web address.",
+          },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    renderApp(<JobsPage />);
+
+    await user.type(screen.getByLabelText('Add a job you found yourself'), 'nope');
+    await user.click(screen.getByRole('button', { name: 'Add job' }));
+
+    expect(await screen.findByText(/not a valid web address/)).toBeTruthy();
+  });
+
   it('shows an error with a retry when the list cannot be loaded', async () => {
     stubApi({
       ...base,

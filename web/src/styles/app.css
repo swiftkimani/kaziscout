@@ -148,6 +148,41 @@
   border-top: var(--border-width) solid var(--border);
 }
 
+.triage__posting {
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.triage__actions {
+  position: sticky;
+  bottom: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-2);
+}
+
+kbd {
+  padding: var(--space-0) var(--space-1);
+  border: var(--border-width) solid currentcolor;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.today-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+}
+
 .job-card {
   display: flex;
   gap: var(--space-4);
@@ -256,6 +291,107 @@
   flex-direction: column;
   gap: var(--space-1);
   font-size: var(--text-sm);
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-0);
+  font-size: var(--text-sm);
+}
+
+.breakdown__row {
+  display: grid;
+  grid-template-columns: var(--space-16) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.breakdown__row dt {
+  color: var(--text-muted);
+}
+
+.breakdown__row dd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-0);
+}
+
+.breakdown__meter {
+  flex: 1;
+  min-width: 0;
+  height: var(--space-2);
+}
+
+.breakdown__value {
+  width: var(--space-8);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-align: right;
+}
+
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--filter-min), 1fr));
+  gap: var(--space-1) var(--space-4);
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checklist__met svg {
+  color: var(--success);
+}
+
+.checklist__missing {
+  color: var(--text-muted);
+}
+
+.gaps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.gaps__row {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--space-16), 1fr) minmax(var(--space-16), 2fr) var(--space-16)
+    minmax(0, 3fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gaps__skill {
+  font-weight: var(--weight-medium);
+}
+
+.gaps__count {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.gaps__example {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.warning-signs {
+  padding: var(--space-4);
 }
 
 .pitch {
@@ -473,6 +609,15 @@
 
   .shell__main {
     padding: var(--space-4);
+  }
+
+  .gaps__row {
+    grid-template-columns: minmax(0, 1fr) var(--space-16);
+  }
+
+  .gaps__row meter,
+  .gaps__example {
+    display: none;
   }
 
   .job-detail__columns,

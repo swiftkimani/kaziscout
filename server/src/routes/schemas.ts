@@ -20,6 +20,8 @@ export const jobListQuery = z.object({
   country: countryCode.optional(),
   remote: z.enum(['true', 'false']).optional(),
   minScore: z.coerce.number().min(1).max(5).optional(),
+  hidden: z.enum(['only']).optional(),
+  untracked: z.enum(['true']).optional(),
   sort: z.enum(['newest', 'score']).default('newest'),
   limit: z.coerce.number().int().min(1).max(100).default(30),
   cursor: z.string().max(300).optional(),

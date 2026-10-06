@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { useProfile } from '../../api/queries';
+import { useMeta, useProfile, useSaveProfile } from '../../api/queries';
 import type { CvImport, FollowUpQuestion, Profile } from '../../api/types';
 import { ErrorState, Skeleton } from '../../components/ui/Feedback';
+import { useToast } from '../../components/ui/Toast';
+import { GuidedSetup } from './GuidedSetup';
 import { ImportCvPanel } from './ImportCvPanel';
 import { ProfileForm } from './ProfileForm';
 
@@ -39,8 +41,34 @@ function FollowUps({ result }: { result: CvImport }) {
 
 export function ProfilePage() {
   const profile = useProfile();
+  const meta = useMeta();
+  const save = useSaveProfile();
+  const toast = useToast();
   // Each import gets a number so the form below is rebuilt from the new draft.
   const [imported, setImported] = useState<{ result: CvImport; count: number } | null>(null);
+  // After an import the questions are asked one at a time, until the person finishes or opts out.
+  const [isGuided, setIsGuided] = useState(false);
+
+  const finishSetup = (answered: Profile) =>
+    save.mutate(answered, {
+      onSuccess: (result) => {
+        toast.success(`Profile saved. ${result.rescored} jobs re-scored.`);
+        setImported(null);
+        setIsGuided(false);
+      },
+      onError: (error) => toast.error(error, "Couldn't save your profile. Try again."),
+    });
+
+  const useFullForm = (answered: Profile) => {
+    setImported(
+      (previous) =>
+        previous && {
+          result: { ...previous.result, draft: answered },
+          count: previous.count + 1,
+        },
+    );
+    setIsGuided(false);
+  };
 
   const draftOver = (saved: Profile | null): Profile => {
     if (!imported) return saved ?? EMPTY_PROFILE;
@@ -69,12 +97,26 @@ export function ProfilePage() {
       {profile.isSuccess && (
         <>
           <ImportCvPanel
-            onImported={(result) =>
-              setImported((previous) => ({ result, count: (previous?.count ?? 0) + 1 }))
-            }
+            onImported={(result) => {
+              setImported((previous) => ({ result, count: (previous?.count ?? 0) + 1 }));
+              setIsGuided(result.questions.length > 0);
+            }}
           />
-          {imported && <FollowUps result={imported.result} />}
-          <ProfileForm key={imported?.count ?? 0} initial={draftOver(profile.data)} />
+          {imported && isGuided ? (
+            <GuidedSetup
+              key={imported.count}
+              result={{ ...imported.result, draft: draftOver(profile.data) }}
+              meta={meta.data}
+              isSaving={save.isPending}
+              onFinish={finishSetup}
+              onUseFullForm={useFullForm}
+            />
+          ) : (
+            <>
+              {imported && <FollowUps result={imported.result} />}
+              <ProfileForm key={imported?.count ?? 0} initial={draftOver(profile.data)} />
+            </>
+          )}
         </>
       )}
     </div>
