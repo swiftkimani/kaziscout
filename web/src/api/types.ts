@@ -54,8 +54,15 @@ export interface Job {
   isHidden?: boolean;
 }
 
+export interface Requirement {
+  skill: string;
+  inProfile: boolean;
+}
+
 export interface JobDetail extends Job {
   application: Application | null;
+  /** Skills the posting names, each marked as shown or not by the profile and CV. */
+  requirements?: Requirement[];
 }
 
 export interface BoardScan {
@@ -140,4 +147,13 @@ export interface Today {
   closingSoon: Job[];
   followUps: Application[];
   failedSources: { id: string; name: string; errorMessage: string }[];
+}
+
+export interface SkillGapReport {
+  gaps: {
+    skill: string;
+    jobs: number;
+    examples: { id: string; title: string; company?: string }[];
+  }[];
+  jobsConsidered: number;
 }

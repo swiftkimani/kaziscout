@@ -332,6 +332,64 @@ kbd {
   text-align: right;
 }
 
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--filter-min), 1fr));
+  gap: var(--space-1) var(--space-4);
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checklist__met svg {
+  color: var(--success);
+}
+
+.checklist__missing {
+  color: var(--text-muted);
+}
+
+.gaps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.gaps__row {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--space-16), 1fr) minmax(var(--space-16), 2fr) var(--space-16)
+    minmax(0, 3fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gaps__skill {
+  font-weight: var(--weight-medium);
+}
+
+.gaps__count {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.gaps__example {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .pitch {
   padding: var(--space-3) var(--space-4);
   border-left: var(--focus-width) solid var(--accent);
@@ -547,6 +605,15 @@ kbd {
 
   .shell__main {
     padding: var(--space-4);
+  }
+
+  .gaps__row {
+    grid-template-columns: minmax(0, 1fr) var(--space-16);
+  }
+
+  .gaps__row meter,
+  .gaps__example {
+    display: none;
   }
 
   .job-detail__columns,

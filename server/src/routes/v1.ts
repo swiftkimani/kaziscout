@@ -10,6 +10,7 @@ import type { ApplyService } from '../services/apply.js';
 import type { CvImportService } from '../services/cv-import.js';
 import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
+import type { InsightService } from '../services/insights.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
 import type { SourceCatalog, SourceService } from '../services/sources.js';
@@ -43,6 +44,7 @@ export interface RouteDeps {
   documentService: DocumentService;
   cvImportService: CvImportService;
   todayService: TodayService;
+  insightService: InsightService;
   /** Name of the configured AI model, if any. */
   aiModel?: string;
   now?: () => Date;
@@ -69,6 +71,8 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
   }));
 
   app.get('/v1/today', () => ({ data: deps.todayService.get() }));
+
+  app.get('/v1/insights/skill-gaps', () => ({ data: deps.insightService.skillGaps() }));
 
   app.get('/v1/boards', () => {
     const lastScans = deps.scans.latestByBoard();
@@ -144,7 +148,13 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     const { id } = parse(idParam, request.params);
     const job = deps.jobs.findById(id);
     if (!job) throw new NotFoundError('That job');
-    return { data: { ...job, application: deps.applications.findByJobId(id) ?? null } };
+    return {
+      data: {
+        ...job,
+        application: deps.applications.findByJobId(id) ?? null,
+        requirements: deps.insightService.requirementsFor(job),
+      },
+    };
   });
 
   app.put('/v1/jobs/:id/hidden', (request) => {

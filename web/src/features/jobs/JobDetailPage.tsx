@@ -7,6 +7,7 @@ import { EvaluationPanel } from './EvaluationPanel';
 import { DocumentsPanel } from './DocumentsPanel';
 import { describePlace, formatListedAt } from './format';
 import { JobActions } from './JobActions';
+import { RequirementsPanel } from './RequirementsPanel';
 
 export function JobDetailPage() {
   const { id = '' } = useParams();
@@ -74,6 +75,7 @@ export function JobDetailPage() {
         </section>
         <div className="stack">
           <EvaluationPanel evaluation={data.evaluation} />
+          <RequirementsPanel requirements={data.requirements ?? []} />
           <DocumentsPanel jobId={data.id} aiModel={meta.data?.features.aiModel ?? null} />
         </div>
       </div>

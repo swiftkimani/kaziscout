@@ -43,6 +43,33 @@ describe('TodayPage', () => {
     expect(screen.getByText(/Couldn't reach www.novojob.com./)).toBeTruthy();
   });
 
+  it('shows the skills most often missing from near-miss jobs', async () => {
+    stubApi({
+      ...base,
+      'GET /v1/today': {
+        data: { newStrong: [JOB], closingSoon: [], followUps: [], failedSources: [] },
+      },
+      'GET /v1/insights/skill-gaps': {
+        data: {
+          gaps: [
+            { skill: 'PostgreSQL', jobs: 41, examples: [{ id: 'j9', title: 'Backend Developer' }] },
+            { skill: 'Docker', jobs: 1, examples: [] },
+          ],
+          jobsConsidered: 120,
+        },
+      },
+    });
+
+    renderApp(<TodayPage />);
+
+    expect(await screen.findByRole('heading', { name: 'Skills worth learning next' })).toBeTruthy();
+    expect(screen.getByText('41 jobs')).toBeTruthy();
+    expect(screen.getByText('1 job')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'e.g. Backend Developer' }).getAttribute('href')).toBe(
+      '/jobs/j9',
+    );
+  });
+
   it('says so when nothing needs attention, and hides the empty lists', async () => {
     stubApi({
       ...base,

@@ -75,6 +75,32 @@ export const today: Command = async ({ io, call }) => {
   io.out(formatBrief(data));
 };
 
+interface GapReport {
+  gaps: { skill: string; jobs: number; examples: { title: string }[] }[];
+  jobsConsidered: number;
+}
+
+/** The skills most often missing across jobs the person nearly matches. */
+export const gaps: Command = async ({ io, call }) => {
+  const { data } = await call<{ data: GapReport }>('GET', '/v1/insights/skill-gaps');
+  if (data.gaps.length === 0) {
+    io.out(
+      data.jobsConsidered === 0
+        ? 'No near-miss jobs yet. Save a profile and scan the sources first.'
+        : `Looked at ${data.jobsConsidered} jobs you nearly match and found no skill you lack.`,
+    );
+    return;
+  }
+  io.out(
+    `Skills asked for in jobs you nearly match (${data.jobsConsidered} jobs scoring 3 to 4):\n`,
+  );
+  for (const gap of data.gaps) {
+    io.out(
+      `  ${clip(gap.skill, 26)} ${String(gap.jobs).padStart(4)} jobs   e.g. ${gap.examples[0]?.title ?? ''}`,
+    );
+  }
+};
+
 export const markdown: Command = async ({ io, need, call }) => {
   const { data } = await call<{ data: { markdown: string } }>('POST', '/v1/extract', {
     url: need('a web address'),

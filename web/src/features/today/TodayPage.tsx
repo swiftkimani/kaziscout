@@ -4,6 +4,7 @@ import { useToday } from '../../api/queries';
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui/Feedback';
 import { JobCard } from '../jobs/JobCard';
 import { formatDate } from '../jobs/format';
+import { SkillGapsPanel } from './SkillGapsPanel';
 
 function Section({
   title,
@@ -92,6 +93,8 @@ export function TodayPage() {
           ))}
         </ul>
       </Section>
+
+      <SkillGapsPanel />
 
       <Section title="Sources that failed their last scan" count={failedSources.length}>
         <ul className="job-list">

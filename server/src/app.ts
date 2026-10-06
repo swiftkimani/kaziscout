@@ -28,6 +28,7 @@ import { ComputerUseDesktop } from './services/computer-use-desktop.js';
 import { CvImportService } from './services/cv-import.js';
 import { DocumentService } from './services/documents.js';
 import { EvaluationService } from './services/evaluation.js';
+import { InsightService } from './services/insights.js';
 import { MarkdownService } from './services/markdown.js';
 import { PostingCompleter } from './services/posting-completer.js';
 import { ScanService } from './services/scan.js';
@@ -178,6 +179,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     applyService,
     documentService,
     todayService,
+    insightService: new InsightService({ jobs, profiles }),
     cvImportService: new CvImportService({ ai, desktop }),
     aiModel: ai?.model,
     now,

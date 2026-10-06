@@ -18,6 +18,7 @@ import type {
   MarkdownPage,
   Meta,
   Profile,
+  SkillGapReport,
   Today,
 } from './types';
 
@@ -160,6 +161,13 @@ export function useHideJob() {
     mutationFn: (jobId: string) =>
       api<{ data: Job }>(`/v1/jobs/${jobId}/hidden`, { method: 'PUT' }),
     onSuccess: () => invalidateJobs(client),
+  });
+}
+
+export function useSkillGaps() {
+  return useQuery({
+    queryKey: ['jobs', 'skill-gaps'],
+    queryFn: async () => (await api<{ data: SkillGapReport }>('/v1/insights/skill-gaps')).data,
   });
 }
 

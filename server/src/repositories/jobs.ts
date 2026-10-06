@@ -269,6 +269,17 @@ export class JobRepository {
       .map(toJob);
   }
 
+  /** Visible jobs scoring from `min` up to but not including `max`, best first. */
+  listScoredBetween(min: number, max: number, limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE score >= ? AND score < ? AND hidden_at IS NULL ORDER BY score DESC, id DESC LIMIT ?`,
+      )
+      .all(min, max, limit)
+      .map(toJob);
+  }
+
   listCountryCodes(): string[] {
     return this.db
       .prepare('SELECT DISTINCT country_code FROM jobs WHERE country_code IS NOT NULL')

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { JobDetailPage } from '../src/features/jobs/JobDetailPage';
@@ -32,6 +32,34 @@ describe('JobDetailPage', () => {
     expect(screen.getByText('Skills').closest('div')?.textContent).toContain('50%');
     expect(screen.getByRole('link', { name: /Open original posting/ }).getAttribute('href')).toBe(
       JOB.url,
+    );
+  });
+
+  it('lists what the posting asks for, marked against the profile', async () => {
+    stubApi({
+      'GET /v1/meta': META,
+      'GET /v1/boards': { data: [BOARD] },
+      'GET /v1/jobs/job1': {
+        data: {
+          ...JOB,
+          application: null,
+          requirements: [
+            { skill: 'React', inProfile: true },
+            { skill: 'PostgreSQL', inProfile: false },
+          ],
+        },
+      },
+      'GET /v1/jobs/job1/documents': { data: null },
+    });
+
+    renderApp(<JobDetailPage />, route);
+
+    expect(await screen.findByText('1 of 2 in your profile')).toBeTruthy();
+    // "React" also appears in the posting and the fit reasons, so look inside the checklist only.
+    const checklist = within(screen.getByRole('region', { name: 'What it asks for' }));
+    expect(checklist.getByText('React').closest('li')?.textContent).toContain('(in your profile)');
+    expect(checklist.getByText('PostgreSQL').closest('li')?.textContent).toContain(
+      '(not in your profile)',
     );
   });
 
