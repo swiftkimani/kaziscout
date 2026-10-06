@@ -14,6 +14,7 @@ export interface Job {
   summary: string;
   descriptionMd?: string;
   postedAt?: string;
+  closesAt?: string;
   listedAt: string;
   firstSeenAt: string;
   score?: number;
@@ -33,6 +34,7 @@ export interface NewJob {
   summary: string;
   descriptionMd?: string;
   postedAt?: Date;
+  closesAt?: Date;
 }
 
 export interface JobFilter {
@@ -52,7 +54,7 @@ export interface JobPage {
 }
 
 const JOB_COLUMNS = `id, board_id, title, company, location, country_code, is_remote, url, summary,
-  description_md, posted_at, listed_at, first_seen_at, score, evaluation_json, evaluated_at`;
+  description_md, posted_at, closes_at, listed_at, first_seen_at, score, evaluation_json, evaluated_at`;
 
 type Row = Record<string, unknown>;
 
@@ -74,6 +76,7 @@ function toJob(row: Row): Job {
     summary: String(row.summary),
     descriptionMd: optional(row.description_md),
     postedAt: optional(row.posted_at),
+    closesAt: optional(row.closes_at),
     listedAt: String(row.listed_at),
     firstSeenAt: String(row.first_seen_at),
     score: typeof row.score === 'number' ? row.score : undefined,
@@ -115,13 +118,15 @@ export class JobRepository {
     this.db
       .prepare(
         `INSERT INTO jobs (id, board_id, external_id, title, company, location, country_code,
-           is_remote, url, summary, description_md, posted_at, first_seen_at, last_seen_at, listed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           is_remote, url, summary, description_md, posted_at, first_seen_at, last_seen_at, listed_at,
+           closes_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT (id) DO UPDATE SET
            title = excluded.title, company = excluded.company, location = excluded.location,
            country_code = excluded.country_code, is_remote = excluded.is_remote,
            url = excluded.url, summary = excluded.summary,
            description_md = COALESCE(excluded.description_md, jobs.description_md),
+           closes_at = COALESCE(excluded.closes_at, jobs.closes_at),
            last_seen_at = excluded.last_seen_at`,
       )
       .run(
@@ -140,6 +145,7 @@ export class JobRepository {
         seenAt,
         seenAt,
         postedAt ?? seenAt,
+        job.closesAt?.toISOString() ?? null,
       );
     return { id, isNew: existing === undefined };
   }
@@ -217,6 +223,30 @@ export class JobRepository {
 
   saveDescription(id: string, markdown: string): void {
     this.db.prepare('UPDATE jobs SET description_md = ? WHERE id = ?').run(markdown, id);
+  }
+
+  /** Strong matches first seen since `since`, best first. */
+  listNewStrong(since: Date, minScore: number, limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE first_seen_at >= ? AND score >= ? ORDER BY score DESC, id DESC LIMIT ?`,
+      )
+      .all(since.toISOString(), minScore, limit)
+      .map(toJob);
+  }
+
+  /** Jobs closing between two moments that are worth acting on: a fair match, or already tracked. */
+  listClosingSoon(from: Date, until: Date, minScore: number, limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE closes_at >= ? AND closes_at <= ?
+           AND (score >= ? OR id IN (SELECT job_id FROM applications WHERE status = 'saved'))
+         ORDER BY closes_at, id LIMIT ?`,
+      )
+      .all(from.toISOString(), until.toISOString(), minScore, limit)
+      .map(toJob);
   }
 
   listCountryCodes(): string[] {

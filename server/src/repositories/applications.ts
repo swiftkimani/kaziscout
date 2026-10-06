@@ -57,6 +57,17 @@ export class ApplicationRepository {
       .map(toApplication);
   }
 
+  /** Applications sent but not touched since `before`: candidates for a follow-up. */
+  listAwaitingReply(before: Date, limit: number): Application[] {
+    return this.db
+      .prepare(
+        `${SELECT_APPLICATION} WHERE a.status = 'applied' AND a.updated_at <= ?
+         ORDER BY a.updated_at LIMIT ?`,
+      )
+      .all(before.toISOString(), limit)
+      .map(toApplication);
+  }
+
   findById(id: number): Application | undefined {
     const row = this.db.prepare(`${SELECT_APPLICATION} WHERE a.id = ?`).get(id);
     return row ? toApplication(row) : undefined;

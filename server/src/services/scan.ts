@@ -3,6 +3,7 @@ import { type Board, isScannable } from '../boards/registry.js';
 import { runInTransaction, type Db } from '../db/client.js';
 import { AppError, NotFoundError, ValidationError } from '../errors.js';
 import { fragmentToMarkdown, htmlToText } from '../extract/html-to-markdown.js';
+import { findClosingDate } from '../providers/closing-date.js';
 import { providerFor } from '../providers/index.js';
 import type { ProviderContext, RawJob } from '../providers/types.js';
 import type { BoardScan, BoardScanRepository } from '../repositories/board-scans.js';
@@ -58,6 +59,7 @@ export function normaliseJob(board: Board, raw: RawJob): NewJob {
     summary: summarise(text),
     descriptionMd: fragmentToMarkdown(raw.bodyHtml) || undefined,
     postedAt: raw.postedAt,
+    closesAt: raw.closesAt ?? findClosingDate(text),
   };
 }
 
