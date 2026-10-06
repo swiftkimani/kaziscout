@@ -4,7 +4,7 @@
   "private": true,
   "description": "Job-search agent for Africa: scan African job boards, score roles against your CV, turn messy postings into clean Markdown, and track applications.",
   "author": "Benard Kimani (https://github.com/swiftkimani)",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/swiftkimani/kaziscout#readme",
   "repository": {
     "type": "git",

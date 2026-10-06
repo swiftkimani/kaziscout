@@ -62,7 +62,7 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
 ## Do not touch without asking
 
 - Applied migrations in `server/src/db/migrations/`
-- `LICENSE` and `CREDITS.md`
+- `LICENSE`, `NOTICE` and `CREDITS.md`
 - The response shapes under `/v1` (the web app and outside agents depend on them)
 
 ## Definition of done

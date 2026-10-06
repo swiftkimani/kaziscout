@@ -222,4 +222,7 @@ current state of the work. Commits follow Conventional Commits.
 
 ## Licence
 
-[MIT](LICENSE) © 2026 Benard Kimani
+[AGPL-3.0-or-later](LICENSE) © 2026 Benard Kimani. In short: you can use, change and share
+KaziScout freely, and if you run a changed version as a service for other people you must publish
+your changes under the same licence. See [NOTICE](NOTICE) for the licence history and commercial
+licensing.

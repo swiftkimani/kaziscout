@@ -2,10 +2,11 @@
 
 KaziScout was created and is maintained by **Benard Kimani**
 ([@swiftkimani](https://github.com/swiftkimani)), and is released under the
-[MIT licence](LICENSE).
+[GNU Affero General Public License v3.0 or later](LICENSE).
 
 It is new code, but it stands on two open-source projects. Neither project's code is copied into
-this repository; one is used as a dependency and the other shaped the design.
+this repository; one is used as a dependency and the other shaped the design. Both are MIT
+licensed, which is compatible with KaziScout's AGPL licence, and each keeps its own licence.
 
 ## Projects KaziScout builds on
 
