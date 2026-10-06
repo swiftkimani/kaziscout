@@ -14,15 +14,20 @@ Markdown, and tracks your applications. You review each one and press Submit you
 
 ## What it does
 
-|                                 |                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Scans African job boards**    | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and remote boards filtered to roles open to Africa.                                                                                                        |
-| **Reads employer career pages** | Reads 21 employers directly through the public APIs of their hiring systems (Greenhouse, Lever, Ashby): African employers such as M-KOPA, Moniepoint, Jumia, Andela and One Acre Fund, and remote-first companies filtered to roles open to Africa. Any employer on those systems, in any country, can be added with one line. |
-| **Lists the rest**              | A directory of 118 checked sources covering 27 African countries plus pan-African and remote sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                            |
-| **Scores each job 1 to 5**      | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. Connect any AI model (OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio) and it writes a fuller assessment and a suggested opening paragraph.                                    |
-| **Page to Markdown**            | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                                                                                                                          |
-| **Tracks applications**         | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                             |
-| **Helps you apply**             | Builds an application pack (your details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it.                                                                                                                       |
+|                                        |                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scans job boards**                   | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and worldwide remote boards.                                                                                                                                                                           |
+| **Reads employer career pages**        | Reads 30 employers directly through the public APIs of five hiring systems (Greenhouse, Lever, Ashby, SmartRecruiters, Workable) and Teamtailor career feeds: African employers such as M-KOPA, Moniepoint, Jumia, Paystack, Kuda, Andela and One Acre Fund, and employers that hire worldwide. Any employer on those systems, in any country, can be added with one line. |
+| **Lists the rest**                     | A directory of 126 checked sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                                                                                                                                          |
+| **Works for any country**              | Your profile can name any of 234 countries. Africa is where the board list is deepest, but jobs anywhere are detected, filtered and scored.                                                                                                                                                                                                                                |
+| **Scores each job 1 to 5**             | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. A remote role's region limit is judged against your countries, and a job you cannot take because of where it is never scores above 2.                                                                                                                                            |
+| **Works with any AI model**            | Connect OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio, and it writes a fuller assessment. With no model at all, everything else still works.                                                                                                                                                                       |
+| **Writes your documents**              | With a model connected, writes a cover letter and a CV tailored to the posting from your own CV, under a strict "reword, never invent" rule, and opens each on a clean page to print or save as PDF.                                                                                                                                                                       |
+| **Page to Markdown**                   | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                                                                                                                                                                      |
+| **Scans on a schedule and alerts you** | Optionally re-scans every so often and posts new strong matches to a webhook (Slack, Discord, ntfy, Zapier, n8n).                                                                                                                                                                                                                                                          |
+| **Tracks applications**                | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                                                                         |
+| **Helps you apply**                    | Builds an application pack (your details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it.                                                                                                                                                                   |
+| **Can be put behind a sign-in**        | Set an access token and the app and API require it, so you can run it on a home server or VPS. It is single-owner, not multi-user.                                                                                                                                                                                                                                         |
 
 Everything is stored in one SQLite file on your machine. Nothing leaves it except the requests
 you trigger: board scans, page fetches, and AI or Firecrawl calls if you configure them.
@@ -34,11 +39,11 @@ you trigger: board scans, page fetches, and AI or Firecrawl calls if you configu
 ```mermaid
 flowchart LR
   UI[Web UI<br/>React + Vite] -->|/v1 JSON| API[Fastify routes]
-  API --> S[Services<br/>scan · evaluate · markdown · apply]
+  API --> S[Services<br/>scan · evaluate · documents · markdown · apply · alerts]
   S --> R[Repositories] --> DB[(SQLite)]
-  S --> P[Providers<br/>RSS · remote job APIs · Greenhouse · Lever · Ashby] --> Boards[(Job boards<br/>and employers)]
+  S --> P[Providers<br/>RSS · remote job APIs · five hiring systems] --> Boards[(Job boards<br/>and employers)]
   S --> C[Page converter<br/>Readability or Firecrawl]
-  S --> E[Evaluator<br/>keyword or any AI model]
+  S --> E[Evaluator and writer<br/>keyword, or any AI model]
   S --> D[Desktop assist<br/>computer-use-mcp]
   Reg[data/boards.json<br/>board registry] --> S
 ```
@@ -85,7 +90,7 @@ Then:
 ## Test
 
 ```sh
-pnpm test          # 81 server tests; no network needed
+pnpm test          # 124 server tests and 18 web tests; no network needed
 pnpm typecheck
 pnpm lint
 pnpm format:check
@@ -101,6 +106,10 @@ All settings are optional. See [.env.example](.env.example).
 | `HOST`                   | `127.0.0.1`              | Interface to bind. Keep it local; there is no login.                                            |
 | `LOG_LEVEL`              | `info`                   | `debug`, `info`, `warn`, `error` or `silent`                                                    |
 | `DATABASE_PATH`          | `./var/kaziscout.sqlite` | SQLite file, relative to `server/`                                                              |
+| `ACCESS_TOKEN`           | none                     | Sign-in token. Required before listening beyond this computer.                                  |
+| `SCAN_INTERVAL_MINUTES`  | `0`                      | Minutes between automatic scans. `0` is off; minimum 15.                                        |
+| `ALERT_WEBHOOK_URL`      | none                     | Where to post new strong matches after a scheduled scan.                                        |
+| `ALERT_MIN_SCORE`        | `4`                      | Lowest score that triggers an alert.                                                            |
 | `FIRECRAWL_API_KEY`      | none                     | Convert pages with Firecrawl instead of the local converter                                     |
 | `AI_BASE_URL`            | none                     | Base URL of any OpenAI-compatible server. Enables "Assess with AI".                             |
 | `AI_API_KEY`             | none                     | Key for that server. Local servers such as Ollama need none.                                    |
@@ -122,10 +131,12 @@ The UI is a client of a small versioned API, which you can also call directly.
 | `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                           |
 | `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                          |
 | `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                        |
+| `GET` / `POST /v1/jobs/:id/documents`                                    | Read, or have the AI model write, the cover letter and tailored CV                                |
 | `POST /v1/jobs/:id/assist`                                               | Copy the pack to the clipboard through computer-use-mcp                                           |
 | `POST /v1/extract`                                                       | Convert any public page to Markdown. Body: `{"url": "..."}`                                       |
 | `GET` / `PUT /v1/profile`                                                | Read or save the profile                                                                          |
 | `GET` / `POST /v1/applications`, `PATCH` / `DELETE /v1/applications/:id` | The tracker                                                                                       |
+| `GET` / `POST` / `DELETE /v1/session`                                    | Sign-in state, sign in with the access token, sign out                                            |
 | `GET /health`                                                            | Liveness check                                                                                    |
 
 Errors use one envelope:
@@ -148,9 +159,11 @@ server/
   src/boards/           registry loader, country detection, board verifier
   src/providers/        one reader per kind of source (RSS, remote job APIs, hiring systems)
   src/extract/          page to Markdown, Firecrawl client, URL safety check
-  src/scoring/          keyword scorer and AI evaluators (OpenAI-compatible, Claude)
+  src/ai/               one client per kind of model server (OpenAI-compatible, Claude)
+  src/auth/             optional access-token sign-in
+  src/scoring/          keyword scorer, AI assessment, country and remote-region rules
   src/repositories/     SQL
-  src/services/         scan, evaluation, markdown, apply
+  src/services/         scan, scheduler, alerts, evaluation, documents, markdown, apply
   src/routes/           HTTP handlers and request schemas
   src/db/               SQLite client and migrations
   test/                 tests and recorded feed fixtures
@@ -167,7 +180,7 @@ skills/                 agent guide for assisted applications
 
 1. Add an entry to `server/data/boards.json`. Use `"access": {"type": "rss", "feedUrl": "..."}`
    if the board has a feed, or `{"type": "listing"}` if it does not. For an employer that
-   hires through Greenhouse, Lever or Ashby, use
+   hires through Greenhouse, Lever, Ashby, SmartRecruiters or Workable, use
    `{"type": "ats", "provider": "greenhouse", "slug": "<name in its careers URL>"}`.
 2. Run `pnpm boards:verify`. It checks every board and regenerates `docs/BOARDS.md`.
 3. Open a pull request.
@@ -177,15 +190,16 @@ listings or sources that need a login.
 
 ## Troubleshooting
 
-| Problem                                         | What to do                                                                                                                                      |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `No such built-in module: node:sqlite`          | Upgrade to Node.js 24 or newer.                                                                                                                 |
-| A board shows "Last scan failed"                | Boards time out now and then. Scan it again; if it keeps failing, run `pnpm boards:verify`.                                                     |
-| Page to Markdown returns "no readable text"     | The page is drawn by JavaScript. Add `FIRECRAWL_API_KEY`.                                                                                       |
-| "That address can't be fetched"                 | Only public http and https pages are fetched; local and private addresses are refused on purpose.                                               |
-| Jobs show a dash instead of a score             | Save your profile. Scores need something to compare against.                                                                                    |
-| "returned an assessment that could not be read" | The model did not produce valid JSON. Small local models do this; try a larger one.                                                             |
-| Desktop assist fails on macOS                   | Grant your terminal Accessibility permission, as [computer-use-mcp describes](https://github.com/zavora-ai/computer-use-mcp#set-up-your-agent). |
+| Problem                                               | What to do                                                                                                                                      |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `No such built-in module: node:sqlite`                | Upgrade to Node.js 24 or newer.                                                                                                                 |
+| A board shows "Last scan failed"                      | Boards time out now and then. Scan it again; if it keeps failing, run `pnpm boards:verify`.                                                     |
+| Page to Markdown returns "no readable text"           | The page is drawn by JavaScript. Add `FIRECRAWL_API_KEY`.                                                                                       |
+| "That address can't be fetched"                       | Only public http and https pages are fetched; local and private addresses are refused on purpose.                                               |
+| Jobs show a dash instead of a score                   | Save your profile. Scores need something to compare against.                                                                                    |
+| "returned an assessment that could not be read"       | The model did not produce valid JSON. Small local models do this; try a larger one.                                                             |
+| The server refuses to start with "Refusing to listen" | You set `HOST` to something other than `127.0.0.1` without an `ACCESS_TOKEN`. Set a token of 16 or more characters.                             |
+| Desktop assist fails on macOS                         | Grant your terminal Accessibility permission, as [computer-use-mcp describes](https://github.com/zavora-ai/computer-use-mcp#set-up-your-agent). |
 
 ## Limits, stated plainly
 
@@ -193,12 +207,17 @@ listings or sources that need a login.
   "5 years preferred". Use it to rank, then read the posting.
 - Board feeds carry what the board chooses to publish: often the latest 10 to 50 postings, and
   some feeds mix in career articles.
-- Remote-first employers are filtered by the location text on each role. A role marked only
-  "Remote" is kept, even though some of those turn out to be limited to one country.
+- A role marked only "Remote" is treated as open to everyone, though some of those turn out to
+  be limited to one country. Region limits such as "Europe" are understood for African profiles;
+  for other profiles they are flagged as "check that you qualify".
 - AI assessment quality depends on the model. It was run live against a 1.5B local model, which
   handled short postings and failed on long ones. Use a 7B or larger local model, or a hosted one.
-- career-ops reads about 110 kinds of source. KaziScout has the three most common hiring
-  systems, RSS and three remote job APIs; the rest are not ported.
+- career-ops reads about 110 kinds of source. KaziScout reads nine (RSS, Teamtailor feeds, three
+  remote job APIs and five hiring systems); Workday, Recruitee, Personio and the rest are not
+  ported.
+- AI-written documents are only as good as the model. A 1.5B local model produced a cover
+  letter that was fluent and wrong. Read every document against your real CV before sending.
+- Sign-in is one shared access token for one owner. There are no user accounts.
 - KaziScout never submits an application. That is deliberate.
 
 ## Credits

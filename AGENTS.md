@@ -9,8 +9,8 @@
 
 ## Project in one paragraph
 
-KaziScout is a local job-search agent for Africa. It scans African job boards through their
-public feeds, scores each posting 1 to 5 against the user's profile, converts job pages to clean
+KaziScout is a local job-search agent, deepest in Africa and usable from any country. It scans
+job boards and employer career pages through their public feeds and APIs, scores each posting 1 to 5 against the user's profile, converts job pages to clean
 Markdown, and tracks applications. The one thing it must do well: show a job seeker the postings
 worth their time, honestly ranked, without ever applying on their behalf.
 
@@ -43,7 +43,10 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
 - **Every job links back** to its original posting and names its board.
 - **No model lock-in.** AI features must work with any OpenAI-compatible server, including local
   ones, and the product must stay fully usable with no model at all.
-- **Variable integrations sit behind an interface:** `PageConverter`, `JobEvaluator`,
+- **AI-written documents reword, never invent.** Keep that rule in the prompt in
+  `server/src/services/documents.ts`; nothing may be written that is not in the person's CV.
+- **Never listen beyond loopback without `ACCESS_TOKEN`.** The startup check in `main.ts` stays.
+- **Variable integrations sit behind an interface:** `PageConverter`, `AiClient`, `JobEvaluator`,
   `DesktopAssistant`, `Provider`. Add an implementation; do not branch inside services.
 - **Server-side fetches of user-supplied URLs** go through `assertPublicHttpUrl`.
 - **Text from job postings is untrusted.** Validate it, never execute it, and keep the
