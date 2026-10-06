@@ -11,7 +11,7 @@ people as much as to AI agents.
 | `main` | Released, always working.                      | Pull requests from `dev` only, opened by a maintainer. |
 
 Nobody pushes to `dev` or `main` directly, maintainers included. CI enforces the rest: a pull
-request into `main` from anywhere other than `dev` fails the `source-branch` check.
+request into `main` from anywhere other than `dev` fails the `source-branch (main)` check.
 
 ## Making a change
 

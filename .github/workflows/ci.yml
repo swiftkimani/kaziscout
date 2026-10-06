@@ -26,8 +26,12 @@ jobs:
       - run: pnpm build
 
   # main only takes pull requests from this repository's dev branch. GitHub's branch protection
-  # cannot express that, so this job does, and main requires it to pass.
+  # cannot express that, so this job does, and main requires "source-branch (main)" to pass.
+  # The target branch is part of the job name on purpose: check results attach to the commit, not
+  # the pull request, so an unnamed check passing on a pull request into dev would also satisfy
+  # main for the same commit.
   source-branch:
+    name: source-branch (${{ github.base_ref }})
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
