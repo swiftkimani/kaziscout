@@ -87,6 +87,10 @@ export class ScanService {
 
   /** Scans one board. A failing board is recorded and reported, never thrown. */
   async scanBoard(boardId: string): Promise<BoardScan> {
+    return (await this.scanOne(boardId)).scan;
+  }
+
+  private async scanOne(boardId: string): Promise<{ scan: BoardScan; newIds: string[] }> {
     const board = this.deps.boards.find((candidate) => candidate.id === boardId);
     if (!board) throw new NotFoundError('That board');
     const provider = providerFor(board);
@@ -99,9 +103,10 @@ export class ScanService {
     const startedAt = this.now();
     const started = performance.now();
     let scan: BoardScan;
+    let newIds: string[] = [];
     try {
       const rawJobs = await provider(board, this.deps.providerContext);
-      const newIds = runInTransaction(this.deps.db, () =>
+      newIds = runInTransaction(this.deps.db, () =>
         rawJobs
           .map((raw) => this.deps.jobs.upsert(normaliseJob(board, raw), startedAt))
           .filter((result) => result.isNew)
@@ -132,19 +137,27 @@ export class ScanService {
       this.deps.logger.warn({ ...scan, details: error.details }, 'board scan failed');
     }
     this.deps.scans.record(scan);
-    return scan;
+    return { scan, newIds };
   }
 
   /** Scans every board that has a public feed. */
   async scanAll(): Promise<BoardScan[]> {
-    const results: BoardScan[] = [];
+    return (await this.scanAllCollectingNewJobs()).scans;
+  }
+
+  /** Scans every board and also returns the ids of jobs seen for the first time. */
+  async scanAllCollectingNewJobs(): Promise<{ scans: BoardScan[]; newJobIds: string[] }> {
+    const scans: BoardScan[] = [];
+    const newJobIds: string[] = [];
     await runWithConcurrency(
       this.deps.boards.filter(isScannable),
       BOARD_CONCURRENCY,
       async (board) => {
-        results.push(await this.scanBoard(board.id));
+        const result = await this.scanOne(board.id);
+        scans.push(result.scan);
+        newJobIds.push(...result.newIds);
       },
     );
-    return results.sort((a, b) => a.boardId.localeCompare(b.boardId));
+    return { scans: scans.sort((a, b) => a.boardId.localeCompare(b.boardId)), newJobIds };
   }
 }
