@@ -1,0 +1,5 @@
+#!/bin/sh
+# KaziScout in the terminal: ./kazi help
+# Runs from the server folder so the database path matches the web app's.
+cd "$(dirname "$0")/server" || exit 1
+exec ./node_modules/.bin/tsx src/cli-main.ts "$@"
