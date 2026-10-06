@@ -5,7 +5,16 @@ import { cv } from './cv-command.js';
 import { HELP } from './help.js';
 import { add, assess, hide, jobs, pack, show, track, tracker, unhide } from './job-commands.js';
 import { profile } from './profile-commands.js';
-import { boards, follow, gaps, markdown, scan, today, unfollow } from './source-commands.js';
+import {
+  boards,
+  findFeed,
+  follow,
+  gaps,
+  markdown,
+  scan,
+  today,
+  unfollow,
+} from './source-commands.js';
 
 const COMMANDS: Readonly<Record<string, Command>> = {
   help: ({ io }) => Promise.resolve(io.out(HELP)),
@@ -24,6 +33,7 @@ const COMMANDS: Readonly<Record<string, Command>> = {
   boards,
   follow,
   unfollow,
+  'find-feed': findFeed,
   md: markdown,
   profile,
   cv,

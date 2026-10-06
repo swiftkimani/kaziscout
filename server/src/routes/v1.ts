@@ -10,6 +10,8 @@ import type { ApplyService } from '../services/apply.js';
 import type { CvImportService } from '../services/cv-import.js';
 import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
+import { toCalendar } from '../services/calendar.js';
+import type { FeedFinder } from '../services/feed-finder.js';
 import type { InsightService } from '../services/insights.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
@@ -45,6 +47,7 @@ export interface RouteDeps {
   cvImportService: CvImportService;
   todayService: TodayService;
   insightService: InsightService;
+  feedFinder: FeedFinder;
   /** Name of the configured AI model, if any. */
   aiModel?: string;
   now?: () => Date;
@@ -129,6 +132,12 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     const { url } = parse(addJobBody, request.body);
     void reply.code(201);
     return { data: await deps.sourceService.follow(url) };
+  });
+
+  // Tries the usual feed addresses on a board. For maintainers adding a board to the registry.
+  app.post('/v1/sources/find-feed', EXPENSIVE, async (request) => {
+    const { url } = parse(addJobBody, request.body);
+    return { data: await deps.feedFinder.find(url) };
   });
 
   app.delete('/v1/sources/:id', (request, reply) => {
@@ -229,6 +238,12 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
         bytes: Buffer.from(body.contentBase64, 'base64'),
       }),
     };
+  });
+
+  // Closing dates of tracked jobs, for any calendar app to import or subscribe to.
+  app.get('/v1/calendar.ics', (_request, reply) => {
+    void reply.header('content-type', 'text/calendar; charset=utf-8');
+    return toCalendar(deps.jobs.listTrackedWithDeadline(TRACKER_PAGE_SIZE), now());
   });
 
   app.get('/v1/applications', () => ({ data: deps.applications.list(TRACKER_PAGE_SIZE) }));

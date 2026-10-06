@@ -24,6 +24,7 @@ Usage: ./kazi <command> [options]
   follow <job-link>      Follow the employer behind a job link (Greenhouse, Lever, Ashby,
                          Workable, SmartRecruiters, Workday, Recruitee, Teamtailor)
   unfollow <source-id>   Stop following an employer
+  find-feed <board-url>  Look for a public feed on a job board (for adding boards)
   boards                 Sources and their status
       --scanned          Only the ones scanned automatically
   md <url>               Convert a web page to Markdown

@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bookmark, ClipboardCopy, FileDown, Sparkles } from 'lucide-react';
+import { Bookmark, ClipboardCopy, FileDown, Share2, Sparkles } from 'lucide-react';
 import { jobActions, useApplicationMutations } from '../../api/queries';
 import type { JobDetail, Meta } from '../../api/types';
 import { Button } from '../../components/ui/Button';
 import { useToast } from '../../components/ui/Toast';
+import { formatDate } from './format';
 
 export function JobActions({ job, features }: { job: JobDetail; features?: Meta['features'] }) {
   const client = useQueryClient();
@@ -45,6 +46,21 @@ export function JobActions({ job, features }: { job: JobDetail; features?: Meta[
     onError: (error) => toast.error(error, "Couldn't copy the application pack. Try again."),
   });
 
+  /** A short message about this job, ready to paste into a chat group. */
+  const share = async () => {
+    const lines = [
+      `${job.title}${job.company ? ` at ${job.company}` : ''}`,
+      job.closesAt ? `Closes ${formatDate(job.closesAt)}` : '',
+      job.url,
+    ].filter(Boolean);
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      toast.success('Copied. Paste it into a chat to share this job.');
+    } catch (error) {
+      toast.error(error, "Couldn't copy. Share the link from the original posting instead.");
+    }
+  };
+
   const save = () =>
     applications.save.mutate(job.id, {
       onSuccess: () => toast.success('Saved to your tracker.'),
@@ -76,6 +92,9 @@ export function JobActions({ job, features }: { job: JobDetail; features?: Meta[
         onClick={() => fetchPosting.mutate()}
       >
         Fetch full posting
+      </Button>
+      <Button icon={<Share2 size={16} aria-hidden />} onClick={() => void share()}>
+        Share
       </Button>
       {features?.aiModel && (
         <Button

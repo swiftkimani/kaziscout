@@ -91,7 +91,12 @@ export function TrackerPage() {
     <div className="stack">
       <header className="stack-sm">
         <h1>Tracker</h1>
-        <p className="muted">Jobs you saved, and where each application stands.</p>
+        <p className="muted">
+          Jobs you saved, and where each application stands.{' '}
+          <a href="/v1/calendar.ics" download="kaziscout-deadlines.ics">
+            Add closing dates to your calendar
+          </a>
+        </p>
       </header>
 
       {applications.isPending && (

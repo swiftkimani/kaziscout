@@ -8,6 +8,7 @@ import { providerFor } from '../providers/index.js';
 import type { ProviderContext, RawJob } from '../providers/types.js';
 import type { BoardScan, BoardScanRepository } from '../repositories/board-scans.js';
 import type { JobRepository, NewJob } from '../repositories/jobs.js';
+import type { AutoAssessor } from './auto-assessor.js';
 import type { EvaluationService } from './evaluation.js';
 import type { PostingCompleter } from './posting-completer.js';
 
@@ -88,6 +89,8 @@ export class ScanService {
       evaluation: EvaluationService;
       /** Fetches full postings for promising jobs that arrive without a description. */
       completer?: PostingCompleter;
+      /** Has the AI model assess new strong matches, within a daily limit. */
+      autoAssessor?: AutoAssessor;
       providerContext: ProviderContext;
       logger: ScanLogger;
       now?: () => Date;
@@ -128,6 +131,7 @@ export class ScanService {
       this.deps.jobs.markDuplicates(newIds);
       await this.deps.evaluation.scoreNewJobs(newIds);
       await this.deps.completer?.complete(newIds);
+      await this.deps.autoAssessor?.assess(newIds);
       scan = {
         boardId,
         startedAt: startedAt.toISOString(),

@@ -69,6 +69,31 @@ export const unfollow: Command = async ({ io, need, call }) => {
   io.out('No longer following that employer. Jobs already found are kept.');
 };
 
+interface FoundFeed {
+  url: string;
+  items: number;
+  newest?: string;
+  sampleTitle?: string;
+}
+
+/** Looks for a public feed on a job board, for adding the board to the registry. */
+export const findFeed: Command = async ({ io, need, call }) => {
+  const { data } = await call<{ data: FoundFeed[] }>('POST', '/v1/sources/find-feed', {
+    url: need("a job board's address"),
+  });
+  if (data.length === 0) {
+    io.out('No public feed found at the usual addresses. This board can only be a link-out entry.');
+    return;
+  }
+  for (const feed of data) {
+    io.out(`${feed.url}`);
+    io.out(
+      `  ${feed.items} items${feed.newest ? `, newest ${feed.newest.slice(0, 10)}` : ', no dates'}${feed.sampleTitle ? `, e.g. "${feed.sampleTitle}"` : ''}`,
+    );
+  }
+  io.out('\nAdd the best one to server/data/boards.json as {"type": "rss", "feedUrl": "…"}.');
+};
+
 /** The day's short lists: what is new, what is closing, what needs a follow-up. */
 export const today: Command = async ({ io, call }) => {
   const { data } = await call<{ data: Today }>('GET', '/v1/today');

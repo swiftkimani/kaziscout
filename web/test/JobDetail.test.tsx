@@ -78,6 +78,27 @@ describe('JobDetailPage', () => {
     expect(screen.queryByRole('button', { name: 'Write cover letter and CV' })).toBeNull();
   });
 
+  it('copies a short message for sharing the job in a chat', async () => {
+    stubApi({
+      'GET /v1/meta': META,
+      'GET /v1/boards': { data: [BOARD] },
+      'GET /v1/jobs/job1': {
+        data: { ...JOB, application: null, closesAt: '2026-10-20T00:00:00.000Z' },
+      },
+      'GET /v1/jobs/job1/documents': { data: null },
+    });
+    const user = userEvent.setup();
+    renderApp(<JobDetailPage />, route);
+
+    await user.click(await screen.findByRole('button', { name: 'Share' }));
+
+    expect(await screen.findByText('Copied. Paste it into a chat to share this job.')).toBeTruthy();
+    const copied = await navigator.clipboard.readText();
+    expect(copied).toContain('Frontend Developer at Acme');
+    expect(copied).toContain('Closes ');
+    expect(copied).toContain(JOB.url);
+  });
+
   it('saves the job to the tracker', async () => {
     const requests = stubApi({
       'GET /v1/meta': META,

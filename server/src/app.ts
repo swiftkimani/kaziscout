@@ -23,11 +23,13 @@ import { AiJobEvaluator } from './scoring/ai-evaluator.js';
 import { HeuristicEvaluator } from './scoring/heuristic.js';
 import { AlertService } from './services/alerts.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
+import { AutoAssessor } from './services/auto-assessor.js';
 import { BriefScheduler } from './services/brief-scheduler.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
 import { CvImportService } from './services/cv-import.js';
 import { DocumentService } from './services/documents.js';
 import { EvaluationService } from './services/evaluation.js';
+import { FeedFinder } from './services/feed-finder.js';
 import { InsightService } from './services/insights.js';
 import { MarkdownService } from './services/markdown.js';
 import { PostingCompleter } from './services/posting-completer.js';
@@ -91,12 +93,25 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     jobs,
     resolveHost: options.resolveHost,
   });
-  const completer = new PostingCompleter({
-    jobs,
-    markdown: markdownService,
-    evaluation: evaluationService,
-    logger: app.log,
-  });
+  // On a metered connection the extra page fetches are skipped; postings are fetched on demand.
+  const completer = config.LIGHT_DATA
+    ? undefined
+    : new PostingCompleter({
+        jobs,
+        markdown: markdownService,
+        evaluation: evaluationService,
+        logger: app.log,
+      });
+  const autoAssessor =
+    ai && config.AI_AUTO_ASSESS_PER_DAY > 0
+      ? new AutoAssessor({
+          jobs,
+          evaluation: evaluationService,
+          perDay: config.AI_AUTO_ASSESS_PER_DAY,
+          logger: app.log,
+          now,
+        })
+      : undefined;
   const scanService = new ScanService({
     db,
     boards: () => catalog.all(),
@@ -104,6 +119,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     scans,
     evaluation: evaluationService,
     completer,
+    autoAssessor,
     providerContext: { fetchText, now },
     logger: app.log,
     now,
@@ -179,6 +195,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     applyService,
     documentService,
     todayService,
+    feedFinder: new FeedFinder({ fetchText, resolveHost: options.resolveHost }),
     insightService: new InsightService({ jobs, profiles }),
     cvImportService: new CvImportService({ ai, desktop }),
     aiModel: ai?.model,

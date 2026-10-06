@@ -38,6 +38,13 @@ const envSchema = z.object({
   ACCESS_TOKEN: optionalSecret.pipe(
     z.string().min(16, 'must be at least 16 characters').optional(),
   ),
+  // How many new strong matches the AI model may assess by itself each day. 0 turns it off.
+  AI_AUTO_ASSESS_PER_DAY: z.coerce.number().int().min(0).max(200).default(0),
+  // Skip fetching full postings after scans, for metered connections.
+  LIGHT_DATA: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
   DESKTOP_ASSIST_ENABLED: z
     .enum(['true', 'false'])
     .default('false')

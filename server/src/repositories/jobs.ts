@@ -327,6 +327,29 @@ export class JobRepository {
       .map(toJob);
   }
 
+  /** How many jobs an AI model has assessed since `since`. */
+  countAiAssessedSince(since: Date): number {
+    const row = this.db
+      .prepare(
+        `SELECT COUNT(*) AS total FROM jobs
+         WHERE evaluated_at >= ? AND json_extract(evaluation_json, '$.evaluator') = 'ai'`,
+      )
+      .get(since.toISOString());
+    return Number(row?.total ?? 0);
+  }
+
+  /** Tracked jobs that state a closing date, soonest first. */
+  listTrackedWithDeadline(limit: number): Job[] {
+    return this.db
+      .prepare(
+        `SELECT ${JOB_COLUMNS} FROM jobs
+         WHERE closes_at IS NOT NULL AND id IN (SELECT job_id FROM applications)
+         ORDER BY closes_at, id LIMIT ?`,
+      )
+      .all(limit)
+      .map(toJob);
+  }
+
   listCountryCodes(): string[] {
     return this.db
       .prepare('SELECT DISTINCT country_code FROM jobs WHERE country_code IS NOT NULL')
