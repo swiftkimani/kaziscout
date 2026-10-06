@@ -22,7 +22,11 @@ export function formatDate(iso: string): string {
 
 /** Where a job is, in words: the country, "Remote", or the board's own location text. */
 export function describePlace(job: Job, countries: Record<string, string>): string {
-  if (job.isRemote) return job.location ? `Remote · ${job.location}` : 'Remote';
+  if (job.isRemote) {
+    // A location that only says "Remote" adds nothing to the word already shown.
+    const limit = job.location?.replace(/\bremote\b/gi, '').replace(/^[\s,·-]+|[\s,·-]+$/g, '');
+    return limit ? `Remote · ${limit}` : 'Remote';
+  }
   const country = job.countryCode ? countries[job.countryCode] : undefined;
   return country ?? job.location ?? 'Location not stated';
 }

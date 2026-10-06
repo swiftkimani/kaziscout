@@ -50,6 +50,7 @@ const greenhouseSchema = z.object({
       absolute_url: z.url(),
       location: z.object({ name: z.string() }).nullish(),
       first_published: z.string().nullish(),
+      application_deadline: z.string().nullish(),
       updated_at: z.string().nullish(),
       content: z.string().default(''),
     }),
@@ -72,6 +73,7 @@ export const greenhouseProvider: Provider = async (board, { fetchText }) => {
       url: job.absolute_url,
       bodyHtml: unescapeHtml(job.content),
       postedAt: published ? new Date(published) : undefined,
+      closesAt: job.application_deadline ? new Date(job.application_deadline) : undefined,
       isRemote: REMOTE_WORDS.test(location ?? ''),
     };
   });

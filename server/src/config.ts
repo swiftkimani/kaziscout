@@ -26,11 +26,25 @@ const envSchema = z.object({
     })
     .default(0),
   ALERT_WEBHOOK_URL: optionalSecret.pipe(z.url().optional()),
+  // Local time, as HH:MM, to send the morning brief to ALERT_WEBHOOK_URL. Empty turns it off.
+  BRIEF_TIME: optionalSecret.pipe(
+    z
+      .string()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'must be a time such as 07:30')
+      .optional(),
+  ),
   ALERT_MIN_SCORE: z.coerce.number().min(1).max(5).default(4),
   // Required before the server will listen on anything other than this computer.
   ACCESS_TOKEN: optionalSecret.pipe(
     z.string().min(16, 'must be at least 16 characters').optional(),
   ),
+  // How many new strong matches the AI model may assess by itself each day. 0 turns it off.
+  AI_AUTO_ASSESS_PER_DAY: z.coerce.number().int().min(0).max(200).default(0),
+  // Skip fetching full postings after scans, for metered connections.
+  LIGHT_DATA: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
   DESKTOP_ASSIST_ENABLED: z
     .enum(['true', 'false'])
     .default('false')

@@ -5,6 +5,7 @@ import { useJobs, useScan, type JobFilters } from '../../api/queries';
 import { Button } from '../../components/ui/Button';
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui/Feedback';
 import { useToast } from '../../components/ui/Toast';
+import { AddJobByLink } from './AddJobByLink';
 import { JobCard } from './JobCard';
 import { JobFilterBar } from './JobFilterBar';
 import { useDebounced } from './use-debounced';
@@ -63,6 +64,8 @@ export function JobsPage() {
           {scan.isPending ? 'Scanning boards' : 'Scan all boards'}
         </Button>
       </header>
+
+      <AddJobByLink />
 
       <JobFilterBar filters={filters} onChange={setFilters} />
 

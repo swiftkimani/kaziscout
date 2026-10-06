@@ -15,6 +15,7 @@ import { ApplicationRepository } from './repositories/applications.js';
 import { BoardScanRepository } from './repositories/board-scans.js';
 import { JobRepository } from './repositories/jobs.js';
 import { DocumentRepository } from './repositories/documents.js';
+import { FollowedSourceRepository } from './repositories/followed-sources.js';
 import { ProfileRepository } from './repositories/profile.js';
 import { registerV1Routes } from './routes/v1.js';
 import { createAiClient, type AiClient } from './ai/client.js';
@@ -22,13 +23,20 @@ import { AiJobEvaluator } from './scoring/ai-evaluator.js';
 import { HeuristicEvaluator } from './scoring/heuristic.js';
 import { AlertService } from './services/alerts.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
+import { AutoAssessor } from './services/auto-assessor.js';
+import { BriefScheduler } from './services/brief-scheduler.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
 import { CvImportService } from './services/cv-import.js';
 import { DocumentService } from './services/documents.js';
 import { EvaluationService } from './services/evaluation.js';
+import { FeedFinder } from './services/feed-finder.js';
+import { InsightService } from './services/insights.js';
 import { MarkdownService } from './services/markdown.js';
+import { PostingCompleter } from './services/posting-completer.js';
 import { ScanService } from './services/scan.js';
 import { ScanScheduler } from './services/scheduler.js';
+import { SourceCatalog, SourceService } from './services/sources.js';
+import { TodayService } from './services/today.js';
 
 export interface AppOptions {
   config: Config;
@@ -63,6 +71,8 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   const applications = new ApplicationRepository(db);
   const profiles = new ProfileRepository(db);
   const scans = new BoardScanRepository(db);
+  const followed = new FollowedSourceRepository(db);
+  const catalog = new SourceCatalog(boards, followed);
 
   const ai = options.ai ?? createAiClient(config);
   const desktop =
@@ -78,26 +88,54 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     ai: ai ? new AiJobEvaluator(ai) : undefined,
     now,
   });
-  const scanService = new ScanService({
-    db,
-    boards,
-    jobs,
-    scans,
-    evaluation: evaluationService,
-    providerContext: { fetchText, now },
-    logger: app.log,
-    now,
-  });
   const markdownService = new MarkdownService({
     converter,
     jobs,
     resolveHost: options.resolveHost,
+  });
+  // On a metered connection the extra page fetches are skipped; postings are fetched on demand.
+  const completer = config.LIGHT_DATA
+    ? undefined
+    : new PostingCompleter({
+        jobs,
+        markdown: markdownService,
+        evaluation: evaluationService,
+        logger: app.log,
+      });
+  const autoAssessor =
+    ai && config.AI_AUTO_ASSESS_PER_DAY > 0
+      ? new AutoAssessor({
+          jobs,
+          evaluation: evaluationService,
+          perDay: config.AI_AUTO_ASSESS_PER_DAY,
+          logger: app.log,
+          now,
+        })
+      : undefined;
+  const scanService = new ScanService({
+    db,
+    boards: () => catalog.all(),
+    jobs,
+    scans,
+    evaluation: evaluationService,
+    completer,
+    autoAssessor,
+    providerContext: { fetchText, now },
+    logger: app.log,
+    now,
   });
   const documentService = new DocumentService({
     jobs,
     profiles,
     documents: new DocumentRepository(db),
     ai,
+    now,
+  });
+  const todayService = new TodayService({
+    jobs,
+    applications,
+    scans,
+    boards: () => catalog.all(),
     now,
   });
   const applyService = new ApplyService({ jobs, profiles, applications, desktop, now });
@@ -145,7 +183,8 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   });
 
   registerV1Routes(app, {
-    boards,
+    catalog,
+    sourceService: new SourceService({ catalog, followed, scans: scanService, now }),
     jobs,
     applications,
     profiles,
@@ -155,6 +194,9 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     markdownService,
     applyService,
     documentService,
+    todayService,
+    feedFinder: new FeedFinder({ fetchText, resolveHost: options.resolveHost }),
+    insightService: new InsightService({ jobs, profiles }),
     cvImportService: new CvImportService({ ai, desktop }),
     aiModel: ai?.model,
     now,
@@ -195,12 +237,24 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
           logger: app.log,
         })
       : undefined;
+  const briefs =
+    alerts && config.BRIEF_TIME
+      ? new BriefScheduler({
+          today: todayService,
+          alerts,
+          time: config.BRIEF_TIME,
+          logger: app.log,
+          now,
+        })
+      : undefined;
   app.addHook('onReady', () => {
     scheduler?.start();
+    briefs?.start();
   });
 
   app.addHook('onClose', async () => {
     scheduler?.stop();
+    briefs?.stop();
     await desktop?.close();
   });
 

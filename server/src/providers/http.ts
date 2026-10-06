@@ -1,6 +1,6 @@
 import { UpstreamError } from '../errors.js';
 
-export const USER_AGENT = 'KaziScout/0.1 (+https://github.com/swiftkimani/kaziscout)';
+export const USER_AGENT = 'KaziScout/0.2 (+https://github.com/swiftkimani/kaziscout)';
 
 const DEFAULT_TIMEOUT_MS = 20_000;
 // Feeds and job pages are small; anything larger is not something we want to parse.

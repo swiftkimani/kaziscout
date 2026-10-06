@@ -179,6 +179,95 @@ describe('scanning', () => {
   });
 });
 
+describe('jobs that arrive without a description', () => {
+  const titleOnlyFeed = `<rss><channel>
+    <item><title>Digital Video Editor at Acme</title><link>https://jobwebkenya.com/jobs/editor/</link></item>
+    <item><title>Registered Nurse at Acme</title><link>https://jobwebkenya.com/jobs/nurse/</link></item>
+  </channel></rss>`;
+
+  it('fetches the full posting for a promising title and leaves the rest alone', async () => {
+    await app.close();
+    const fetched: string[] = [];
+    app = await buildApp({
+      config: loadConfig({ LOG_LEVEL: 'silent' }),
+      db,
+      boards,
+      now: () => NOW,
+      resolveHost: () => Promise.resolve(['93.184.216.34']),
+      fetchText: (url) => {
+        fetched.push(url);
+        return Promise.resolve(
+          url === FEED_URL
+            ? titleOnlyFeed
+            : '<html><title>Editor</title><body><h1>Editor</h1><p>Video editing daily.</p></body></html>',
+        );
+      },
+    });
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
+
+    await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
+    const jobs = (await app.inject({ method: 'GET', url: '/v1/jobs?sort=score' })).json() as {
+      data: { title: string; descriptionMd?: string; evaluation: { matchedSkills: string[] } }[];
+    };
+
+    expect(fetched).toEqual([FEED_URL, 'https://jobwebkenya.com/jobs/editor/']);
+    expect(jobs.data[0]).toMatchObject({ title: 'Digital Video Editor' });
+    expect(jobs.data[0]?.descriptionMd).toContain('Video editing daily.');
+    expect(jobs.data[0]?.evaluation.matchedSkills).toEqual(['Video', 'Editing']);
+    expect(jobs.data[1]?.descriptionMd).toBeUndefined();
+  });
+});
+
+describe('the same role on two boards', () => {
+  const feed = (company: string) => `<rss><channel>
+    <item><title>Data Engineer at ${company}</title><link>https://jobwebkenya.com/jobs/de/</link></item>
+  </channel></rss>`;
+  const secondBoard: Board = {
+    ...boards[0]!,
+    id: 'second',
+    name: 'Second Board',
+    access: { type: 'rss', feedUrl: 'https://second.example/feed/' },
+  };
+
+  async function scanBoth(companyOnSecond: string) {
+    await app.close();
+    app = await buildApp({
+      config: loadConfig({ LOG_LEVEL: 'silent' }),
+      db,
+      boards: [boards[0]!, secondBoard],
+      now: () => NOW,
+      fetchText: (url) =>
+        Promise.resolve(
+          url === FEED_URL
+            ? feed('Acme Ltd')
+            : feed(companyOnSecond).replace('jobwebkenya.com/jobs/de/', 'second.example/de/'),
+        ),
+    });
+    await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
+    await app.inject({ method: 'POST', url: '/v1/boards/second/scan' });
+    return (await app.inject({ method: 'GET', url: '/v1/jobs' })).json() as {
+      data: { id: string }[];
+    };
+  }
+
+  it('lists the role once and says where else it is posted', async () => {
+    const listing = await scanBoth('ACME  ltd.');
+    const detail = (
+      await app.inject({ method: 'GET', url: `/v1/jobs/${listing.data[0]?.id}` })
+    ).json() as {
+      data: { boardId: string; alsoOn: { boardId: string; url: string }[] };
+    };
+
+    expect(listing.data).toHaveLength(1);
+    expect(detail.data.boardId).toBe('jobwebkenya');
+    expect(detail.data.alsoOn).toEqual([{ boardId: 'second', url: 'https://second.example/de/' }]);
+  });
+
+  it('keeps both when the employer differs', async () => {
+    expect((await scanBoth('Other Company')).data).toHaveLength(2);
+  });
+});
+
 describe('job listing', () => {
   it('pages through jobs with a cursor without repeating any', async () => {
     await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
@@ -195,6 +284,40 @@ describe('job listing', () => {
     expect(pageTwo.data).toHaveLength(1);
     expect(pageTwo.data[0]?.id).not.toBe(pageOne.data[0]?.id);
     expect(pageTwo.next_cursor).toBeNull();
+  });
+
+  it('leaves hidden jobs out of lists until they are restored, even after another scan', async () => {
+    const jobId = await scanAndGetFirstJobId();
+
+    const hidden = await app.inject({ method: 'PUT', url: `/v1/jobs/${jobId}/hidden` });
+    await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
+    const visible = (await app.inject({ method: 'GET', url: '/v1/jobs' })).json() as {
+      data: { id: string }[];
+    };
+    const onlyHidden = (
+      await app.inject({ method: 'GET', url: '/v1/jobs?hidden=only' })
+    ).json() as { data: { id: string }[] };
+    await app.inject({ method: 'DELETE', url: `/v1/jobs/${jobId}/hidden` });
+    const restored = (await app.inject({ method: 'GET', url: '/v1/jobs' })).json() as {
+      data: unknown[];
+    };
+
+    expect(hidden.json()).toMatchObject({ data: { id: jobId, isHidden: true } });
+    expect(visible.data.map((job) => job.id)).not.toContain(jobId);
+    expect(onlyHidden.data.map((job) => job.id)).toEqual([jobId]);
+    expect(restored.data).toHaveLength(2);
+  });
+
+  it('can leave out jobs already in the tracker, for triage', async () => {
+    const jobId = await scanAndGetFirstJobId();
+    await app.inject({ method: 'POST', url: '/v1/applications', payload: { jobId } });
+
+    const untracked = (
+      await app.inject({ method: 'GET', url: '/v1/jobs?untracked=true' })
+    ).json() as { data: { id: string }[] };
+
+    expect(untracked.data).toHaveLength(1);
+    expect(untracked.data[0]?.id).not.toBe(jobId);
   });
 
   it('rejects an invalid filter with the field named', async () => {

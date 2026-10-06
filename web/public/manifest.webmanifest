@@ -1,0 +1,11 @@
+{
+  "name": "KaziScout",
+  "short_name": "KaziScout",
+  "description": "Find work worth your while: scan job boards, score roles against your CV and track applications.",
+  "start_url": "/today",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#0f3d2e",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

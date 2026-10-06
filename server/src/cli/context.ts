@@ -50,7 +50,7 @@ export interface CliContext {
   /** Returns the argument, or stops with a message saying what was expected. */
   need: (what: string) => string;
   /** Calls one of the app's own routes in-process and returns its JSON body. */
-  call: <T>(method: 'GET' | 'POST' | 'PUT', url: string, payload?: object) => Promise<T>;
+  call: <T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, payload?: object) => Promise<T>;
 }
 
 export type Command = (context: CliContext) => Promise<void>;
@@ -72,6 +72,9 @@ export interface ApiJob {
     gaps: string[];
     evaluator: string;
     model?: string;
+    breakdown?: { title: number; skills: number; location: number; freshness: number };
+    warnings?: string[];
+    advice?: string;
   };
 }
 
@@ -85,7 +88,10 @@ export function formatScore(value: number | undefined): string {
 }
 
 export function describePlace(job: ApiJob): string {
-  if (job.isRemote) return job.location ? `Remote · ${job.location}` : 'Remote';
+  if (job.isRemote) {
+    const limit = job.location?.replace(/\bremote\b/gi, '').replace(/^[\s,·-]+|[\s,·-]+$/g, '');
+    return limit ? `Remote · ${limit}` : 'Remote';
+  }
   return job.location ?? job.countryCode ?? '';
 }
 

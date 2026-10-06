@@ -18,6 +18,8 @@ import type {
   MarkdownPage,
   Meta,
   Profile,
+  SkillGapReport,
+  Today,
 } from './types';
 
 export interface JobFilters {
@@ -101,6 +103,79 @@ export function useWriteDocuments(jobId: string) {
       (await api<{ data: ApplicationDocuments }>(`/v1/jobs/${jobId}/documents`, { method: 'POST' }))
         .data,
     onSuccess: (documents) => client.setQueryData(['documents', jobId], documents),
+  });
+}
+
+export function useAddJob() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (url: string) =>
+      api<{ data: Job; suggestedSource: { name: string; link: string } | null }>('/v1/jobs', {
+        method: 'POST',
+        body: { url },
+      }),
+    onSuccess: () => invalidateJobs(client),
+  });
+}
+
+function invalidateSources(client: QueryClient): Promise<unknown> {
+  return Promise.all([client.invalidateQueries({ queryKey: ['boards'] }), invalidateJobs(client)]);
+}
+
+export function useFollowSource() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (url: string) =>
+      (
+        await api<{ data: { board: Board; scan: BoardScan } }>('/v1/sources', {
+          method: 'POST',
+          body: { url },
+        })
+      ).data,
+    onSuccess: () => invalidateSources(client),
+  });
+}
+
+export function useUnfollowSource() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/v1/sources/${id}`, { method: 'DELETE' }),
+    onSuccess: () => invalidateSources(client),
+  });
+}
+
+/** The best untracked, unhidden jobs, for going through one at a time. */
+export function useTriageQueue() {
+  return useQuery({
+    // Not under "jobs": saving or hiding during triage must not reshuffle the queue mid-review.
+    queryKey: ['triage'],
+    queryFn: async () =>
+      (await api<{ data: Job[] }>('/v1/jobs?sort=score&untracked=true&limit=30')).data,
+    staleTime: Infinity,
+  });
+}
+
+export function useHideJob() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (jobId: string) =>
+      api<{ data: Job }>(`/v1/jobs/${jobId}/hidden`, { method: 'PUT' }),
+    onSuccess: () => invalidateJobs(client),
+  });
+}
+
+export function useSkillGaps() {
+  return useQuery({
+    queryKey: ['jobs', 'skill-gaps'],
+    queryFn: async () => (await api<{ data: SkillGapReport }>('/v1/insights/skill-gaps')).data,
+  });
+}
+
+export function useToday() {
+  return useQuery({
+    // Under "jobs" so scans, saves and scoring refresh it along with the job lists.
+    queryKey: ['jobs', 'today'],
+    queryFn: async () => (await api<{ data: Today }>('/v1/today')).data,
   });
 }
 

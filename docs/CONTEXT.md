@@ -27,6 +27,7 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 ## Done
 
+- 2026-10-06 First round of roadmap items: see `docs/ROADMAP.md` for built and not built.
 - 2026-10-06 Profile set up from a CV with follow-up questions; desktop assist on under `pnpm dev`.
 - 2026-10-06 Skill for AI coding tools; add a job by link; store an outside assessment.
 - 2026-10-06 Terminal interface; practice application form; email and phone in the profile.

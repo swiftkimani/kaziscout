@@ -1,10 +1,69 @@
-# Roadmap: ideas for later
+# Roadmap
 
-_Written 2026-10-06. Nothing here is built. It is a list to choose from, not a promise._
+_Written 2026-10-06, and updated the same day after the first round of building._
 
 Each idea says what it is, why it would matter, and roughly how big it is: **S** is a day or
-less, **M** is a few days, **L** is a week or more. Ideas marked ★ are the ones worth doing first:
-high value for the effort, and they build on code that already exists.
+less, **M** is a few days, **L** is a week or more. The tables below are the original list. This
+section says which of them now exist.
+
+## Built
+
+**Automation**
+
+- Fetch the full posting automatically for promising jobs that arrive without a description.
+- Two-stage assessment: the AI model assesses new strong matches by itself, within a daily limit
+  (`AI_AUTO_ASSESS_PER_DAY`).
+- Merge duplicates: a role posted on several boards is listed once, with "Also on …".
+- Closing dates, read from sources and from posting text.
+- Legitimacy flags for postings that ask for fees or money transfers or promise easy earnings.
+- Morning brief to the alert webhook (`BRIEF_TIME`), including follow-up reminders.
+- Calendar file of tracked jobs' closing dates (`/v1/calendar.ics`).
+- Recognise an employer from a pasted link and follow it.
+- Weekly source check on GitHub.
+- Feed finder (`./kazi find-feed`).
+- Skills-gap radar (`./kazi gaps`, and on the Today screen).
+
+**Interface**
+
+- The Today home screen.
+- Triage mode, as the Review screen, with `S`, `K` and `H` keys.
+- Score breakdown, and "what would raise this score".
+- Requirements checklist on each job.
+- Guided setup: follow-up questions one per step after a CV import.
+- Installable: a web app manifest, so it can be added to a phone's home screen.
+- Light data mode (`LIGHT_DATA`).
+- Share a match as a short message.
+
+## Not built
+
+- **Retire dead postings.** Jobs that disappear from their feed are not yet marked closed.
+- **Follow-up drafts and the interview pack.** Reminders exist; the written drafts do not.
+- **Saved searches.**
+- **"Add to KaziScout" bookmarklet.**
+- **Learn from what gets saved**, and **salary reading**.
+- **WhatsApp or Telegram assistant, SMS digest, MCP server.**
+- **Keyboard everywhere and a command palette.** Only the Review screen has shortcuts.
+- **Compare two jobs.**
+- **Profile strength.**
+- **Board view for the tracker, application timeline, in-place document editing with a fact
+  check.**
+- **Offline use.** The app is installable but still needs the server; there is no offline copy
+  of the last scan.
+- **Kiswahili and French.**
+- **Where the jobs are** (country chips or a map).
+- **Cohort view**, which needs user accounts.
+
+## Known weak spots in what was built
+
+- The skills-gap radar counts any vocabulary word a posting uses, so general words such as
+  "sales" or "social media" show up for engineering roles when they appear in company blurbs.
+- The requirements checklist only knows the skills in its fixed list of about 150.
+- Warning signs are pattern matches. They will miss scams worded differently, and a match is a
+  reason to look closer, not proof.
+- The weekly source check needs "Allow GitHub Actions to create and approve pull requests" turned
+  on in the repository settings, and has not yet run on its schedule.
+- The calendar link cannot be subscribed to from a calendar app when an access token is set,
+  because calendar apps cannot sign in. Downloading the file from the tracker still works.
 
 ## Automation
 
@@ -104,7 +163,9 @@ high value for the effort, and they build on code that already exists.
 |     | **Share a match.** Produce a short text card for a job (title, employer, link, closing date) ready to paste into a chat group.                               | Cohorts already share jobs this way; make the message a good one.                                   | S    |
 |     | **Cohort view.** For a trainer: how many learners have a profile, have applied, have interviews, and which skills gaps are most common. Needs user accounts. | This is the paid product described in ADR-0005, and the report funders ask training programmes for. | L    |
 
-## Suggested order
+## Original suggested order
+
+All five steps below are now built.
 
 1. Fetch full postings for strong matches, and the score breakdown. Both are small and make
    the existing scores more trustworthy.

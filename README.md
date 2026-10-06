@@ -20,14 +20,17 @@ and press Submit yourself.
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Scans job boards**                   | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and worldwide remote boards.                                                                                                                                                                                                      |
 | **Reads employer career pages**        | Reads 35 employers directly through the public APIs of seven hiring systems (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Workday, Recruitee) and Teamtailor career feeds: African employers such as M-KOPA, Moniepoint, Jumia, Paystack, Kuda, Absa, Andela and One Acre Fund, and employers that hire worldwide. Any employer on those systems, in any country, can be added with one line. |
+| **Follows employers you find**         | Paste a job link from Greenhouse, Lever, Ashby, Workable, SmartRecruiters, Workday, Recruitee or Teamtailor and KaziScout offers to follow all of that employer's openings. The same role on two boards is listed once.                                                                                                                                                                               |
 | **Lists the rest**                     | A directory of 131 checked sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                                                                                                                                                                     |
 | **Works for any country**              | Your profile can name any of 234 countries. Africa is where the board list is deepest, but jobs anywhere are detected, filtered and scored.                                                                                                                                                                                                                                                           |
 | **Sets itself up from your CV**        | Give it your CV as a PDF, Word, text or Markdown file, or copy the text. It fills in your name, contact details, headline, skills and country, then asks follow-up questions about what the CV does not say: the roles you want, where you can work, whether remote suits you. Nothing is saved until you confirm.                                                                                    |
 | **Scores each job 1 to 5**             | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. A remote role's region limit ("EMEA", "US only", "LATAM") is judged against your countries, including limits stated only in the posting text, and a job you cannot take because of where it is never scores above 2.                                                                                        |
+| **Shows why, and what is missing**     | Each score breaks down into title, skills, location and freshness, with a line on what would raise it. Each job lists the skills the posting names against your profile, and warns when a posting asks applicants for a fee.                                                                                                                                                                          |
+| **Opens on what matters today**        | A Today screen with new strong matches, jobs closing within three days, applications with no reply for a week, and the skills most often missing from jobs you nearly match. A Review screen goes through new matches one at a time with three keys.                                                                                                                                                  |
 | **Works with any AI model**            | Connect OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio, and it writes a fuller assessment. With no model at all, everything else still works.                                                                                                                                                                                                  |
 | **Writes your documents**              | With a model connected, writes a cover letter and a CV tailored to the posting from your own CV, under a strict "reword, never invent" rule, and opens each on a clean page to print or save as PDF.                                                                                                                                                                                                  |
 | **Page to Markdown**                   | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                                                                                                                                                                                                 |
-| **Scans on a schedule and alerts you** | Optionally re-scans every so often and posts new strong matches to a webhook (Slack, Discord, ntfy, Zapier, n8n).                                                                                                                                                                                                                                                                                     |
+| **Scans on a schedule and alerts you** | Optionally re-scans every so often and posts new strong matches to a webhook (Slack, Discord, ntfy, Zapier, n8n), and sends a morning brief once a day. Closing dates of tracked jobs export to any calendar.                                                                                                                                                                                         |
 | **Tracks applications**                | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                                                                                                    |
 | **Helps you apply**                    | Builds an application pack (your contact details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it. A practice form at `/practice-form` lets you or an AI agent rehearse first.                                                                                                          |
 | **Works in the terminal**              | Talk to it through an AI coding tool (Claude Code, OpenCode, Codex), which assesses jobs with its own model, or run `./kazi scan`, `./kazi jobs`, `./kazi show <id>` yourself.                                                                                                                                                                                                                        |
@@ -121,11 +124,15 @@ needs no AI key of its own for this. In Claude Code and OpenCode the skill is al
 ./kazi cv ~/Documents/cv.pdf   # set up your profile from your CV; asks follow-up questions
 ./kazi profile --roles "Frontend Developer, Full-Stack Developer"   # change any answer later
 ./kazi scan                 # read every source (about a minute)
+./kazi today                # what needs you: new matches, closing soon, follow-ups
 ./kazi jobs --min 4         # your strongest matches
+./kazi gaps                 # skills most often missing from jobs you nearly match
 ./kazi jobs --country KE --newest
 ./kazi add https://...      # add a job you found yourself, and score it
 ./kazi show <ID>            # fit, reasons, link and description
+./kazi follow https://...   # follow every opening from that link's employer
 ./kazi track <ID>           # save it to your tracker
+./kazi hide <ID>            # dismiss it for good
 ./kazi md https://...       # any web page as clean Markdown
 ./kazi help
 ```
@@ -133,7 +140,7 @@ needs no AI key of its own for this. In Claude Code and OpenCode the skill is al
 ## Test
 
 ```sh
-pnpm test          # 195 server tests and 43 web tests; no network needed
+pnpm test          # 262 server tests and 54 web tests; no network needed
 pnpm typecheck
 pnpm lint
 pnpm format:check
@@ -153,6 +160,9 @@ All settings are optional. See [.env.example](.env.example).
 | `SCAN_INTERVAL_MINUTES`  | `0`                               | Minutes between automatic scans. `0` is off; minimum 15.                                        |
 | `ALERT_WEBHOOK_URL`      | none                              | Where to post new strong matches after a scheduled scan.                                        |
 | `ALERT_MIN_SCORE`        | `4`                               | Lowest score that triggers an alert.                                                            |
+| `BRIEF_TIME`             | none                              | Local time (`07:30`) to send a morning brief to the alert webhook                               |
+| `AI_AUTO_ASSESS_PER_DAY` | `0`                               | How many new strong matches the AI model may assess by itself each day                          |
+| `LIGHT_DATA`             | `false`                           | Skip fetching full postings after scans, for metered connections                                |
 | `FIRECRAWL_API_KEY`      | none                              | Convert pages with Firecrawl instead of the local converter                                     |
 | `AI_BASE_URL`            | none                              | Base URL of any OpenAI-compatible server. Enables "Assess with AI".                             |
 | `AI_API_KEY`             | none                              | Key for that server. Local servers such as Ollama need none.                                    |
@@ -166,18 +176,24 @@ The UI is a client of a small versioned API, which you can also call directly.
 
 | Method and path                                                          | Purpose                                                                                                |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `GET /v1/today`                                                          | New strong matches, jobs closing soon, follow-ups due, failed sources                                  |
+| `GET /v1/insights/skill-gaps`                                            | Skills most often missing from jobs you nearly match                                                   |
 | `GET /v1/boards`                                                         | Board directory with last scan result and job counts                                                   |
 | `POST /v1/scans`                                                         | Scan every board that has a public feed                                                                |
 | `POST /v1/boards/:id/scan`                                               | Scan one board                                                                                         |
 | `GET /v1/jobs`                                                           | List jobs. Filters: `search`, `board`, `country`, `remote`, `minScore`, `sort`, `limit`, `cursor`      |
 | `POST /v1/jobs`                                                          | Add a job from its posting link. Body: `{"url": "..."}`                                                |
 | `GET /v1/jobs/:id`                                                       | One job with its evaluation and tracker entry                                                          |
+| `PUT` / `DELETE /v1/jobs/:id/hidden`                                     | Hide a job from every list, or restore it                                                              |
 | `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                                |
 | `PUT /v1/jobs/:id/evaluation`                                            | Store an assessment made outside KaziScout, for example by an AI coding tool                           |
 | `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                               |
 | `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                             |
 | `GET` / `POST /v1/jobs/:id/documents`                                    | Read, or have the AI model write, the cover letter and tailored CV                                     |
 | `POST /v1/jobs/:id/assist`                                               | Copy the pack to the clipboard through computer-use-mcp                                                |
+| `POST /v1/sources`, `DELETE /v1/sources/:id`                             | Follow the employer behind a job link, or stop                                                         |
+| `POST /v1/sources/find-feed`                                             | Look for a public feed on a job board                                                                  |
+| `GET /v1/calendar.ics`                                                   | Closing dates of tracked jobs, for any calendar app                                                    |
 | `POST /v1/extract`                                                       | Convert any public page to Markdown. Body: `{"url": "..."}`                                            |
 | `GET` / `PUT /v1/profile`                                                | Read or save the profile                                                                               |
 | `POST /v1/profile/import`                                                | Draft a profile from a CV file, pasted text or the clipboard, with follow-up questions. Saves nothing. |
@@ -218,7 +234,7 @@ server/
   test/                 tests and recorded feed fixtures
 web/
   src/components/ui/    primitives (the only place raw styling lives)
-  src/features/         jobs, boards, tracker, profile, extract, practice form
+  src/features/         today, review, jobs, boards, tracker, profile, extract, practice form
   src/styles/tokens.css design tokens
 brand/                  logo and brand notes
 docs/                   board list, decisions, handoff journal
@@ -294,7 +310,7 @@ Full acknowledgements, including data sources, are in [CREDITS.md](CREDITS.md).
 Pull requests go to the `dev` branch; `main` is only updated from `dev`. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for the branch flow, [AGENTS.md](AGENTS.md) for the project
 rules, [docs/CONTEXT.md](docs/CONTEXT.md) for the current state of the work, and
-[docs/ROADMAP.md](docs/ROADMAP.md) for ideas waiting to be built.
+[docs/ROADMAP.md](docs/ROADMAP.md) for what is built and what is waiting.
 
 ## Licence
 

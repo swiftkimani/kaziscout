@@ -38,35 +38,41 @@ export class AlertService {
     const heading = `KaziScout found ${matches.length} new strong ${matches.length === 1 ? 'match' : 'matches'}`;
     const text = [heading, ...lines].join('\n');
 
+    const jobs = listed.map(({ id, title, company, location, score, url }) => ({
+      id,
+      title,
+      company,
+      location,
+      score,
+      url,
+    }));
+    if (!(await this.post(text, { jobs }))) return 0;
+    this.deps.logger.info({ jobs: matches.length }, 'alert sent');
+    return matches.length;
+  }
+
+  /** Sends the morning brief. Returns whether the webhook accepted it. */
+  async sendBrief(text: string): Promise<boolean> {
+    const sent = await this.post(`KaziScout: your morning brief\n\n${text}`, {});
+    if (sent) this.deps.logger.info({}, 'morning brief sent');
+    return sent;
+  }
+
+  /** Posts one message. A webhook that is down or refuses is logged, never thrown. */
+  private async post(text: string, extra: Record<string, unknown>): Promise<boolean> {
     try {
       const response = await (this.deps.fetchImpl ?? fetch)(this.deps.webhookUrl, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          content: text,
-          jobs: listed.map(({ id, title, company, location, score, url }) => ({
-            id,
-            title,
-            company,
-            location,
-            score,
-            url,
-          })),
-        }),
+        body: JSON.stringify({ text, content: text, ...extra }),
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
-      if (!response.ok) {
-        this.deps.logger.warn({ status: response.status }, 'alert webhook rejected the message');
-        return 0;
-      }
+      if (response.ok) return true;
+      this.deps.logger.warn({ status: response.status }, 'alert webhook rejected the message');
     } catch (error) {
-      // An unreachable webhook must never fail the scan that found the jobs.
       const reason = error instanceof Error ? error.message : String(error);
       this.deps.logger.warn({ reason }, 'alert webhook could not be reached');
-      return 0;
     }
-    this.deps.logger.info({ jobs: matches.length }, 'alert sent');
-    return matches.length;
+    return false;
   }
 }

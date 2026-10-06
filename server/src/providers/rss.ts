@@ -1,5 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { UpstreamError } from '../errors.js';
+import { findClosingDate } from './closing-date.js';
 import type { Provider, RawJob } from './types.js';
 
 const parser = new XMLParser({
@@ -76,6 +77,8 @@ export function parseRss(xml: string, options: { isRemoteBoard: boolean }): RawJ
       url,
       bodyHtml: text(item['content:encoded']) || text(item.description),
       postedAt: parseDate(text(item.pubDate)),
+      // Zimbabwean boards put the deadline in the title; elsewhere it is found in the body later.
+      closesAt: findClosingDate(rawTitle),
       isRemote,
     });
   }

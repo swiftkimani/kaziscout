@@ -1,0 +1,47 @@
+name: Verify sources
+
+# Re-checks every job board and employer once a week, and opens a pull request into dev when a
+# source's status has changed. Needs "Allow GitHub Actions to create and approve pull requests"
+# turned on under Settings > Actions > General.
+on:
+  schedule:
+    - cron: '0 5 * * 1' # Mondays, 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm boards:verify
+      - name: Open a pull request if any source changed status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The verifier rewrites the check date on every source, so only a status change counts.
+          if ! git diff -U0 -- server/data/boards.json | grep -qE '^[+-] +"status"'; then
+            echo "No source changed status."
+            exit 0
+          fi
+          branch="chore/verify-sources-$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add server/data/boards.json docs/BOARDS.md
+          git commit -m "chore(boards): update source statuses from the weekly check"
+          git push origin "$branch"
+          gh pr create --base dev --head "$branch" \
+            --title "chore(boards): update source statuses from the weekly check" \
+            --body "The weekly check found sources whose status changed. Review the diff of \`docs/BOARDS.md\` before merging: a source marked down may only have been briefly unreachable."
