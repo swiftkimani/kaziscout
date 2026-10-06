@@ -1,6 +1,6 @@
 ---
 name: kaziscout-apply
-description: Fill in a job application form from a KaziScout application pack using computer-use-mcp, then stop before Submit so the person can review. Use when the person asks to apply, or to fill in the form, for a job they found in KaziScout.
+description: Fill in a job application form from a KaziScout application pack, then stop before Submit so the person can review. Use when the person asks to apply, or to fill in the form, for a job they found in KaziScout.
 ---
 
 # Assisted application with KaziScout
@@ -10,9 +10,18 @@ submit.
 
 ## Requirements
 
-- KaziScout is running (default `http://127.0.0.1:8787`).
-- The computer-use MCP server (`@zavora-ai/computer-use-mcp`) is connected.
+- KaziScout is running (default `http://127.0.0.1:8787`). If it has an access token, send it as
+  `Authorization: Bearer <token>` on every request.
+- A tool that can fill in forms:
+  - **Web forms (almost every application):** a browser tool that works on the page's own
+    structure, such as Claude in Chrome or the Playwright MCP server.
+  - **Native desktop apps:** the computer-use MCP server (`@zavora-ai/computer-use-mcp`).
 - The person has told you which job, by its KaziScout id or title.
+
+Use a browser tool for web forms. Chromium-based browsers (Chrome, Brave, Edge) do not expose a
+page's fields to desktop accessibility tools by default, so computer-use's `find_element` and
+`fill_form` return nothing for them. This was found by running this skill, not assumed. Fall back
+to computer-use screenshots and clicks on a web page only when no browser tool is connected.
 
 ## Steps
 
@@ -21,14 +30,19 @@ submit.
 2. **Get the pack.** `GET /v1/jobs/<id>/application-pack` returns the person's details, the skills
    to lead with and the gaps to address. Use only what is in the pack and the profile
    (`GET /v1/profile`). Do not invent experience, dates, salaries or referees.
-3. **Open the posting** from the job's `url` in the person's browser and find the application form.
-4. **Fill the form** with computer-use's accessibility tools (`find_element`, `set_value`,
-   `fill_form`) in preference to pixel clicks. Name the target app or window on every call.
-5. **Leave blank anything you do not know**, and list those fields for the person.
+3. **Open the posting** from the job's `url` and find the application form.
+4. **Fill the form** field by field, matching each field's visible label to what the pack holds.
+5. **Leave blank anything you do not know**, and list those fields for the person. A missing
+   email or phone number means the profile has none; say so rather than guessing.
 6. **Stop before Submit.** Never activate a control that submits, sends, applies or pays. Tell
    the person the form is ready, what you filled, and what still needs them.
 7. **After they submit**, record it: `PATCH /v1/applications/<id>` with `{"status": "applied"}`.
    Create the tracker entry first with `POST /v1/applications` if there is none.
+
+## Rehearse first
+
+KaziScout has a practice form at `/practice-form`. It is shaped like an employer's form and sends
+nothing anywhere. Run steps 1 to 6 against it before trying a real application.
 
 ## Rules
 

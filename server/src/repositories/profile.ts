@@ -13,7 +13,7 @@ export class ProfileRepository {
   get(): (Profile & { updatedAt: string }) | undefined {
     const row = this.db
       .prepare(
-        `SELECT full_name, headline, cv_text, skills_json, target_titles_json, countries_json,
+        `SELECT full_name, email, phone, headline, cv_text, skills_json, target_titles_json, countries_json,
                 is_remote_ok, updated_at
          FROM profiles WHERE id = 1`,
       )
@@ -21,6 +21,8 @@ export class ProfileRepository {
     if (!row) return undefined;
     return {
       fullName: String(row.full_name),
+      email: String(row.email),
+      phone: String(row.phone),
       headline: String(row.headline),
       cvText: String(row.cv_text),
       skills: parseList(row.skills_json),
@@ -34,11 +36,12 @@ export class ProfileRepository {
   save(profile: Profile, now: Date): void {
     this.db
       .prepare(
-        `INSERT INTO profiles (id, full_name, headline, cv_text, skills_json, target_titles_json,
-           countries_json, is_remote_ok, updated_at)
-         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)
+        `INSERT INTO profiles (id, full_name, email, phone, headline, cv_text, skills_json,
+           target_titles_json, countries_json, is_remote_ok, updated_at)
+         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT (id) DO UPDATE SET
-           full_name = excluded.full_name, headline = excluded.headline,
+           full_name = excluded.full_name, email = excluded.email, phone = excluded.phone,
+           headline = excluded.headline,
            cv_text = excluded.cv_text, skills_json = excluded.skills_json,
            target_titles_json = excluded.target_titles_json,
            countries_json = excluded.countries_json, is_remote_ok = excluded.is_remote_ok,
@@ -46,6 +49,8 @@ export class ProfileRepository {
       )
       .run(
         profile.fullName,
+        profile.email,
+        profile.phone,
         profile.headline,
         profile.cvText,
         JSON.stringify(profile.skills),

@@ -16,3 +16,4 @@
 - [ ] No code path submits an application
 - [ ] New boards use a public feed or API, and `pnpm boards:verify` was run
 - [ ] `docs/CONTEXT.md` updated
+- [ ] First contribution: the CLA line from `CONTRIBUTING.md` is in this description

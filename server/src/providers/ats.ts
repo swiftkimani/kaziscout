@@ -219,6 +219,101 @@ export const workableProvider: Provider = async (board, { fetchText }) => {
   }));
 };
 
+const recruiteeSchema = z.object({
+  offers: z.array(
+    z.object({
+      id: z.number(),
+      title: z.string(),
+      careers_url: z.url(),
+      status: z.string().default('published'),
+      location: z.string().nullish(),
+      country: z.string().nullish(),
+      remote: z.boolean().nullish(),
+      published_at: z.string().nullish(),
+      company_name: z.string().nullish(),
+      description: z.string().nullish(),
+      requirements: z.string().nullish(),
+    }),
+  ),
+});
+
+export const recruiteeProvider: Provider = async (board, { fetchText }) => {
+  const body = await fetchText(`https://${slugOf(board)}.recruitee.com/api/offers/`, {
+    accept: 'application/json',
+  });
+  return parseJson(body, recruiteeSchema, 'Recruitee')
+    .offers.filter((offer) => offer.status === 'published')
+    .map((offer): RawJob => {
+      const isRemote = offer.remote === true;
+      // For a remote role the country is the restriction; for an on-site one it is the place.
+      const place = isRemote ? offer.country : [offer.location, offer.country].join(', ');
+      return {
+        externalId: String(offer.id),
+        title: offer.title.trim(),
+        company: offer.company_name ?? board.name,
+        location: place?.trim() || undefined,
+        url: offer.careers_url,
+        bodyHtml: `${offer.description ?? ''}\n${offer.requirements ?? ''}`,
+        // Recruitee writes "2026-09-24 11:51:18 UTC".
+        postedAt: offer.published_at
+          ? new Date(offer.published_at.replace(' UTC', 'Z').replace(' ', 'T'))
+          : undefined,
+        isRemote,
+      };
+    });
+};
+
+const workdaySchema = z.object({
+  jobPostings: z.array(
+    z.object({
+      title: z.string(),
+      externalPath: z.string().startsWith('/'),
+      locationsText: z.string().nullish(),
+      postedOn: z.string().nullish(),
+      remoteType: z.string().nullish(),
+    }),
+  ),
+});
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Workday gives only relative dates: "Posted Today", "Posted 3 Days Ago", "Posted 30+ Days Ago". */
+export function parseWorkdayPostedOn(
+  postedOn: string | null | undefined,
+  now: Date,
+): Date | undefined {
+  const text = postedOn?.toLowerCase() ?? '';
+  if (text.includes('today')) return now;
+  if (text.includes('yesterday')) return new Date(now.getTime() - DAY_MS);
+  const days = /(\d+)\+? days? ago/.exec(text)?.[1];
+  return days ? new Date(now.getTime() - Number(days) * DAY_MS) : undefined;
+}
+
+/**
+ * Workday's job list is a search endpoint that takes a POST and returns 20 postings a page,
+ * without descriptions. Only the first page is read, which is the 20 newest.
+ */
+export const workdayProvider: Provider = async (board, { fetchText, now }) => {
+  if (board.access.type !== 'workday') throw new Error(`${board.id} is not a Workday board`);
+  const { host, tenant, site } = board.access;
+  const body = await fetchText(`https://${host}/wday/cxs/${tenant}/${site}/jobs`, {
+    accept: 'application/json',
+    postJson: { appliedFacets: {}, limit: 20, offset: 0, searchText: '' },
+  });
+  const scannedAt = now?.() ?? new Date();
+  return parseJson(body, workdaySchema, 'Workday').jobPostings.map((job): RawJob => ({
+    // The path ends in the requisition id and is stable for the life of the posting.
+    externalId: job.externalPath,
+    title: job.title.replace(/\s+/g, ' ').trim(),
+    company: board.name,
+    location: job.locationsText?.trim() || undefined,
+    url: `https://${host}/${site}${job.externalPath}`,
+    bodyHtml: '',
+    postedAt: parseWorkdayPostedOn(job.postedOn, scannedAt),
+    isRemote: job.remoteType?.toLowerCase() === 'remote',
+  }));
+};
+
 /** The public API address for an employer board, used by the board verifier. */
 export function atsApiUrl(board: Board): string {
   if (board.access.type !== 'ats') throw new Error(`${board.id} is not an employer board`);
@@ -234,5 +329,7 @@ export function atsApiUrl(board: Board): string {
       return `https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=1`;
     case 'workable':
       return `https://apply.workable.com/api/v1/widget/accounts/${slug}`;
+    case 'recruitee':
+      return `https://${slug}.recruitee.com/api/offers/`;
   }
 }

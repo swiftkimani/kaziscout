@@ -41,6 +41,8 @@ export function describeProfile(profile: Profile): string {
   return [
     '<candidate_profile>',
     `Name: ${profile.fullName}`,
+    `Email: ${profile.email || 'not given'}`,
+    `Phone: ${profile.phone || 'not given'}`,
     `Headline: ${profile.headline}`,
     `Target roles: ${profile.targetTitles.join(', ')}`,
     `Skills: ${profile.skills.join(', ')}`,

@@ -19,6 +19,7 @@
     "dev": "pnpm --parallel --filter \"./server\" --filter \"./web\" dev",
     "build": "pnpm --filter \"./web\" build && pnpm --filter \"./server\" build",
     "start": "pnpm --filter \"./server\" start",
+    "kazi": "pnpm --silent --filter \"./server\" cli",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",

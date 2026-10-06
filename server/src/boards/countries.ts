@@ -130,6 +130,14 @@ const AFRICAN_ALIASES: Readonly<Record<string, string>> = {
   mogadishu: 'SO',
   khartoum: 'SD',
   juba: 'SS',
+  sandton: 'ZA',
+  pemba: 'MZ',
+  lodwar: 'KE',
+  kano: 'NG',
+  ibadan: 'NG',
+  'port harcourt': 'NG',
+  arusha: 'TZ',
+  entebbe: 'UG',
 };
 
 /** Common ways job postings name countries outside Africa. */
@@ -211,13 +219,58 @@ export function detectCountry(
   return detectCountries(text, scope)[0];
 }
 
+// Continents, for resolving region limits such as "Europe" or "APAC". Africa is AFRICAN_COUNTRIES.
+const EUROPE =
+  'AD AL AT AX BA BE BG BY CH CY CZ DE DK EE ES FI FO FR GB GG GI GR HR HU IE IM IS IT JE LI LT LU ' +
+  'LV MC MD ME MK MT NL NO PL PT RO RS RU SE SI SK SM UA VA';
+const MIDDLE_EAST = 'AE BH IL IQ IR JO KW LB OM PS QA SA SY TR YE';
+const ASIA_OTHER =
+  'AF AM AZ BD BN BT CN GE HK ID IN JP KG KH KP KR KZ LA LK MM MN MO MV MY NP PH PK SG TH TJ TL ' +
+  'TM TW UZ VN';
+const NORTH_AMERICA = 'BM CA GL PM US';
+// Mexico, Central America and the Caribbean: "LATAM" and "Americas", never "North America".
+const LATIN_NORTH =
+  'AG AI AW BB BL BQ BS BZ CR CU CW DM DO GD GP GT HN HT JM KN KY LC MF MQ MS MX NI PA PR SV SX ' +
+  'TC TT VC VG VI';
+const SOUTH_AMERICA = 'AR BO BR CL CO EC FK GF GY PE PY SR UY VE';
+const OCEANIA = 'AS AU CK FJ FM GU KI MH MP NC NR NU NZ PF PG PW SB TO TV VU WF WS';
+const INDIAN_OCEAN_FRANCE = 'RE YT';
+const NORTH_AFRICA = 'DZ EG LY MA SD TN';
+
+const codes = (...lists: string[]): ReadonlySet<string> => new Set(lists.join(' ').split(' '));
+const AFRICA = codes(Object.keys(AFRICAN_COUNTRIES).join(' '), INDIAN_OCEAN_FRANCE);
+const AMERICAS = codes(NORTH_AMERICA, LATIN_NORTH, SOUTH_AMERICA);
+
+/** The countries each region word stands for. Patterns are tried in order; all that match count. */
+const REGIONS: ReadonlyArray<readonly [word: RegExp, members: ReadonlySet<string>]> = [
+  [/\bemea\b/i, codes(EUROPE, MIDDLE_EAST, [...AFRICA].join(' '))],
+  [/\bmena\b/i, codes(MIDDLE_EAST, NORTH_AFRICA)],
+  [/\b(africa|ssa)\b/i, AFRICA],
+  [/\b(europe|european union|eu|eea)\b/i, codes(EUROPE)],
+  [/\bnordics?\b/i, codes('DK FI IS NO SE')],
+  [/\bdach\b/i, codes('AT CH DE')],
+  [/\bmiddle east\b/i, codes(MIDDLE_EAST)],
+  [/\bnorth america\b/i, codes(NORTH_AMERICA)],
+  [/\b(latam|latin america|south america)\b/i, codes(LATIN_NORTH, SOUTH_AMERICA)],
+  [/\bamericas\b/i, AMERICAS],
+  [/\bapac\b/i, codes(ASIA_OTHER, OCEANIA)],
+  [/\basia\b/i, codes(ASIA_OTHER, MIDDLE_EAST)],
+  [/\boceania\b/i, codes(OCEANIA)],
+];
+
+/** Every country assigned to a continent above, for the test that none is left out. */
+export const COUNTRIES_WITH_A_REGION: ReadonlySet<string> = codes(
+  [...AFRICA].join(' '),
+  EUROPE,
+  MIDDLE_EAST,
+  ASIA_OTHER,
+  [...AMERICAS].join(' '),
+  OCEANIA,
+);
+
 const REMOTE_ONLY_WORDS = /\b(fully |100% )?(remote|home[- ]based|work from home)\b/gi;
 const WORLDWIDE_WORDS =
   /\b(worldwide|anywhere|global|international|all regions|no restrictions?)\b/i;
-// Regions that include Africa, and regions that do not.
-const AFRICA_REGION_WORDS = /\b(africa|emea|mena|ssa)\b/i;
-const OTHER_REGION_WORDS =
-  /\b(europe|european union|eu|eea|americas?|north america|latam|latin america|apac|asia|oceania|nordics?|dach)\b/i;
 
 export type RemoteEligibility =
   /** No region restriction is stated. */
@@ -226,7 +279,7 @@ export type RemoteEligibility =
   | { kind: 'match'; place: string }
   /** The restriction names places, none of which the person can work from. */
   | { kind: 'excluded'; place: string }
-  /** The restriction is stated but could not be resolved for this person. */
+  /** The restriction is stated but names no country or region KaziScout recognises. */
   | { kind: 'unclear'; place: string };
 
 /**
@@ -244,17 +297,37 @@ export function judgeRemoteRestriction(
     .trim();
   if (!meaningful || WORLDWIDE_WORDS.test(meaningful)) return { kind: 'open' };
 
-  const named = detectCountries(meaningful, 'world');
-  if (named.some((code) => profileCountries.includes(code))) return { kind: 'match', place };
+  const namedCountries = detectCountries(meaningful, 'world');
+  const namedRegions = REGIONS.filter(([word]) => word.test(meaningful)).map(
+    ([, members]) => members,
+  );
+  if (namedCountries.length === 0 && namedRegions.length === 0) return { kind: 'unclear', place };
 
-  const hasAfricanCountry = profileCountries.some(isAfrican);
-  if (AFRICA_REGION_WORDS.test(meaningful) && hasAfricanCountry) return { kind: 'match', place };
+  const isAllowed = (code: string) =>
+    namedCountries.includes(code) || namedRegions.some((members) => members.has(code));
+  return profileCountries.some(isAllowed) ? { kind: 'match', place } : { kind: 'excluded', place };
+}
 
-  const everyCountryIsAfrican = profileCountries.length > 0 && profileCountries.every(isAfrican);
-  if (named.length > 0) return { kind: 'excluded', place };
-  if (OTHER_REGION_WORDS.test(meaningful)) {
-    // Without a continent table, a non-African profile cannot be placed in "Europe" or "APAC".
-    return everyCountryIsAfrican ? { kind: 'excluded', place } : { kind: 'unclear', place };
+// Phrases postings use to limit where a "Remote" role can be done. Each captures the place.
+const STATED_RESTRICTIONS: readonly RegExp[] = [
+  /\b(?:must|need to|required to|should)\s+(?:be\s+)?(?:based|located|residing|reside|live|living)\s+in\s+(?:the\s+)?([^.;:!?\n]{2,60})/i,
+  /\b(?:only|exclusively)\s+(?:open|available)\s+to\s+(?:candidates|applicants|residents|people|those)\s+(?:in|from|based in|located in|residing in)\s+(?:the\s+)?([^.;:!?\n]{2,60})/i,
+  /\b(?:authori[sz]ed|eligible|legally\s+(?:able|authori[sz]ed|permitted)|have\s+the\s+right)\s+to\s+work\s+in\s+(?:the\s+)?([^.;:!?\n]{2,60})/i,
+  /\bthis\s+(?:role|position|job)\s+is\s+(?:only\s+)?(?:open|available)\s+(?:to\s+(?:candidates|applicants|residents)\s+)?(?:in|from|within)\s+(?:the\s+)?([^.;:!?\n]{2,60})/i,
+  /\b((?:US|U\.S\.|USA|UK|EU|Canada|Europe)[- ](?:only|based only|residents only))\b/i,
+];
+// Restrictions appear in the summary or requirements, not deep in boilerplate.
+const BODY_SEARCH_LENGTH = 6000;
+
+/**
+ * Looks in a posting's text for a sentence limiting where the role can be done, for roles whose
+ * location says only "Remote". Returns the place named, or undefined when nothing is stated.
+ */
+export function findStatedRestriction(body: string): string | undefined {
+  const text = body.slice(0, BODY_SEARCH_LENGTH);
+  for (const pattern of STATED_RESTRICTIONS) {
+    const place = pattern.exec(text)?.[1]?.trim();
+    if (place) return place;
   }
-  return { kind: 'unclear', place };
+  return undefined;
 }

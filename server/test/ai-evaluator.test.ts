@@ -8,6 +8,8 @@ import type { Profile, ScorableJob } from '../src/scoring/types.js';
 
 const profile: Profile = {
   fullName: 'Wanjiru Kamau',
+  email: '',
+  phone: '',
   headline: 'Data analyst',
   cvText: 'Three years of SQL and Python at a county health office.',
   skills: ['SQL', 'Python'],

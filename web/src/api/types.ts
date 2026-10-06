@@ -69,7 +69,7 @@ export interface Board {
   countries: string[];
   category: string;
   language: string;
-  access: { type: 'rss' | 'api' | 'ats' | 'listing' };
+  access: { type: 'rss' | 'api' | 'ats' | 'workday' | 'listing' };
   status: 'live' | 'blocked' | 'down';
   checkedAt: string;
   note?: string;
@@ -80,6 +80,8 @@ export interface Board {
 
 export interface Profile {
   fullName: string;
+  email: string;
+  phone: string;
   headline: string;
   cvText: string;
   skills: string[];
