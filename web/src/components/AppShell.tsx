@@ -1,5 +1,6 @@
 import { BriefcaseBusiness, FileText, Globe, KanbanSquare, UserRound } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { useSession, useSignOut } from '../api/queries';
 
 const NAV_ITEMS = [
   { to: '/jobs', label: 'Jobs', icon: BriefcaseBusiness },
@@ -10,6 +11,9 @@ const NAV_ITEMS = [
 ] as const;
 
 export function AppShell() {
+  const session = useSession();
+  const signOut = useSignOut();
+
   return (
     <div className="shell">
       <a className="skip-link" href="#main">
@@ -32,7 +36,14 @@ export function AppShell() {
             ))}
           </ul>
         </nav>
-        <p className="shell__foot">You review every application and press Submit yourself.</p>
+        <div className="shell__foot">
+          <p>You review every application and press Submit yourself.</p>
+          {session.data?.required && (
+            <button type="button" className="shell__signout" onClick={() => signOut.mutate()}>
+              Sign out
+            </button>
+          )}
+        </div>
       </aside>
       <main id="main" className="shell__main" tabIndex={-1}>
         <Outlet />

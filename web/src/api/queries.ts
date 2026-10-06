@@ -164,3 +164,34 @@ export function useExtract() {
       (await api<{ data: MarkdownPage }>('/v1/extract', { method: 'POST', body: { url } })).data,
   });
 }
+
+export interface Session {
+  required: boolean;
+  authenticated: boolean;
+}
+
+export function useSession() {
+  return useQuery({
+    queryKey: ['session'],
+    queryFn: async () => (await api<{ data: Session }>('/v1/session')).data,
+    staleTime: Infinity,
+  });
+}
+
+export function useSignIn() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (token: string) =>
+      (await api<{ data: Session }>('/v1/session', { method: 'POST', body: { token } })).data,
+    // Everything fetched before sign-in was refused, so it is all fetched again.
+    onSuccess: () => client.invalidateQueries(),
+  });
+}
+
+export function useSignOut() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<void>('/v1/session', { method: 'DELETE' }),
+    onSuccess: () => client.invalidateQueries(),
+  });
+}

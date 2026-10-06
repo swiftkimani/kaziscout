@@ -6,6 +6,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import type { Board } from './boards/registry.js';
 import type { Config } from './config.js';
 import type { Db } from './db/client.js';
+import { registerAuth } from './auth/routes.js';
 import { AppError } from './errors.js';
 import { FirecrawlConverter, LocalConverter, type PageConverter } from './extract/converters.js';
 import type { ResolveHost } from './extract/safe-url.js';
@@ -17,11 +18,13 @@ import { ProfileRepository } from './repositories/profile.js';
 import { registerV1Routes } from './routes/v1.js';
 import { createAiEvaluator, type AiEvaluator } from './scoring/ai-evaluator.js';
 import { HeuristicEvaluator } from './scoring/heuristic.js';
+import { AlertService } from './services/alerts.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
 import { EvaluationService } from './services/evaluation.js';
 import { MarkdownService } from './services/markdown.js';
 import { ScanService } from './services/scan.js';
+import { ScanScheduler } from './services/scheduler.js';
 
 export interface AppOptions {
   config: Config;
@@ -43,10 +46,14 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   const fetchText = options.fetchText ?? defaultFetchText;
 
   const app = Fastify({
-    logger: { level: config.LOG_LEVEL, redact: ['req.headers.authorization'] },
+    logger: {
+      level: config.LOG_LEVEL,
+      redact: ['req.headers.authorization', 'req.headers.cookie'],
+    },
     bodyLimit: 256 * 1024,
   });
   await app.register(rateLimit, { max: 300, timeWindow: '1 minute' });
+  registerAuth(app, { accessToken: config.ACCESS_TOKEN, now: now ?? (() => new Date()) });
 
   const jobs = new JobRepository(db);
   const applications = new ApplicationRepository(db);
@@ -158,7 +165,29 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     });
   }
 
+  const alerts = config.ALERT_WEBHOOK_URL
+    ? new AlertService({
+        jobs,
+        webhookUrl: config.ALERT_WEBHOOK_URL,
+        minScore: config.ALERT_MIN_SCORE,
+        logger: app.log,
+      })
+    : undefined;
+  const scheduler =
+    config.SCAN_INTERVAL_MINUTES > 0
+      ? new ScanScheduler({
+          scans: scanService,
+          alerts,
+          intervalMinutes: config.SCAN_INTERVAL_MINUTES,
+          logger: app.log,
+        })
+      : undefined;
+  app.addHook('onReady', () => {
+    scheduler?.start();
+  });
+
   app.addHook('onClose', async () => {
+    scheduler?.stop();
     await desktop?.close();
   });
 

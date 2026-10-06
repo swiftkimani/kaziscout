@@ -17,6 +17,20 @@ const envSchema = z.object({
   AI_BASE_URL: optionalSecret.pipe(z.url().optional()),
   AI_API_KEY: optionalSecret,
   AI_MODEL: optionalSecret,
+  // 0 turns scheduled scans off. Boards are small sites, so the shortest interval is 15 minutes.
+  SCAN_INTERVAL_MINUTES: z.coerce
+    .number()
+    .int()
+    .refine((minutes) => minutes === 0 || (minutes >= 15 && minutes <= 10_080), {
+      message: 'must be 0 (off) or between 15 and 10080',
+    })
+    .default(0),
+  ALERT_WEBHOOK_URL: optionalSecret.pipe(z.url().optional()),
+  ALERT_MIN_SCORE: z.coerce.number().min(1).max(5).default(4),
+  // Required before the server will listen on anything other than this computer.
+  ACCESS_TOKEN: optionalSecret.pipe(
+    z.string().min(16, 'must be at least 16 characters').optional(),
+  ),
   DESKTOP_ASSIST_ENABLED: z
     .enum(['true', 'false'])
     .default('false')

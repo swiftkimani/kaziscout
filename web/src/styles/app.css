@@ -90,6 +90,29 @@
   font-size: var(--text-xs);
 }
 
+.shell__signout {
+  min-height: var(--target-min);
+  padding: var(--space-0);
+  border: none;
+  background: none;
+  color: var(--brand-fg);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-4);
+}
+
+.auth__panel {
+  width: 100%;
+  max-width: var(--column-min);
+}
+
 .shell__main {
   width: 100%;
   max-width: var(--content-max);
@@ -380,6 +403,29 @@
 
   .shell__foot {
     display: none;
+  }
+
+  .shell__signout {
+    min-height: var(--target-min);
+    padding: var(--space-0);
+    border: none;
+    background: none;
+    color: var(--brand-fg);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .auth {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: var(--space-4);
+  }
+
+  .auth__panel {
+    width: 100%;
+    max-width: var(--column-min);
   }
 
   .shell__main {

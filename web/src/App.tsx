@@ -1,5 +1,6 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
+import { AuthGate } from './components/AuthGate';
 import { EmptyState } from './components/ui/Feedback';
 import { BoardsPage } from './features/boards/BoardsPage';
 import { ExtractPage } from './features/extract/ExtractPage';
@@ -19,7 +20,13 @@ function NotFoundPage() {
 export function App() {
   return (
     <Routes>
-      <Route element={<AppShell />}>
+      <Route
+        element={
+          <AuthGate>
+            <AppShell />
+          </AuthGate>
+        }
+      >
         <Route index element={<Navigate to="/jobs" replace />} />
         <Route path="jobs" element={<JobsPage />} />
         <Route path="jobs/:id" element={<JobDetailPage />} />
