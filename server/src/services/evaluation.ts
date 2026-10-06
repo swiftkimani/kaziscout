@@ -1,0 +1,102 @@
+import { NotConfiguredError, NotFoundError, ValidationError } from '../errors.js';
+import type { Job, JobRepository } from '../repositories/jobs.js';
+import type { ProfileRepository } from '../repositories/profile.js';
+import type { Evaluation, JobEvaluator, Profile, ScorableJob } from '../scoring/types.js';
+
+const RESCORE_BATCH = 500;
+
+function toScorable(job: Job): ScorableJob {
+  return {
+    title: job.title,
+    company: job.company,
+    location: job.location,
+    countryCode: job.countryCode,
+    isRemote: job.isRemote,
+    body: job.descriptionMd ?? job.summary,
+    listedAt: new Date(job.listedAt),
+  };
+}
+
+export class EvaluationService {
+  constructor(
+    private readonly deps: {
+      jobs: JobRepository;
+      profiles: ProfileRepository;
+      heuristic: JobEvaluator;
+      /** Absent when no Anthropic API key is configured. */
+      claude?: JobEvaluator;
+      now?: () => Date;
+    },
+  ) {}
+
+  get isClaudeAvailable(): boolean {
+    return this.deps.claude !== undefined;
+  }
+
+  private now(): Date {
+    return this.deps.now?.() ?? new Date();
+  }
+
+  private requireProfile(): Profile {
+    const profile = this.deps.profiles.get();
+    if (!profile) {
+      throw new ValidationError(
+        'Fill in your profile first, so there is something to score against.',
+      );
+    }
+    return profile;
+  }
+
+  /** Evaluates one job and stores the result. */
+  async evaluate(jobId: string, evaluatorName: Evaluation['evaluator']): Promise<Job> {
+    const job = this.deps.jobs.findById(jobId);
+    if (!job) throw new NotFoundError('That job');
+    const profile = this.requireProfile();
+
+    let evaluator = this.deps.heuristic;
+    if (evaluatorName === 'claude') {
+      if (!this.deps.claude) {
+        throw new NotConfiguredError('Set ANTHROPIC_API_KEY to evaluate jobs with Claude.');
+      }
+      evaluator = this.deps.claude;
+    }
+    const evaluation = await evaluator.evaluate(toScorable(job), profile);
+    this.deps.jobs.saveEvaluation(jobId, evaluation, this.now());
+    return { ...job, score: evaluation.score, evaluation, evaluatedAt: this.now().toISOString() };
+  }
+
+  /** Scores freshly scanned jobs offline. Does nothing until a profile exists. */
+  async scoreNewJobs(jobIds: string[]): Promise<void> {
+    const profile = this.deps.profiles.get();
+    if (!profile) return;
+    for (const id of jobIds) {
+      const job = this.deps.jobs.findById(id);
+      if (!job) continue;
+      const evaluation = await this.deps.heuristic.evaluate(toScorable(job), profile);
+      this.deps.jobs.saveEvaluation(id, evaluation, this.now());
+    }
+  }
+
+  /**
+   * Re-scores every job offline after the profile changes. Jobs assessed by Claude keep their
+   * assessment, because it cost money and is not reproducible offline.
+   */
+  async rescoreAll(): Promise<number> {
+    const profile = this.requireProfile();
+    let rescored = 0;
+    let afterId = '';
+    for (;;) {
+      const ids = this.deps.jobs.listIds(afterId, RESCORE_BATCH);
+      const lastId = ids.at(-1);
+      if (lastId === undefined) return rescored;
+      for (const id of ids) {
+        const job = this.deps.jobs.findById(id);
+        if (!job || job.evaluation?.evaluator === 'claude') continue;
+        const evaluation = await this.deps.heuristic.evaluate(toScorable(job), profile);
+        this.deps.jobs.saveEvaluation(id, evaluation, this.now());
+        rescored += 1;
+      }
+      afterId = lastId;
+    }
+  }
+}

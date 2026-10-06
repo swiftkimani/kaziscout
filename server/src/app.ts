@@ -1,0 +1,170 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import rateLimit from '@fastify/rate-limit';
+import fastifyStatic from '@fastify/static';
+import Fastify, { type FastifyInstance } from 'fastify';
+import type { Board } from './boards/registry.js';
+import type { Config } from './config.js';
+import type { Db } from './db/client.js';
+import { AppError } from './errors.js';
+import { FirecrawlConverter, LocalConverter, type PageConverter } from './extract/converters.js';
+import type { ResolveHost } from './extract/safe-url.js';
+import { fetchText as defaultFetchText, type FetchText } from './providers/http.js';
+import { ApplicationRepository } from './repositories/applications.js';
+import { BoardScanRepository } from './repositories/board-scans.js';
+import { JobRepository } from './repositories/jobs.js';
+import { ProfileRepository } from './repositories/profile.js';
+import { registerV1Routes } from './routes/v1.js';
+import { ClaudeEvaluator } from './scoring/claude.js';
+import { HeuristicEvaluator } from './scoring/heuristic.js';
+import type { JobEvaluator } from './scoring/types.js';
+import { ApplyService, type DesktopAssistant } from './services/apply.js';
+import { ComputerUseDesktop } from './services/computer-use-desktop.js';
+import { EvaluationService } from './services/evaluation.js';
+import { MarkdownService } from './services/markdown.js';
+import { ScanService } from './services/scan.js';
+
+export interface AppOptions {
+  config: Config;
+  db: Db;
+  boards: Board[];
+  /** Overrides for tests; production uses the real network, clock and desktop. */
+  fetchText?: FetchText;
+  resolveHost?: ResolveHost;
+  claude?: JobEvaluator;
+  desktop?: DesktopAssistant;
+  now?: () => Date;
+}
+
+const WEB_DIST = fileURLToPath(new URL('../../web/dist', import.meta.url));
+
+/** Wires repositories, services and routes into a Fastify app. Nothing here listens on a port. */
+export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
+  const { config, db, boards, now } = options;
+  const fetchText = options.fetchText ?? defaultFetchText;
+
+  const app = Fastify({
+    logger: { level: config.LOG_LEVEL, redact: ['req.headers.authorization'] },
+    bodyLimit: 256 * 1024,
+  });
+  await app.register(rateLimit, { max: 300, timeWindow: '1 minute' });
+
+  const jobs = new JobRepository(db);
+  const applications = new ApplicationRepository(db);
+  const profiles = new ProfileRepository(db);
+  const scans = new BoardScanRepository(db);
+
+  const claude =
+    options.claude ??
+    (config.ANTHROPIC_API_KEY
+      ? new ClaudeEvaluator(config.ANTHROPIC_API_KEY, config.AI_MODEL)
+      : undefined);
+  const desktop =
+    options.desktop ?? (config.DESKTOP_ASSIST_ENABLED ? new ComputerUseDesktop() : undefined);
+  const converter: PageConverter = config.FIRECRAWL_API_KEY
+    ? new FirecrawlConverter(config.FIRECRAWL_API_KEY)
+    : new LocalConverter(fetchText);
+
+  const evaluationService = new EvaluationService({
+    jobs,
+    profiles,
+    heuristic: new HeuristicEvaluator(now),
+    claude,
+    now,
+  });
+  const scanService = new ScanService({
+    db,
+    boards,
+    jobs,
+    scans,
+    evaluation: evaluationService,
+    providerContext: { fetchText },
+    logger: app.log,
+    now,
+  });
+  const markdownService = new MarkdownService({
+    converter,
+    jobs,
+    resolveHost: options.resolveHost,
+  });
+  const applyService = new ApplyService({ jobs, profiles, applications, desktop, now });
+
+  app.setErrorHandler((error, request, reply) => {
+    if (error instanceof AppError) {
+      return reply.code(error.statusCode).send({
+        error: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          request_id: request.id,
+        },
+      });
+    }
+    const statusCode = (error as { statusCode?: number }).statusCode;
+    if (statusCode !== undefined && statusCode >= 400 && statusCode < 500) {
+      // Fastify's own client errors: malformed JSON, payload too large, rate limited.
+      return reply.code(statusCode).send({
+        error: {
+          code: statusCode === 429 ? 'RATE_LIMITED' : 'BAD_REQUEST',
+          message:
+            statusCode === 429
+              ? 'Too many requests. Wait a minute and try again.'
+              : 'The request could not be read.',
+          details: {},
+          request_id: request.id,
+        },
+      });
+    }
+    request.log.error({ err: error }, 'unhandled error');
+    return reply.code(500).send({
+      error: {
+        code: 'INTERNAL',
+        message: 'Something went wrong on our side. Your data is safe; try again.',
+        details: {},
+        request_id: request.id,
+      },
+    });
+  });
+
+  app.get('/health', () => {
+    db.prepare('SELECT 1').get();
+    return { status: 'ok' };
+  });
+
+  registerV1Routes(app, {
+    boards,
+    jobs,
+    applications,
+    profiles,
+    scans,
+    scanService,
+    evaluationService,
+    markdownService,
+    applyService,
+    now,
+  });
+
+  // In production the built web app is served by this process; in dev, Vite serves it.
+  if (existsSync(WEB_DIST)) {
+    await app.register(fastifyStatic, { root: WEB_DIST });
+    app.setNotFoundHandler((request, reply) => {
+      if (request.method === 'GET' && !request.url.startsWith('/v1/')) {
+        return reply.sendFile('index.html');
+      }
+      return reply.code(404).send({
+        error: {
+          code: 'NOT_FOUND',
+          message: 'That address does not exist.',
+          details: {},
+          request_id: request.id,
+        },
+      });
+    });
+  }
+
+  app.addHook('onClose', async () => {
+    await desktop?.close();
+  });
+
+  return app;
+}
