@@ -8,19 +8,22 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 ## Status at a glance
 
-| Area                        | State           | Notes                                                                                 |
-| --------------------------- | --------------- | ------------------------------------------------------------------------------------- |
-| Board registry              | done            | 98 boards checked on 2026-10-06; 25 scanned                                           |
-| Scanners (RSS, remote APIs) | done            | 24 of 25 boards returned jobs on the first live scan; 1 timed out and passed on retry |
-| Scoring                     | done            | Keyword scorer tested; Claude evaluator written but not run against the live API      |
-| Page to Markdown            | done            | Local converter tested on live pages; Firecrawl client tested against a stub only     |
-| Tracker                     | done            |                                                                                       |
-| Web UI                      | done            | Checked by hand at desktop and 500 px widths                                          |
-| Desktop assist              | partly verified | Clipboard write through computer-use-mcp verified on macOS                            |
-| CI                          | written         | Not yet observed running on GitHub                                                    |
+| Area                        | State           | Notes                                                                                                                                                                             |
+| --------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Board registry              | done            | 118 sources checked on 2026-10-06; 46 scanned (25 boards, 21 employers)                                                                                                           |
+| Scanners (RSS, remote APIs) | done            | 24 of 25 boards returned jobs on the first live scan; 1 timed out and passed on retry                                                                                             |
+| Employer readers            | done            | Greenhouse, Lever, Ashby; all 21 employers scanned live                                                                                                                           |
+| Scoring                     | done            | Keyword scorer tested. AI path run live against Ollama `qwen2.5:1.5b`: works on short postings; that 1.5B model returns unreadable output on long ones. Claude path not run live. |
+| Page to Markdown            | done            | Local converter tested on live pages; Firecrawl client tested against a stub only                                                                                                 |
+| Tracker                     | done            |                                                                                                                                                                                   |
+| Web UI                      | done            | Checked by hand at desktop and 500 px widths                                                                                                                                      |
+| Desktop assist              | partly verified | Clipboard write through computer-use-mcp verified on macOS                                                                                                                        |
+| CI                          | written         | Not yet observed running on GitHub                                                                                                                                                |
 
 ## Done
 
+- 2026-10-06 Employer readers for Greenhouse, Lever and Ashby, with 21 verified employers.
+- 2026-10-06 AI assessment works with any OpenAI-compatible model, local or hosted.
 - 2026-10-06 Initial build: server, web UI, board registry, docs, brand.
 
 ## In progress
@@ -29,18 +32,21 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 ## Next (ordered)
 
-1. Run "Assess with Claude" against the live API with a real key and check the output quality.
-2. Run the Firecrawl converter with a real key.
-3. Apply for a ReliefWeb app name and add a ReliefWeb provider.
-4. Web UI tests for the profile form and job filters.
-5. Expose KaziScout's own tools as an MCP server so agents need no HTTP calls.
-6. Scheduled scans, and "new since last visit" on the jobs list.
+1. Try "Assess with AI" with a capable model. The 1.5B local model tested gives poor,
+   self-contradicting verdicts; judge quality on a 7B+ local model or a hosted one.
+2. Port more career-ops source types, most valuable first: Workable, SmartRecruiters, Workday,
+   Recruitee, Teamtailor, Personio. career-ops reads about 110; KaziScout reads 6.
+3. Run the Firecrawl converter with a real key.
+4. Apply for a ReliefWeb app name and add a ReliefWeb provider.
+5. Web UI tests for the profile form and job filters.
+6. Expose KaziScout's own tools as an MCP server so agents need no HTTP calls.
+7. Scheduled scans, and "new since last visit" on the jobs list.
 
 ## Decisions
 
 - ADR-0001 Scan only open feeds; link out to every other board
 - ADR-0002 SQLite through Node's built-in module
-- ADR-0003 Local-first, with Firecrawl and Claude as optional upgrades
+- ADR-0003 Local-first, with Firecrawl and any AI model as optional upgrades
 - ADR-0004 The human presses Submit
 
 ## Assumptions (made without confirmation — revisit)
@@ -54,6 +60,11 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 ## Known issues / deferred
 
+- Elastic's Greenhouse feed exceeds the 5 MB response cap, so it is not in the registry.
+- A role located only as "Remote" is kept for worldwide employers, though some are
+  country-limited.
+- Profile countries and country detection cover Africa only; jobs elsewhere show their location
+  text but cannot be filtered by country.
 - The Claude evaluator does not opt in to server-side refusal fallbacks; a refused assessment is
   reported as an error and the keyword score stays.
 - Boards without dates in their feed (iHarare Jobs, VacancyMail) are listed by first-seen time,

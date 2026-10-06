@@ -14,17 +14,18 @@ Markdown, and tracks your applications. You review each one and press Submit you
 
 ## What it does
 
-|                              |                                                                                                                                                                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Scans African job boards** | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and remote boards filtered to roles open to Africa. |
-| **Lists the rest**           | A directory of 98 checked boards covering 27 countries plus pan-African and remote sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                               |
-| **Scores each job 1 to 5**   | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. Add an Anthropic API key and Claude writes a fuller assessment and a suggested opening paragraph.                             |
-| **Page to Markdown**         | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                   |
-| **Tracks applications**      | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                      |
-| **Helps you apply**          | Builds an application pack (your details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it.                |
+|                                 |                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Scans African job boards**    | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and remote boards filtered to roles open to Africa.                                                                                                        |
+| **Reads employer career pages** | Reads 21 employers directly through the public APIs of their hiring systems (Greenhouse, Lever, Ashby): African employers such as M-KOPA, Moniepoint, Jumia, Andela and One Acre Fund, and remote-first companies filtered to roles open to Africa. Any employer on those systems, in any country, can be added with one line. |
+| **Lists the rest**              | A directory of 118 checked sources covering 27 African countries plus pan-African and remote sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                            |
+| **Scores each job 1 to 5**      | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. Connect any AI model (OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio) and it writes a fuller assessment and a suggested opening paragraph.                                    |
+| **Page to Markdown**            | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                                                                                                                          |
+| **Tracks applications**         | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                             |
+| **Helps you apply**             | Builds an application pack (your details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it.                                                                                                                       |
 
 Everything is stored in one SQLite file on your machine. Nothing leaves it except the requests
-you trigger: board scans, page fetches, and Claude or Firecrawl calls if you configure them.
+you trigger: board scans, page fetches, and AI or Firecrawl calls if you configure them.
 
 ![The board directory](docs/assets/boards.jpg)
 
@@ -35,9 +36,9 @@ flowchart LR
   UI[Web UI<br/>React + Vite] -->|/v1 JSON| API[Fastify routes]
   API --> S[Services<br/>scan · evaluate · markdown · apply]
   S --> R[Repositories] --> DB[(SQLite)]
-  S --> P[Providers<br/>RSS · Remotive · Himalayas · Remote OK] --> Boards[(Job boards)]
+  S --> P[Providers<br/>RSS · remote job APIs · Greenhouse · Lever · Ashby] --> Boards[(Job boards<br/>and employers)]
   S --> C[Page converter<br/>Readability or Firecrawl]
-  S --> E[Evaluator<br/>keyword or Claude]
+  S --> E[Evaluator<br/>keyword or any AI model]
   S --> D[Desktop assist<br/>computer-use-mcp]
   Reg[data/boards.json<br/>board registry] --> S
 ```
@@ -84,7 +85,7 @@ Then:
 ## Test
 
 ```sh
-pnpm test          # 62 server tests; no network needed
+pnpm test          # 81 server tests; no network needed
 pnpm typecheck
 pnpm lint
 pnpm format:check
@@ -94,16 +95,18 @@ pnpm format:check
 
 All settings are optional. See [.env.example](.env.example).
 
-| Variable                 | Default                  | Purpose                                                     |
-| ------------------------ | ------------------------ | ----------------------------------------------------------- |
-| `PORT`                   | `8787`                   | Port the server listens on                                  |
-| `HOST`                   | `127.0.0.1`              | Interface to bind. Keep it local; there is no login.        |
-| `LOG_LEVEL`              | `info`                   | `debug`, `info`, `warn`, `error` or `silent`                |
-| `DATABASE_PATH`          | `./var/kaziscout.sqlite` | SQLite file, relative to `server/`                          |
-| `FIRECRAWL_API_KEY`      | none                     | Convert pages with Firecrawl instead of the local converter |
-| `ANTHROPIC_API_KEY`      | none                     | Enables "Assess with Claude"                                |
-| `AI_MODEL`               | `claude-opus-5-5`        | Claude model used for assessments                           |
-| `DESKTOP_ASSIST_ENABLED` | `false`                  | Copy application packs through computer-use-mcp             |
+| Variable                 | Default                  | Purpose                                                                                         |
+| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------- |
+| `PORT`                   | `8787`                   | Port the server listens on                                                                      |
+| `HOST`                   | `127.0.0.1`              | Interface to bind. Keep it local; there is no login.                                            |
+| `LOG_LEVEL`              | `info`                   | `debug`, `info`, `warn`, `error` or `silent`                                                    |
+| `DATABASE_PATH`          | `./var/kaziscout.sqlite` | SQLite file, relative to `server/`                                                              |
+| `FIRECRAWL_API_KEY`      | none                     | Convert pages with Firecrawl instead of the local converter                                     |
+| `AI_BASE_URL`            | none                     | Base URL of any OpenAI-compatible server. Enables "Assess with AI".                             |
+| `AI_API_KEY`             | none                     | Key for that server. Local servers such as Ollama need none.                                    |
+| `AI_MODEL`               | none                     | Model name. Required with `AI_BASE_URL`.                                                        |
+| `ANTHROPIC_API_KEY`      | none                     | Use Claude instead, when `AI_BASE_URL` is empty. `AI_MODEL` then defaults to `claude-opus-5-5`. |
+| `DESKTOP_ASSIST_ENABLED` | `false`                  | Copy application packs through computer-use-mcp                                                 |
 
 ## API
 
@@ -116,7 +119,7 @@ The UI is a client of a small versioned API, which you can also call directly.
 | `POST /v1/boards/:id/scan`                                               | Scan one board                                                                                    |
 | `GET /v1/jobs`                                                           | List jobs. Filters: `search`, `board`, `country`, `remote`, `minScore`, `sort`, `limit`, `cursor` |
 | `GET /v1/jobs/:id`                                                       | One job with its evaluation and tracker entry                                                     |
-| `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "claude"}`                                       |
+| `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                           |
 | `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                          |
 | `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                        |
 | `POST /v1/jobs/:id/assist`                                               | Copy the pack to the clipboard through computer-use-mcp                                           |
@@ -143,9 +146,9 @@ stop before Submit so you can check it.
 server/
   data/boards.json      board registry (source of truth for boards)
   src/boards/           registry loader, country detection, board verifier
-  src/providers/        one reader per kind of source (RSS, remote job APIs)
+  src/providers/        one reader per kind of source (RSS, remote job APIs, hiring systems)
   src/extract/          page to Markdown, Firecrawl client, URL safety check
-  src/scoring/          keyword scorer and Claude evaluator
+  src/scoring/          keyword scorer and AI evaluators (OpenAI-compatible, Claude)
   src/repositories/     SQL
   src/services/         scan, evaluation, markdown, apply
   src/routes/           HTTP handlers and request schemas
@@ -163,7 +166,9 @@ skills/                 agent guide for assisted applications
 ## Adding a job board
 
 1. Add an entry to `server/data/boards.json`. Use `"access": {"type": "rss", "feedUrl": "..."}`
-   if the board has a feed, or `{"type": "listing"}` if it does not.
+   if the board has a feed, or `{"type": "listing"}` if it does not. For an employer that
+   hires through Greenhouse, Lever or Ashby, use
+   `{"type": "ats", "provider": "greenhouse", "slug": "<name in its careers URL>"}`.
 2. Run `pnpm boards:verify`. It checks every board and regenerates `docs/BOARDS.md`.
 3. Open a pull request.
 
@@ -172,14 +177,15 @@ listings or sources that need a login.
 
 ## Troubleshooting
 
-| Problem                                     | What to do                                                                                                                                      |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `No such built-in module: node:sqlite`      | Upgrade to Node.js 24 or newer.                                                                                                                 |
-| A board shows "Last scan failed"            | Boards time out now and then. Scan it again; if it keeps failing, run `pnpm boards:verify`.                                                     |
-| Page to Markdown returns "no readable text" | The page is drawn by JavaScript. Add `FIRECRAWL_API_KEY`.                                                                                       |
-| "That address can't be fetched"             | Only public http and https pages are fetched; local and private addresses are refused on purpose.                                               |
-| Jobs show a dash instead of a score         | Save your profile. Scores need something to compare against.                                                                                    |
-| Desktop assist fails on macOS               | Grant your terminal Accessibility permission, as [computer-use-mcp describes](https://github.com/zavora-ai/computer-use-mcp#set-up-your-agent). |
+| Problem                                         | What to do                                                                                                                                      |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `No such built-in module: node:sqlite`          | Upgrade to Node.js 24 or newer.                                                                                                                 |
+| A board shows "Last scan failed"                | Boards time out now and then. Scan it again; if it keeps failing, run `pnpm boards:verify`.                                                     |
+| Page to Markdown returns "no readable text"     | The page is drawn by JavaScript. Add `FIRECRAWL_API_KEY`.                                                                                       |
+| "That address can't be fetched"                 | Only public http and https pages are fetched; local and private addresses are refused on purpose.                                               |
+| Jobs show a dash instead of a score             | Save your profile. Scores need something to compare against.                                                                                    |
+| "returned an assessment that could not be read" | The model did not produce valid JSON. Small local models do this; try a larger one.                                                             |
+| Desktop assist fails on macOS                   | Grant your terminal Accessibility permission, as [computer-use-mcp describes](https://github.com/zavora-ai/computer-use-mcp#set-up-your-agent). |
 
 ## Limits, stated plainly
 
@@ -187,6 +193,12 @@ listings or sources that need a login.
   "5 years preferred". Use it to rank, then read the posting.
 - Board feeds carry what the board chooses to publish: often the latest 10 to 50 postings, and
   some feeds mix in career articles.
+- Remote-first employers are filtered by the location text on each role. A role marked only
+  "Remote" is kept, even though some of those turn out to be limited to one country.
+- AI assessment quality depends on the model. It was run live against a 1.5B local model, which
+  handled short postings and failed on long ones. Use a 7B or larger local model, or a hosted one.
+- career-ops reads about 110 kinds of source. KaziScout has the three most common hiring
+  systems, RSS and three remote job APIs; the rest are not ported.
 - KaziScout never submits an application. That is deliberate.
 
 ## Credits
@@ -199,7 +211,7 @@ KaziScout builds on two open-source projects, with thanks to their authors:
   (Zavora Technologies Ltd), used as a dependency for desktop control.
 - [career-ops](https://github.com/career-ops-hq/career-ops) by
   **Santiago Fernández de Valderrama**, the design reference for local, human-in-the-loop job
-  search.
+  search and for reading employers through their hiring systems.
 
 Full acknowledgements, including data sources, are in [CREDITS.md](CREDITS.md).
 

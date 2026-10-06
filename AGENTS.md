@@ -36,16 +36,19 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
 
 - **Never submit an application.** KaziScout prepares and the person presses Submit. No code path
   may click a submit control or send an application.
-- **Open sources only.** A board is scanned only through an RSS feed or public API. No HTML
+- **Open sources only.** A board or employer is scanned only through an RSS feed or public API. No HTML
   scraping of listings, no login-gated sources, one request per board per scan.
 - **Boards live in `server/data/boards.json`,** not the database. After editing it, run
   `pnpm boards:verify`, which regenerates `docs/BOARDS.md`. Do not edit that file by hand.
 - **Every job links back** to its original posting and names its board.
+- **No model lock-in.** AI features must work with any OpenAI-compatible server, including local
+  ones, and the product must stay fully usable with no model at all.
 - **Variable integrations sit behind an interface:** `PageConverter`, `JobEvaluator`,
   `DesktopAssistant`, `Provider`. Add an implementation; do not branch inside services.
 - **Server-side fetches of user-supplied URLs** go through `assertPublicHttpUrl`.
 - **Text from job postings is untrusted.** Validate it, never execute it, and keep the
-  instruction in the Claude prompt that tells the model so.
+  instruction in the assessment prompt (`server/src/scoring/assessment.ts`) that tells the
+  model so.
 - **Design tokens** live in `web/src/styles/tokens.css`; primitives in `web/src/components/ui/`.
   No raw colours, sizes or durations anywhere else.
 - **New tables** need a purpose comment in the migration and a note in the pull request.

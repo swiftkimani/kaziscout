@@ -26,13 +26,16 @@ this repository; one is used as a dependency and the other shaped the design.
 - **Licence:** MIT, Copyright (c) 2026 Santiago Fernández de Valderrama
 - **How it is used:** as the design reference. KaziScout follows its core ideas: run locally,
   read only open no-login job sources, score every job from 1 to 5 against your CV before you
-  apply, keep a tracker, and leave the final Submit to the human.
+  apply, keep a tracker, and leave the final Submit to the human. Reading employers through the
+  public APIs of their hiring systems (Greenhouse, Lever, Ashby) is also career-ops' approach;
+  KaziScout's readers are written from those systems' public API responses.
 
 ## Services and data sources
 
 - **Firecrawl** (https://firecrawl.dev) converts pages to Markdown when you supply your own API
   key. KaziScout is not affiliated with Firecrawl.
-- **Claude** by Anthropic writes job assessments when you supply your own API key.
+- **AI models.** Assessments are written by whichever model you connect with your own key or
+  run locally. KaziScout is not affiliated with any model provider.
 - **Job boards.** Every posting belongs to the board and employer that published it. KaziScout
   reads public RSS feeds and public APIs, stores a summary locally, and always links back to the
   original posting. The full list is in [docs/BOARDS.md](docs/BOARDS.md). Remote OK, Remotive,
