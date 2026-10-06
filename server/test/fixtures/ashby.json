@@ -1,0 +1,52 @@
+{
+ "jobs": [
+  {
+   "id": "280abdf4-c574-4e76-af2f-befed2bf512d",
+   "title": "Sales Executive - Epe 2",
+   "department": "Smartphones",
+   "team": "Sales",
+   "employmentType": "FullTime",
+   "location": "Lagos",
+   "secondaryLocations": [],
+   "publishedAt": "2026-09-21T11:54:41.419+00:00",
+   "isListed": true,
+   "isRemote": false,
+   "workplaceType": "OnSite",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "Lagos State",
+     "addressCountry": "Nigeria",
+     "addressLocality": "Lagos"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/m-kopa/280abdf4-c574-4e76-af2f-befed2bf512d",
+   "applyUrl": "https://jobs.ashbyhq.com/m-kopa/280abdf4-c574-4e76-af2f-befed2bf512d/application",
+   "descriptionHtml": "<div style=\"text-align:left\"><img style=\"max-width:100%\" src=\"https://app.ashbyhq.com/api/images/user-content/1d985516-2a99-43c0-b591-957f5adaceb9/5ac97b31-49cd-4012-8bb0-5caf15e33c69/B25.png\" /></div><p style=\"min-height:1.5em\"></p><h2><strong>We are looking for a Sales Executive - \u2060Epe, Lagos State to join our Sales Team as we scale up and drive digital and financial inclusion across our markets",
+   "descriptionPlain": "[https://app.ashbyhq.com/api/images/user-content/1d985516-2a99-43c0-b591-957f5adaceb9/5ac97b31-49cd-4012-8bb0-5caf15e33c69/B25.png]\n\n\n\n\nWE ARE LOOKING FOR A SALES EXECUTIVE - \u2060EPE, LAGOS STATE TO JOIN OUR SALES TEAM AS WE SCALE UP AND DRIVE DIGITAL AND FINANCIAL INCLUSION ACROSS OUR MARKETS.\n\n\u00a0\n[https://app.ashbyhq.com/api/images/user-content/1d985516-2a99-43c0-b591-957f5adaceb9/2c6957b4-39d2-40b3"
+  },
+  {
+   "id": "32fa7e9b-5c57-4e07-b996-b8fd0d0d2f66",
+   "title": "Telesales Team Lead",
+   "department": "Fintech",
+   "team": "Retention Operations",
+   "employmentType": "FullTime",
+   "location": "Lagos",
+   "secondaryLocations": [],
+   "publishedAt": "2026-09-23T14:22:16.809+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "Lagos State",
+     "addressCountry": "Nigeria",
+     "addressLocality": "Lagos"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/m-kopa/32fa7e9b-5c57-4e07-b996-b8fd0d0d2f66",
+   "applyUrl": "https://jobs.ashbyhq.com/m-kopa/32fa7e9b-5c57-4e07-b996-b8fd0d0d2f66/application",
+   "descriptionHtml": "<div style=\"text-align:left\"><img style=\"max-width:100%\" src=\"https://app.ashbyhq.com/api/images/user-content/1d985516-2a99-43c0-b591-957f5adaceb9/5ac97b31-49cd-4012-8bb0-5caf15e33c69/B25.png\" /></div><p style=\"min-height:1.5em\"></p><h2><br /><strong>We are looking for a Telesales Team Lead to join our Retention team, as we scale up and drive digital and financial inclusion across our markets.</st",
+   "descriptionPlain": "[https://app.ashbyhq.com/api/images/user-content/1d985516-2a99-43c0-b591-957f5adaceb9/5ac97b31-49cd-4012-8bb0-5caf15e33c69/B25.png]\n\n\n\n\n\nWE ARE LOOKING FOR A TELESALES TEAM LEAD TO JOIN OUR RETENTION TEAM, AS WE SCALE UP AND DRIVE DIGITAL AND FINANCIAL INCLUSION ACROSS OUR MARKETS.\n\n\n \n\n\n\n[https://app.ashbyhq.com/api/images/user-content/1d985516-2a99-43c0-b591-957f5adaceb9/2c6957b4-39d2-40b3-8eb6-"
+  }
+ ]
+}

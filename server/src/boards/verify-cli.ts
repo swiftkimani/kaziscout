@@ -7,6 +7,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { atsApiUrl } from '../providers/ats.js';
 import { AFRICAN_COUNTRIES } from './countries.js';
 import { type Board, loadBoards, REGISTRY_URL } from './registry.js';
 
@@ -32,7 +33,12 @@ async function httpStatus(url: string): Promise<number> {
 }
 
 async function checkBoard(board: Board): Promise<Board['status']> {
-  const target = board.access.type === 'rss' ? board.access.feedUrl : board.url;
+  const target =
+    board.access.type === 'rss'
+      ? board.access.feedUrl
+      : board.access.type === 'ats'
+        ? atsApiUrl(board)
+        : board.url;
   const status = await httpStatus(target);
   if (status >= 200 && status < 300 && status !== 202) return 'live';
   if (BLOCKED_STATUSES.has(status)) return 'blocked';
@@ -52,6 +58,7 @@ function describeCountries(board: Board): string {
 function describeAccess(board: Board): string {
   if (board.access.type === 'rss') return 'Scanned (RSS)';
   if (board.access.type === 'api') return 'Scanned (API)';
+  if (board.access.type === 'ats') return 'Scanned (employer careers API)';
   return 'Link-out';
 }
 
@@ -74,7 +81,7 @@ function renderDocs(boards: Board[], checkedAt: string): string {
     '',
     `${boards.length} boards: ${count('live')} live, ${count('blocked')} blocked, ${count('down')} down. ${scanned} are scanned automatically.`,
     '',
-    '- **Scanned** boards publish an RSS feed or a public API, which KaziScout reads.',
+    '- **Scanned** boards publish an RSS feed or a public API, which KaziScout reads. Employers are read through the public API of their hiring system (Greenhouse, Lever or Ashby).',
     '- **Link-out** boards have no public feed. KaziScout lists them and opens them in your browser; it never scrapes them.',
     '- **blocked** means the site is up but refuses automated checks, so it could only be confirmed in a browser.',
     '',

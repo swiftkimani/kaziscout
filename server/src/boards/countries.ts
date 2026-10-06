@@ -132,6 +132,8 @@ export function detectCountry(text: string): string | undefined {
   return LOOKUP.find(([pattern]) => pattern.test(haystack))?.[1];
 }
 
+const REMOTE_ONLY_WORDS = /\b(fully |100% )?(remote|home[- ]based|work from home)\b/gi;
+
 const OPEN_REGIONS =
   /\b(worldwide|anywhere|global|international|africa|emea|all regions|no restrictions?)\b/i;
 
@@ -140,7 +142,11 @@ const OPEN_REGIONS =
  * An empty restriction means the employer set none.
  */
 export function isOpenToAfrica(restriction: string | undefined): boolean {
-  const text = restriction?.trim() ?? '';
+  // "Remote" or "Home based" with no region named is treated as no restriction.
+  const text = (restriction ?? '')
+    .replace(REMOTE_ONLY_WORDS, '')
+    .replace(/[\s,;()/-]+/g, ' ')
+    .trim();
   if (!text) return true;
   return OPEN_REGIONS.test(text) || detectCountry(text) !== undefined;
 }

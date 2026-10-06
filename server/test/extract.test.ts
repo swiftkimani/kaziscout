@@ -165,6 +165,10 @@ describe('isOpenToAfrica', () => {
     ['Worldwide', true],
     ['EMEA', true],
     ['Kenya, Nigeria', true],
+    ['Remote', true],
+    ['Home based - Africa, Europe', true],
+    ['Remote - US', false],
+    ['London, UK', false],
     ['USA Only', false],
     ['Europe, USA, Canada, APAC', false],
   ])('"%s" -> %s', (restriction, expected) => {

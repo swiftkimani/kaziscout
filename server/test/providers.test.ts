@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Board } from '../src/boards/registry.js';
+import { ashbyProvider, greenhouseProvider, leverProvider } from '../src/providers/ats.js';
 import {
   himalayasProvider,
   remoteOkProvider,
@@ -131,5 +132,69 @@ describe('remote API providers', () => {
     await expect(
       remotiveProvider(remoteBoard, { fetchText: () => Promise.resolve('{"postings":[]}') }),
     ).rejects.toThrow('changed its response format');
+  });
+});
+
+describe('employer career APIs', () => {
+  const employer = (provider: 'greenhouse' | 'lever' | 'ashby', countries: string[]): Board => ({
+    ...remoteBoard,
+    id: 'employer',
+    name: 'Example Employer',
+    countries,
+    category: 'employer',
+    access: { type: 'ats', provider, slug: 'example' },
+  });
+
+  it('reads Greenhouse jobs and unescapes the description markup', async () => {
+    const requested: string[] = [];
+    const jobs = await greenhouseProvider(employer('greenhouse', ['PAN']), {
+      fetchText: (url) => {
+        requested.push(url);
+        return Promise.resolve(fixture('greenhouse.json'));
+      },
+    });
+
+    expect(requested).toEqual([
+      'https://boards-api.greenhouse.io/v1/boards/example/jobs?content=true',
+    ]);
+    expect(jobs[0]).toMatchObject({
+      externalId: '7649022',
+      title: 'Agroforestry Innovations Specialist',
+      company: 'Example Employer',
+      location: 'Bauchi, Nigeria',
+      isRemote: false,
+    });
+    expect(jobs[0]?.bodyHtml).toContain('<h3>About One Acre Fund</h3>');
+  });
+
+  it('keeps only roles open to Africa for an employer that hires worldwide', async () => {
+    const jobs = await leverProvider(employer('lever', ['REMOTE']), {
+      fetchText: () => Promise.resolve(fixture('lever.json')),
+    });
+
+    // Both recorded Tala roles are restricted to the US.
+    expect(jobs).toEqual([]);
+  });
+
+  it('keeps every role for an employer based in Africa', async () => {
+    const jobs = await leverProvider(employer('lever', ['KE']), {
+      fetchText: () => Promise.resolve(fixture('lever.json')),
+    });
+
+    expect(jobs).toHaveLength(2);
+    expect(jobs[0]).toMatchObject({ title: 'Analytics Platforms Architect', isRemote: true });
+  });
+
+  it('reads Ashby jobs and adds the country from the postal address', async () => {
+    const jobs = await ashbyProvider(employer('ashby', ['REMOTE']), {
+      fetchText: () => Promise.resolve(fixture('ashby.json')),
+    });
+
+    expect(jobs[0]).toMatchObject({
+      title: 'Sales Executive - Epe 2',
+      location: 'Lagos, Nigeria',
+      isRemote: false,
+    });
+    expect(jobs[0]?.postedAt?.toISOString()).toBe('2026-09-21T11:54:41.419Z');
   });
 });

@@ -1400,22 +1400,6 @@
     "checkedAt": "2026-10-06"
   },
   {
-    "id": "andela",
-    "name": "Andela",
-    "url": "https://www.andela.com",
-    "countries": [
-      "PAN"
-    ],
-    "category": "tech",
-    "language": "en",
-    "access": {
-      "type": "listing"
-    },
-    "status": "live",
-    "checkedAt": "2026-10-06",
-    "note": "Talent network for engineers."
-  },
-  {
     "id": "gebeya",
     "name": "Gebeya",
     "url": "https://gebeya.com",
@@ -1529,5 +1513,381 @@
     "status": "live",
     "checkedAt": "2026-10-06",
     "note": "Only roles open worldwide or to Africa are kept."
+  },
+  {
+    "id": "andela",
+    "name": "Andela",
+    "url": "https://www.andela.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "andela"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "m-kopa",
+    "name": "M-KOPA",
+    "url": "https://www.m-kopa.com",
+    "countries": [
+      "KE",
+      "NG",
+      "UG",
+      "GH",
+      "ZA"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "m-kopa"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "lemfi",
+    "name": "LemFi",
+    "url": "https://lemfi.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "lemfi"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "moniepoint",
+    "name": "Moniepoint",
+    "url": "https://moniepoint.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "moniepoint"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jumia",
+    "name": "Jumia",
+    "url": "https://group.jumia.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "jumia"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "one-acre-fund",
+    "name": "One Acre Fund",
+    "url": "https://oneacrefund.org",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "oneacrefund"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "apollo-agriculture",
+    "name": "Apollo Agriculture",
+    "url": "https://www.apolloagriculture.com",
+    "countries": [
+      "KE",
+      "ZM"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "lever",
+      "slug": "apolloagriculture"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "zipline",
+    "name": "Zipline",
+    "url": "https://www.flyzipline.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "flyzipline"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Operates in Rwanda, Ghana, Nigeria, Kenya and Cote d'Ivoire. Only roles open to Africa are kept."
+  },
+  {
+    "id": "give-directly",
+    "name": "GiveDirectly",
+    "url": "https://www.givedirectly.org",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "givedirectly"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open to Africa are kept."
+  },
+  {
+    "id": "tala",
+    "name": "Tala",
+    "url": "https://tala.co",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "lever",
+      "slug": "tala"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open to Africa are kept."
+  },
+  {
+    "id": "wikimedia",
+    "name": "Wikimedia Foundation",
+    "url": "https://wikimediafoundation.org",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "wikimedia"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open to Africa are kept."
+  },
+  {
+    "id": "canonical",
+    "name": "Canonical",
+    "url": "https://canonical.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "canonical"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
+  },
+  {
+    "id": "gitlab",
+    "name": "GitLab",
+    "url": "https://about.gitlab.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "gitlab"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
+  },
+  {
+    "id": "grafana-labs",
+    "name": "Grafana Labs",
+    "url": "https://grafana.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "grafanalabs"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
+  },
+  {
+    "id": "mozilla",
+    "name": "Mozilla",
+    "url": "https://www.mozilla.org",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "mozilla"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open to Africa are kept."
+  },
+  {
+    "id": "turing",
+    "name": "Turing",
+    "url": "https://www.turing.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "greenhouse",
+      "slug": "turing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open to Africa are kept."
+  },
+  {
+    "id": "toptal",
+    "name": "Toptal",
+    "url": "https://www.toptal.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "lever",
+      "slug": "toptal"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open to Africa are kept."
+  },
+  {
+    "id": "supabase",
+    "name": "Supabase",
+    "url": "https://supabase.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "supabase"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
+  },
+  {
+    "id": "posthog",
+    "name": "PostHog",
+    "url": "https://posthog.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "posthog"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
+  },
+  {
+    "id": "zapier",
+    "name": "Zapier",
+    "url": "https://zapier.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "zapier"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
+  },
+  {
+    "id": "buffer",
+    "name": "Buffer",
+    "url": "https://buffer.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "ashby",
+      "slug": "buffer"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote-first. Only roles open to Africa are kept."
   }
 ]
