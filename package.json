@@ -2,7 +2,7 @@
   "name": "kaziscout",
   "version": "0.1.0",
   "private": true,
-  "description": "Job-search agent for Africa: scan African job boards, score roles against your CV, turn messy postings into clean Markdown, and track applications.",
+  "description": "Job-search agent that runs on your computer: reads 131 job boards and employer career pages (deepest in Africa, any country), scores roles against your CV, cleans job pages into Markdown, and tracks applications. Web, terminal, or any AI coding tool.",
   "author": "Benard Kimani (https://github.com/swiftkimani)",
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/swiftkimani/kaziscout#readme",
