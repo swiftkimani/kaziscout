@@ -4,9 +4,11 @@
 
 <p align="center"><strong>Find work worth your while, across Africa.</strong></p>
 
-KaziScout is a job-search agent that runs on your own computer. It scans African job boards,
-scores every posting from 1 to 5 against your profile, turns cluttered job pages into clean
-Markdown, and tracks your applications. You review each one and press Submit yourself.
+KaziScout is a job-search agent that runs on your own computer. It reads job boards and employer
+career pages, deepest in Africa and usable from any country, scores every posting from 1 to 5
+against your profile, turns cluttered job pages into clean Markdown, and tracks your applications.
+Use it in the browser, in the terminal, or through an AI coding tool. You review each application
+and press Submit yourself.
 
 "Kazi" is Swahili for work.
 
@@ -138,7 +140,7 @@ All settings are optional. See [.env.example](.env.example).
 | Variable                 | Default                  | Purpose                                                                                         |
 | ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------- |
 | `PORT`                   | `8787`                   | Port the server listens on                                                                      |
-| `HOST`                   | `127.0.0.1`              | Interface to bind. Keep it local; there is no login.                                            |
+| `HOST`                   | `127.0.0.1`              | Interface to bind. Anything else requires `ACCESS_TOKEN`.                                       |
 | `LOG_LEVEL`              | `info`                   | `debug`, `info`, `warn`, `error` or `silent`                                                    |
 | `DATABASE_PATH`          | `./var/kaziscout.sqlite` | SQLite file, relative to `server/`                                                              |
 | `ACCESS_TOKEN`           | none                     | Sign-in token. Required before listening beyond this computer.                                  |
@@ -209,7 +211,7 @@ server/
   test/                 tests and recorded feed fixtures
 web/
   src/components/ui/    primitives (the only place raw styling lives)
-  src/features/         jobs, boards, tracker, profile, extract
+  src/features/         jobs, boards, tracker, profile, extract, practice form
   src/styles/tokens.css design tokens
 brand/                  logo and brand notes
 docs/                   board list, decisions, handoff journal
