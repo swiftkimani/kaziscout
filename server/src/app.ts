@@ -22,6 +22,7 @@ import { AiJobEvaluator } from './scoring/ai-evaluator.js';
 import { HeuristicEvaluator } from './scoring/heuristic.js';
 import { AlertService } from './services/alerts.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
+import { BriefScheduler } from './services/brief-scheduler.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
 import { CvImportService } from './services/cv-import.js';
 import { DocumentService } from './services/documents.js';
@@ -30,6 +31,7 @@ import { MarkdownService } from './services/markdown.js';
 import { PostingCompleter } from './services/posting-completer.js';
 import { ScanService } from './services/scan.js';
 import { ScanScheduler } from './services/scheduler.js';
+import { TodayService } from './services/today.js';
 
 export interface AppOptions {
   config: Config;
@@ -108,6 +110,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     ai,
     now,
   });
+  const todayService = new TodayService({ jobs, applications, scans, boards, now });
   const applyService = new ApplyService({ jobs, profiles, applications, desktop, now });
 
   app.setErrorHandler((error, request, reply) => {
@@ -163,6 +166,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     markdownService,
     applyService,
     documentService,
+    todayService,
     cvImportService: new CvImportService({ ai, desktop }),
     aiModel: ai?.model,
     now,
@@ -203,12 +207,24 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
           logger: app.log,
         })
       : undefined;
+  const briefs =
+    alerts && config.BRIEF_TIME
+      ? new BriefScheduler({
+          today: todayService,
+          alerts,
+          time: config.BRIEF_TIME,
+          logger: app.log,
+          now,
+        })
+      : undefined;
   app.addHook('onReady', () => {
     scheduler?.start();
+    briefs?.start();
   });
 
   app.addHook('onClose', async () => {
     scheduler?.stop();
+    briefs?.stop();
     await desktop?.close();
   });
 

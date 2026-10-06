@@ -46,6 +46,8 @@ export interface Job {
   summary: string;
   descriptionMd?: string;
   postedAt?: string;
+  /** When applications close, if the posting says. */
+  closesAt?: string;
   listedAt: string;
   score?: number;
   evaluation?: Evaluation;
@@ -128,4 +130,11 @@ export interface CvImport {
   questions: FollowUpQuestion[];
   readBy: 'ai' | 'rules';
   characters: number;
+}
+
+export interface Today {
+  newStrong: Job[];
+  closingSoon: Job[];
+  followUps: Application[];
+  failedSources: { id: string; name: string; errorMessage: string }[];
 }

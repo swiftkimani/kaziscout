@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useBoards, useMeta } from '../../api/queries';
 import type { Job } from '../../api/types';
 import { ScoreBadge } from '../../components/ui/Feedback';
-import { describePlace, formatListedAt } from './format';
+import { describePlace, formatDate, formatListedAt } from './format';
 
 export function JobCard({ job }: { job: Job }) {
   const meta = useMeta();
@@ -21,6 +21,7 @@ export function JobCard({ job }: { job: Job }) {
           <span>{describePlace(job, meta.data?.countries ?? {})}</span>
           <span>{boardName}</span>
           <span>{formatListedAt(job.listedAt)}</span>
+          {job.closesAt && <span>Closes {formatDate(job.closesAt)}</span>}
         </p>
         {job.summary && <p className="job-card__summary">{job.summary}</p>}
       </div>

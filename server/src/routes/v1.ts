@@ -12,6 +12,7 @@ import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
+import type { TodayService } from '../services/today.js';
 import {
   addJobBody,
   applicationCreateBody,
@@ -39,6 +40,7 @@ export interface RouteDeps {
   applyService: ApplyService;
   documentService: DocumentService;
   cvImportService: CvImportService;
+  todayService: TodayService;
   /** Name of the configured AI model, if any. */
   aiModel?: string;
   now?: () => Date;
@@ -63,6 +65,8 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
       converter: deps.markdownService.converterName,
     },
   }));
+
+  app.get('/v1/today', () => ({ data: deps.todayService.get() }));
 
   app.get('/v1/boards', () => {
     const lastScans = deps.scans.latestByBoard();

@@ -1,3 +1,4 @@
+import { formatBrief, type Today } from '../services/today.js';
 import { clip, type Command } from './context.js';
 
 interface Scan {
@@ -50,6 +51,12 @@ export const boards: Command = async ({ io, values, call }) => {
   }
   const scanned = shown.filter((board) => board.isScannable).length;
   io.out(`\n${shown.length} sources, ${scanned} scanned automatically.`);
+};
+
+/** The day's short lists: what is new, what is closing, what needs a follow-up. */
+export const today: Command = async ({ io, call }) => {
+  const { data } = await call<{ data: Today }>('GET', '/v1/today');
+  io.out(formatBrief(data));
 };
 
 export const markdown: Command = async ({ io, need, call }) => {

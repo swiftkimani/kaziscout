@@ -18,6 +18,7 @@ import type {
   MarkdownPage,
   Meta,
   Profile,
+  Today,
 } from './types';
 
 export interface JobFilters {
@@ -101,6 +102,14 @@ export function useWriteDocuments(jobId: string) {
       (await api<{ data: ApplicationDocuments }>(`/v1/jobs/${jobId}/documents`, { method: 'POST' }))
         .data,
     onSuccess: (documents) => client.setQueryData(['documents', jobId], documents),
+  });
+}
+
+export function useToday() {
+  return useQuery({
+    // Under "jobs" so scans, saves and scoring refresh it along with the job lists.
+    queryKey: ['jobs', 'today'],
+    queryFn: async () => (await api<{ data: Today }>('/v1/today')).data,
   });
 }
 

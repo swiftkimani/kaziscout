@@ -2,6 +2,7 @@ export const HELP = `KaziScout in the terminal
 
 Usage: ./kazi <command> [options]
 
+  today                  What needs you today: new matches, closing soon, follow-ups
   scan [board-id]        Scan every source, or one board
   jobs                   List jobs, best fit first
       --search <text>    Match title or company

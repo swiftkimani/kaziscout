@@ -5,10 +5,11 @@ import { cv } from './cv-command.js';
 import { HELP } from './help.js';
 import { add, assess, jobs, pack, show, track, tracker } from './job-commands.js';
 import { profile } from './profile-commands.js';
-import { boards, markdown, scan } from './source-commands.js';
+import { boards, markdown, scan, today } from './source-commands.js';
 
 const COMMANDS: Readonly<Record<string, Command>> = {
   help: ({ io }) => Promise.resolve(io.out(HELP)),
+  today,
   scan,
   jobs,
   add,
