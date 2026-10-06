@@ -320,6 +320,18 @@
   column-gap: var(--space-4);
 }
 
+.country-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  max-height: var(--picker-max);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
 .extract-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

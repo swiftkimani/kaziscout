@@ -39,15 +39,18 @@ function toQueryString(filters: JobFilters, cursor: string | undefined): string 
 }
 
 /** Scans, scoring and profile changes all alter what the job list shows. */
-function invalidateJobs(client: QueryClient): Promise<void> {
-  return client.invalidateQueries({ queryKey: ['jobs'] });
+async function invalidateJobs(client: QueryClient): Promise<void> {
+  await Promise.all([
+    client.invalidateQueries({ queryKey: ['jobs'] }),
+    // The meta response lists which countries have jobs, which a scan can change.
+    client.invalidateQueries({ queryKey: ['meta'] }),
+  ]);
 }
 
 export function useMeta() {
   return useQuery({
     queryKey: ['meta'],
     queryFn: () => api<Meta>('/v1/meta'),
-    staleTime: Infinity,
   });
 }
 

@@ -1,0 +1,129 @@
+{
+ "offset": 0,
+ "limit": 2,
+ "totalFound": 8,
+ "content": [
+  {
+   "id": "743999691495505",
+   "name": "Market Research & Business Intelligence Manager",
+   "uuid": "75ebcbbd-d7b0-4cda-a883-422851dd48bb",
+   "jobAdId": "5b9e7f1e-c1ee-44db-a583-af3e9c2d9149",
+   "defaultJobAd": true,
+   "refNumber": "REF10P",
+   "company": {
+    "identifier": "BURNManufacturing",
+    "name": "BURN Manufacturing"
+   },
+   "releasedDate": "2019-07-10T13:54:59.000Z",
+   "location": {
+    "city": "Ruiru",
+    "region": "Kiambu County",
+    "country": "ke",
+    "address": "Eastern Bypass",
+    "remote": false,
+    "hybrid": false,
+    "latitude": "-1.1932365",
+    "longitude": "36.97613409999997",
+    "fullLocation": "Ruiru, Kiambu County, Kenya"
+   },
+   "industry": {
+    "id": "renewables_and_environment",
+    "label": "Renewables And Environment"
+   },
+   "department": {},
+   "function": {
+    "id": "manufacturing",
+    "label": "Manufacturing"
+   },
+   "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+   },
+   "experienceLevel": {
+    "id": "mid_senior_level",
+    "label": "Mid-Senior Level"
+   },
+   "customField": [
+    {
+     "fieldId": "58b7e660e4b09a6d37a0d2ff",
+     "fieldLabel": "Brands",
+     "valueId": "default",
+     "valueLabel": "BURN Manufacturing"
+    },
+    {
+     "fieldId": "COUNTRY",
+     "fieldLabel": "Country/Region",
+     "valueId": "ke",
+     "valueLabel": "Kenya"
+    }
+   ],
+   "visibility": "PUBLIC",
+   "ref": "https://api.smartrecruiters.com/v1/companies/burnmanufacturing/postings/743999691495505",
+   "language": {
+    "code": "en",
+    "label": "English",
+    "labelNative": "English (US)"
+   }
+  },
+  {
+   "id": "743999664331460",
+   "name": "Client Account Manager",
+   "uuid": "13a16275-c427-4251-ba6f-bb97dc5856cd",
+   "jobAdId": "00668530-ad12-456a-9a4e-1f6181fb6605",
+   "defaultJobAd": true,
+   "refNumber": "REF9A",
+   "company": {
+    "identifier": "BURNManufacturing",
+    "name": "BURN Manufacturing"
+   },
+   "releasedDate": "2018-01-03T13:26:35.000Z",
+   "location": {
+    "city": "Ruiru",
+    "region": "Kiambu County",
+    "country": "ke",
+    "address": "Ruiru Kamiti Road",
+    "remote": false,
+    "hybrid": false,
+    "fullLocation": "Ruiru, Kiambu County, Kenya"
+   },
+   "industry": {
+    "id": "renewables_and_environment",
+    "label": "Renewables And Environment"
+   },
+   "department": {},
+   "function": {
+    "id": "manufacturing",
+    "label": "Manufacturing"
+   },
+   "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+   },
+   "experienceLevel": {
+    "id": "mid_senior_level",
+    "label": "Mid-Senior Level"
+   },
+   "customField": [
+    {
+     "fieldId": "58b7e660e4b09a6d37a0d2ff",
+     "fieldLabel": "Brands",
+     "valueId": "default",
+     "valueLabel": "BURN Manufacturing"
+    },
+    {
+     "fieldId": "COUNTRY",
+     "fieldLabel": "Country/Region",
+     "valueId": "ke",
+     "valueLabel": "Kenya"
+    }
+   ],
+   "visibility": "PUBLIC",
+   "ref": "https://api.smartrecruiters.com/v1/companies/burnmanufacturing/postings/743999664331460",
+   "language": {
+    "code": "en",
+    "label": "English",
+    "labelNative": "English (US)"
+   }
+  }
+ ]
+}

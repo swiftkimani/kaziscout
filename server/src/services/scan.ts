@@ -29,11 +29,14 @@ export function normaliseJob(board: Board, raw: RawJob): NewJob {
   const [onlyCountry] = board.countries;
   const isNationalBoard =
     board.countries.length === 1 && onlyCountry !== 'PAN' && onlyCountry !== 'REMOTE';
+  // The location field is short and reliable enough to match any country in the world. Titles
+  // and descriptions are searched for African countries only, where a false match is unlikely.
   const countryCode = raw.isRemote
     ? undefined
     : isNationalBoard
       ? onlyCountry
-      : detectCountry(`${raw.location ?? ''} ${raw.title} ${text.slice(0, 600)}`);
+      : (detectCountry(raw.location ?? '', 'world') ??
+        detectCountry(`${raw.title} ${text.slice(0, 600)}`));
 
   return {
     boardId: board.id,

@@ -89,7 +89,11 @@ export interface Profile {
 }
 
 export interface Meta {
+  /** Every known country by ISO code. */
   countries: Record<string, string>;
+  africanCountries: string[];
+  /** Countries that currently have jobs. */
+  jobCountries: string[];
   features: { aiModel: string | null; desktopAssist: boolean; converter: 'firecrawl' | 'local' };
 }
 

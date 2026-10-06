@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { AFRICAN_COUNTRIES } from '../boards/countries.js';
+import { COUNTRIES } from '../boards/countries.js';
 import { ValidationError } from '../errors.js';
 import { APPLICATION_STATUSES } from '../repositories/applications.js';
 
 const countryCode = z
   .string()
   .toUpperCase()
-  .refine((code) => code in AFRICAN_COUNTRIES, 'must be an African country code');
+  .refine((code) => code in COUNTRIES, 'must be a known country code');
 
 const trimmedList = (maxItems: number, maxLength: number) =>
   z
@@ -38,7 +38,7 @@ export const profileBody = z.object({
   cvText: z.string().trim().max(50_000).default(''),
   skills: trimmedList(60, 60),
   targetTitles: trimmedList(15, 100),
-  countries: z.array(countryCode).max(54),
+  countries: z.array(countryCode).max(60),
   isRemoteOk: z.boolean(),
 });
 

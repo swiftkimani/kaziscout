@@ -219,6 +219,13 @@ export class JobRepository {
     this.db.prepare('UPDATE jobs SET description_md = ? WHERE id = ?').run(markdown, id);
   }
 
+  listCountryCodes(): string[] {
+    return this.db
+      .prepare('SELECT DISTINCT country_code FROM jobs WHERE country_code IS NOT NULL')
+      .all()
+      .map((row) => String(row.country_code));
+  }
+
   countByBoard(): Map<string, number> {
     const rows = this.db.prepare('SELECT board_id, COUNT(*) AS total FROM jobs GROUP BY board_id');
     return new Map(rows.all().map((row) => [String(row.board_id), Number(row.total)]));

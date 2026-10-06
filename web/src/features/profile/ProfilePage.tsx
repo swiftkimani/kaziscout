@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { ErrorState, Skeleton } from '../../components/ui/Feedback';
 import { Checkbox, TextAreaField, TextField } from '../../components/ui/Field';
 import { useToast } from '../../components/ui/Toast';
+import { CountryPicker } from './CountryPicker';
 
 const EMPTY_PROFILE: Profile = {
   fullName: '',
@@ -35,18 +36,7 @@ function ProfileForm({ initial }: { initial: Profile }) {
   const [nameError, setNameError] = useState('');
 
   const fieldErrors = save.error instanceof ApiError ? save.error.fieldErrors : {};
-  const countries = Object.entries(meta.data?.countries ?? {}).sort((a, b) =>
-    a[1].localeCompare(b[1]),
-  );
   const validateName = (name: string) => setNameError(name.trim() ? '' : 'Enter your name');
-
-  const toggleCountry = (code: string, isChecked: boolean) =>
-    setProfile((current) => ({
-      ...current,
-      countries: isChecked
-        ? [...current.countries, code]
-        : current.countries.filter((existing) => existing !== code),
-    }));
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -93,19 +83,11 @@ function ProfileForm({ initial }: { initial: Profile }) {
         error={fieldErrors.skills}
         onChange={(event) => setSkillsText(event.target.value)}
       />
-      <fieldset className="fieldset">
-        <legend className="field__label">Countries you can work in</legend>
-        <div className="country-grid">
-          {countries.map(([code, name]) => (
-            <Checkbox
-              key={code}
-              label={name}
-              checked={profile.countries.includes(code)}
-              onChange={(event) => toggleCountry(code, event.target.checked)}
-            />
-          ))}
-        </div>
-      </fieldset>
+      <CountryPicker
+        meta={meta.data}
+        selected={profile.countries}
+        onChange={(countries) => setProfile((current) => ({ ...current, countries }))}
+      />
       <Checkbox
         label="I'm open to remote work"
         checked={profile.isRemoteOk}

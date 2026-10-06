@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { isOpenToAfrica } from '../boards/countries.js';
 import { UpstreamError } from '../errors.js';
 import type { Provider, RawJob } from './types.js';
 
@@ -37,19 +36,17 @@ export const remotiveProvider: Provider = async (_board, { fetchText }) => {
   const body = await fetchText('https://remotive.com/api/remote-jobs', {
     accept: 'application/json',
   });
-  return parseJson(body, remotiveSchema, 'Remotive')
-    .jobs.filter((job) => isOpenToAfrica(job.candidate_required_location))
-    .map((job): RawJob => ({
-      externalId: String(job.id),
-      title: job.title,
-      company: job.company_name,
-      location: job.candidate_required_location || 'Worldwide',
-      url: job.url,
-      bodyHtml: job.description,
-      // Remotive publishes naive timestamps in UTC.
-      postedAt: new Date(`${job.publication_date}Z`),
-      isRemote: true,
-    }));
+  return parseJson(body, remotiveSchema, 'Remotive').jobs.map((job): RawJob => ({
+    externalId: String(job.id),
+    title: job.title,
+    company: job.company_name,
+    location: job.candidate_required_location || 'Worldwide',
+    url: job.url,
+    bodyHtml: job.description,
+    // Remotive publishes naive timestamps in UTC.
+    postedAt: new Date(`${job.publication_date}Z`),
+    isRemote: true,
+  }));
 };
 
 const himalayasSchema = z.object({
@@ -71,18 +68,16 @@ export const himalayasProvider: Provider = async (_board, { fetchText }) => {
   const body = await fetchText('https://himalayas.app/jobs/api?limit=20', {
     accept: 'application/json',
   });
-  return parseJson(body, himalayasSchema, 'Himalayas')
-    .jobs.filter((job) => isOpenToAfrica(job.locationRestrictions.join(', ')))
-    .map((job): RawJob => ({
-      externalId: job.guid,
-      title: job.title,
-      company: job.companyName,
-      location: job.locationRestrictions.join(', ') || 'Worldwide',
-      url: job.applicationLink,
-      bodyHtml: job.description,
-      postedAt: new Date(job.pubDate * 1000),
-      isRemote: true,
-    }));
+  return parseJson(body, himalayasSchema, 'Himalayas').jobs.map((job): RawJob => ({
+    externalId: job.guid,
+    title: job.title,
+    company: job.companyName,
+    location: job.locationRestrictions.join(', ') || 'Worldwide',
+    url: job.applicationLink,
+    bodyHtml: job.description,
+    postedAt: new Date(job.pubDate * 1000),
+    isRemote: true,
+  }));
 };
 
 const remoteOkJobSchema = z.object({
@@ -102,7 +97,6 @@ export const remoteOkProvider: Provider = async (_board, { fetchText }) => {
   return z
     .array(remoteOkJobSchema)
     .parse(entries)
-    .filter((job) => isOpenToAfrica(job.location))
     .map((job): RawJob => ({
       externalId: job.id,
       title: job.position,

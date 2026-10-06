@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectCountry, isOpenToAfrica } from '../src/boards/countries.js';
+import { COUNTRIES, detectCountry, judgeRemoteRestriction } from '../src/boards/countries.js';
 import { FirecrawlConverter, LocalConverter } from '../src/extract/converters.js';
 import { htmlToText, pageToMarkdown } from '../src/extract/html-to-markdown.js';
 import { assertPublicHttpUrl } from '../src/extract/safe-url.js';
@@ -159,19 +159,53 @@ describe('detectCountry', () => {
   });
 });
 
-describe('isOpenToAfrica', () => {
+describe('detectCountry with world scope', () => {
   it.each([
-    ['', true],
-    ['Worldwide', true],
-    ['EMEA', true],
-    ['Kenya, Nigeria', true],
-    ['Remote', true],
-    ['Home based - Africa, Europe', true],
-    ['Remote - US', false],
-    ['London, UK', false],
-    ['USA Only', false],
-    ['Europe, USA, Canada, APAC', false],
-  ])('"%s" -> %s', (restriction, expected) => {
-    expect(isOpenToAfrica(restriction)).toBe(expected);
+    ['Remote - US', 'US'],
+    ['London, UK', 'GB'],
+    ['Berlin, Germany', 'DE'],
+    ['São Paulo, Brazil', 'BR'],
+    ['Lagos, Nigeria', 'NG'],
+  ])('finds the country in "%s"', (text, code) => {
+    expect(detectCountry(text, 'world')).toBe(code);
+  });
+
+  it('does not match countries outside Africa in the default scope', () => {
+    expect(detectCountry('Berlin, Germany')).toBeUndefined();
+  });
+
+  it('knows more than 150 countries, each with a real name', () => {
+    const entries = Object.entries(COUNTRIES);
+    expect(entries.length).toBeGreaterThan(150);
+    for (const [code, name] of entries) expect(name, code).not.toBe(code);
+  });
+});
+
+describe('judgeRemoteRestriction', () => {
+  const kenyan = ['KE'];
+
+  it.each([
+    ['', 'open'],
+    ['Remote', 'open'],
+    ['Worldwide', 'open'],
+    ['Home based - Worldwide', 'open'],
+    ['EMEA', 'match'],
+    ['Home based - Africa, Europe', 'match'],
+    ['Kenya, Nigeria', 'match'],
+    ['Remote - US', 'excluded'],
+    ['USA Only', 'excluded'],
+    ['Europe, USA, Canada, APAC', 'excluded'],
+    ['Americas', 'excluded'],
+    ['Timezone UTC+2 to UTC+5', 'unclear'],
+  ])('"%s" is %s for someone in Kenya', (restriction, kind) => {
+    expect(judgeRemoteRestriction(restriction, kenyan).kind).toBe(kind);
+  });
+
+  it('matches a restriction that names a country outside Africa in the profile', () => {
+    expect(judgeRemoteRestriction('Remote - Germany', ['DE']).kind).toBe('match');
+  });
+
+  it('cannot place a non-African profile in a region, so says the restriction is unclear', () => {
+    expect(judgeRemoteRestriction('Europe', ['DE']).kind).toBe('unclear');
   });
 });

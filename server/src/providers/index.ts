@@ -1,5 +1,11 @@
 import type { Board } from '../boards/registry.js';
-import { ashbyProvider, greenhouseProvider, leverProvider } from './ats.js';
+import {
+  ashbyProvider,
+  greenhouseProvider,
+  leverProvider,
+  smartRecruitersProvider,
+  workableProvider,
+} from './ats.js';
 import { himalayasProvider, remoteOkProvider, remotiveProvider } from './remote-apis.js';
 import { rssProvider } from './rss.js';
 import type { Provider } from './types.js';
@@ -14,6 +20,8 @@ const ATS_PROVIDERS: Readonly<Record<string, Provider>> = {
   greenhouse: greenhouseProvider,
   lever: leverProvider,
   ashby: ashbyProvider,
+  smartrecruiters: smartRecruitersProvider,
+  workable: workableProvider,
 };
 
 /** Picks the provider that can read a board, or undefined for link-out boards. */

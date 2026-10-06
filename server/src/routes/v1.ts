@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { AFRICAN_COUNTRIES } from '../boards/countries.js';
+import { AFRICAN_COUNTRIES, COUNTRIES } from '../boards/countries.js';
 import { type Board, isScannable } from '../boards/registry.js';
 import { NotFoundError } from '../errors.js';
 import type { ApplicationRepository } from '../repositories/applications.js';
@@ -46,7 +46,10 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
   const now = () => deps.now?.() ?? new Date();
 
   app.get('/v1/meta', () => ({
-    countries: AFRICAN_COUNTRIES,
+    countries: COUNTRIES,
+    africanCountries: Object.keys(AFRICAN_COUNTRIES),
+    // Countries that currently have jobs, so the filter offers only useful choices.
+    jobCountries: deps.jobs.listCountryCodes(),
     features: {
       aiModel: deps.aiModel ?? null,
       desktopAssist: deps.applyService.isDesktopAssistAvailable,

@@ -8,13 +8,15 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { atsApiUrl } from '../providers/ats.js';
-import { AFRICAN_COUNTRIES } from './countries.js';
+import { COUNTRIES } from './countries.js';
 import { type Board, loadBoards, REGISTRY_URL } from './registry.js';
 
 const BROWSER_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const TIMEOUT_MS = 20_000;
-const CONCURRENCY = 12;
+const CONCURRENCY = 8;
+const RETRIES_BEFORE_DOWN = 2;
+const RETRY_DELAY_MS = 3_000;
 const BLOCKED_STATUSES = new Set([202, 401, 403, 406, 429]);
 const DOCS_PATH = fileURLToPath(new URL('../../../docs/BOARDS.md', import.meta.url));
 
@@ -32,6 +34,12 @@ async function httpStatus(url: string): Promise<number> {
   }
 }
 
+function classify(status: number): Board['status'] {
+  if (status >= 200 && status < 300 && status !== 202) return 'live';
+  if (BLOCKED_STATUSES.has(status)) return 'blocked';
+  return 'down';
+}
+
 async function checkBoard(board: Board): Promise<Board['status']> {
   const target =
     board.access.type === 'rss'
@@ -39,9 +47,12 @@ async function checkBoard(board: Board): Promise<Board['status']> {
       : board.access.type === 'ats'
         ? atsApiUrl(board)
         : board.url;
-  const status = await httpStatus(target);
-  if (status >= 200 && status < 300 && status !== 202) return 'live';
-  if (BLOCKED_STATUSES.has(status)) return 'blocked';
+  // One slow answer is not an outage, so a source is only "down" after failing twice.
+  for (let attempt = 1; attempt <= RETRIES_BEFORE_DOWN; attempt += 1) {
+    const result = classify(await httpStatus(target));
+    if (result !== 'down') return result;
+    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+  }
   return 'down';
 }
 
@@ -50,7 +61,7 @@ function describeCountries(board: Board): string {
     .map((code) => {
       if (code === 'PAN') return 'Pan-African';
       if (code === 'REMOTE') return 'Remote (worldwide)';
-      return AFRICAN_COUNTRIES[code] ?? code;
+      return COUNTRIES[code] ?? code;
     })
     .join(', ');
 }

@@ -1,7 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Board } from '../src/boards/registry.js';
-import { ashbyProvider, greenhouseProvider, leverProvider } from '../src/providers/ats.js';
+import {
+  atsApiUrl,
+  ashbyProvider,
+  greenhouseProvider,
+  leverProvider,
+  smartRecruitersProvider,
+  workableProvider,
+} from '../src/providers/ats.js';
 import {
   himalayasProvider,
   remoteOkProvider,
@@ -79,22 +86,40 @@ describe('parseRss', () => {
     );
   });
 
-  it('drops remote roles restricted to regions outside Africa', () => {
+  it('keeps the region restriction of a remote role as its location', () => {
     const item = (title: string, region: string) =>
       `<item><title>${title}</title><link>https://example.com/${title}</link><region>${region}</region></item>`;
     const xml = `<rss><channel>${item('a', 'USA Only')}${item('b', 'Anywhere in the World')}</channel></rss>`;
 
-    expect(parseRss(xml, { isRemoteBoard: true }).map((job) => job.title)).toEqual(['b']);
+    expect(parseRss(xml, { isRemoteBoard: true }).map((job) => job.location)).toEqual([
+      'USA Only',
+      'Anywhere in the World',
+    ]);
+  });
+
+  it('reads the place and remote status from a Teamtailor career feed', () => {
+    const xml = `<rss xmlns:tt="https://teamtailor.com/locations"><channel>
+      <item><title>Product Manager</title><link>https://careers.example.com/jobs/1</link>
+        <remoteStatus>hybrid</remoteStatus>
+        <tt:locations><tt:location><tt:city>Lagos</tt:city><tt:country>Nigeria</tt:country></tt:location></tt:locations></item>
+      <item><title>Developer</title><link>https://careers.example.com/jobs/2</link>
+        <remoteStatus>fully</remoteStatus><tt:locations></tt:locations></item>
+    </channel></rss>`;
+
+    expect(parseRss(xml, { isRemoteBoard: false })).toMatchObject([
+      { title: 'Product Manager', location: 'Lagos, Nigeria', isRemote: false },
+      { title: 'Developer', location: undefined, isRemote: true },
+    ]);
   });
 });
 
 describe('remote API providers', () => {
-  it('keeps only Remotive roles open worldwide or to Africa', async () => {
+  it('reads Remotive roles with their location restriction', async () => {
     const jobs = await remotiveProvider(remoteBoard, {
       fetchText: () => Promise.resolve(fixture('remotive.json')),
     });
 
-    expect(jobs).toHaveLength(1);
+    expect(jobs.map((job) => job.location)).toEqual(['Worldwide', 'Europe, USA, Canada, APAC']);
     expect(jobs[0]).toMatchObject({
       externalId: '1749306',
       title: 'Freelance Copywriter',
@@ -104,17 +129,13 @@ describe('remote API providers', () => {
     expect(jobs[0]?.postedAt?.toISOString()).toBe('2026-10-02T20:01:00.000Z');
   });
 
-  it('keeps Himalayas roles restricted to African countries and drops the rest', async () => {
-    const feed = JSON.parse(fixture('himalayas.json')) as {
-      jobs: { locationRestrictions: string[] }[];
-    };
-    feed.jobs[1]!.locationRestrictions = ['Kenya', 'Nigeria'];
-
+  it('reads Himalayas roles with their location restriction', async () => {
     const jobs = await himalayasProvider(remoteBoard, {
-      fetchText: () => Promise.resolve(JSON.stringify(feed)),
+      fetchText: () => Promise.resolve(fixture('himalayas.json')),
     });
 
-    expect(jobs.map((job) => job.location)).toEqual(['Kenya, Nigeria']);
+    expect(jobs.map((job) => job.location)).toEqual(['Brazil', 'Brazil']);
+    expect(jobs.every((job) => job.isRemote)).toBe(true);
   });
 
   it('skips the legal notice at the head of the Remote OK feed', async () => {
@@ -136,7 +157,10 @@ describe('remote API providers', () => {
 });
 
 describe('employer career APIs', () => {
-  const employer = (provider: 'greenhouse' | 'lever' | 'ashby', countries: string[]): Board => ({
+  const employer = (
+    provider: 'greenhouse' | 'lever' | 'ashby' | 'smartrecruiters' | 'workable',
+    countries: string[],
+  ): Board => ({
     ...remoteBoard,
     id: 'employer',
     name: 'Example Employer',
@@ -167,22 +191,44 @@ describe('employer career APIs', () => {
     expect(jobs[0]?.bodyHtml).toContain('<h3>About One Acre Fund</h3>');
   });
 
-  it('keeps only roles open to Africa for an employer that hires worldwide', async () => {
+  it('reads Lever jobs with their place and remote status', async () => {
     const jobs = await leverProvider(employer('lever', ['REMOTE']), {
       fetchText: () => Promise.resolve(fixture('lever.json')),
     });
 
-    // Both recorded Tala roles are restricted to the US.
-    expect(jobs).toEqual([]);
+    expect(jobs).toHaveLength(2);
+    expect(jobs[0]).toMatchObject({
+      title: 'Analytics Platforms Architect',
+      location: 'US',
+      isRemote: true,
+    });
   });
 
-  it('keeps every role for an employer based in Africa', async () => {
-    const jobs = await leverProvider(employer('lever', ['KE']), {
-      fetchText: () => Promise.resolve(fixture('lever.json')),
+  it('reads SmartRecruiters postings and builds their public links', async () => {
+    const jobs = await smartRecruitersProvider(employer('smartrecruiters', ['KE']), {
+      fetchText: () => Promise.resolve(fixture('smartrecruiters.json')),
     });
 
-    expect(jobs).toHaveLength(2);
-    expect(jobs[0]).toMatchObject({ title: 'Analytics Platforms Architect', isRemote: true });
+    expect(jobs[0]).toMatchObject({
+      title: 'Market Research & Business Intelligence Manager',
+      company: 'BURN Manufacturing',
+      location: 'Ruiru, Kiambu County, Kenya',
+      url: 'https://jobs.smartrecruiters.com/BURNManufacturing/743999691495505',
+      isRemote: false,
+    });
+  });
+
+  it('reads Workable jobs with city and country', async () => {
+    const jobs = await workableProvider(employer('workable', ['NG']), {
+      fetchText: () => Promise.resolve(fixture('workable.json')),
+    });
+
+    expect(jobs[0]).toMatchObject({
+      externalId: '82E249C10F',
+      title: 'Data Analyst - Credit',
+      location: 'Lagos, Nigeria',
+      url: 'https://apply.workable.com/j/82E249C10F',
+    });
   });
 
   it('reads Ashby jobs and adds the country from the postal address', async () => {
@@ -196,5 +242,19 @@ describe('employer career APIs', () => {
       isRemote: false,
     });
     expect(jobs[0]?.postedAt?.toISOString()).toBe('2026-09-21T11:54:41.419Z');
+  });
+});
+
+describe('atsApiUrl', () => {
+  it.each([
+    ['greenhouse', 'https://boards-api.greenhouse.io/v1/boards/acme/jobs'],
+    ['lever', 'https://api.lever.co/v0/postings/acme?mode=json'],
+    ['ashby', 'https://api.ashbyhq.com/posting-api/job-board/acme'],
+    ['smartrecruiters', 'https://api.smartrecruiters.com/v1/companies/acme/postings?limit=1'],
+    ['workable', 'https://apply.workable.com/api/v1/widget/accounts/acme'],
+  ] as const)('builds the %s address the board verifier checks', (provider, url) => {
+    const board: Board = { ...remoteBoard, access: { type: 'ats', provider, slug: 'acme' } };
+
+    expect(atsApiUrl(board)).toBe(url);
   });
 });

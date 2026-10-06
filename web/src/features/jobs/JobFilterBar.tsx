@@ -13,9 +13,10 @@ export function JobFilterBar({
   const set = <K extends keyof JobFilters>(key: K, value: JobFilters[K]) =>
     onChange({ ...filters, [key]: value });
 
-  const countries = Object.entries(meta.data?.countries ?? {}).sort((a, b) =>
-    a[1].localeCompare(b[1]),
-  );
+  const names = meta.data?.countries ?? {};
+  const countries = (meta.data?.jobCountries ?? [])
+    .map((code) => [code, names[code] ?? code] as const)
+    .sort((a, b) => a[1].localeCompare(b[1]));
   const scannedBoards = (boards.data ?? []).filter((board) => board.jobCount > 0);
 
   return (

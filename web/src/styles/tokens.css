@@ -51,6 +51,7 @@
   --filter-min: 180px;
   --column-min: 320px;
   --content-max: 1120px;
+  --picker-max: 320px;
   --target-min: 44px;
   --border-width: 1px;
   --focus-width: 3px;

@@ -1416,22 +1416,6 @@
     "note": "Pan-African tech talent marketplace."
   },
   {
-    "id": "tunga",
-    "name": "Tunga",
-    "url": "https://tunga.io",
-    "countries": [
-      "PAN"
-    ],
-    "category": "tech",
-    "language": "en",
-    "access": {
-      "type": "listing"
-    },
-    "status": "live",
-    "checkedAt": "2026-10-06",
-    "note": "Remote software work for African developers."
-  },
-  {
     "id": "remote4africa",
     "name": "Remote4Africa",
     "url": "https://remote4africa.com",
@@ -1461,7 +1445,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open worldwide or to Africa are kept."
+    "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
     "id": "himalayas",
@@ -1478,7 +1462,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open worldwide or to Africa are kept."
+    "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
     "id": "remoteok",
@@ -1495,7 +1479,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open worldwide or to Africa are kept."
+    "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
     "id": "we-work-remotely",
@@ -1512,7 +1496,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open worldwide or to Africa are kept."
+    "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
     "id": "andela",
@@ -1654,7 +1638,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Operates in Rwanda, Ghana, Nigeria, Kenya and Cote d'Ivoire. Only roles open to Africa are kept."
+    "note": "Operates in Rwanda, Ghana, Nigeria, Kenya and Cote d'Ivoire. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "give-directly",
@@ -1672,7 +1656,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open to Africa are kept."
+    "note": "Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "tala",
@@ -1690,7 +1674,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open to Africa are kept."
+    "note": "Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "wikimedia",
@@ -1708,7 +1692,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open to Africa are kept."
+    "note": "Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "canonical",
@@ -1726,7 +1710,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "gitlab",
@@ -1744,7 +1728,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "grafana-labs",
@@ -1762,7 +1746,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "mozilla",
@@ -1780,7 +1764,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open to Africa are kept."
+    "note": "Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "turing",
@@ -1798,7 +1782,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open to Africa are kept."
+    "note": "Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "toptal",
@@ -1816,7 +1800,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Only roles open to Africa are kept."
+    "note": "Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "supabase",
@@ -1834,7 +1818,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "posthog",
@@ -1852,7 +1836,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "zapier",
@@ -1870,7 +1854,7 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
     "id": "buffer",
@@ -1888,6 +1872,161 @@
     },
     "status": "live",
     "checkedAt": "2026-10-06",
-    "note": "Remote-first. Only roles open to Africa are kept."
+    "note": "Remote-first. Hires in many countries; each role is scored against your countries."
+  },
+  {
+    "id": "burn-manufacturing",
+    "name": "BURN Manufacturing",
+    "url": "https://burnstoves.com",
+    "countries": [
+      "KE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "smartrecruiters",
+      "slug": "burnmanufacturing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "palmpay",
+    "name": "PalmPay",
+    "url": "https://www.palmpay.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "smartrecruiters",
+      "slug": "palmpay"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "canva",
+    "name": "Canva",
+    "url": "https://www.canva.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "smartrecruiters",
+      "slug": "canva"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Hires in many countries; each role is scored against your countries."
+  },
+  {
+    "id": "wise",
+    "name": "Wise",
+    "url": "https://wise.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "smartrecruiters",
+      "slug": "wise"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only the 100 newest roles are read. Hires in many countries; each role is scored against your countries."
+  },
+  {
+    "id": "kuda",
+    "name": "Kuda",
+    "url": "https://kuda.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "workable",
+      "slug": "kuda"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "helium-health",
+    "name": "Helium Health",
+    "url": "https://heliumhealth.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "workable",
+      "slug": "helium-health"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "carry1st",
+    "name": "Carry1st",
+    "url": "https://www.carry1st.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "workable",
+      "slug": "carry1st"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "paystack",
+    "name": "Paystack",
+    "url": "https://paystack.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://paystack.teamtailor.com/jobs.rss"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Read from its Teamtailor career feed."
+  },
+  {
+    "id": "tunga",
+    "name": "Tunga",
+    "url": "https://tunga.io",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://tunga.teamtailor.com/jobs.rss"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote software work for African developers. Read from its Teamtailor career feed."
   }
 ]

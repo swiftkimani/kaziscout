@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { isOpenToAfrica } from '../boards/countries.js';
 import type { Board } from '../boards/registry.js';
 import { UpstreamError } from '../errors.js';
 import type { Provider, RawJob } from './types.js';
@@ -7,6 +6,7 @@ import type { Provider, RawJob } from './types.js';
 /**
  * Readers for three applicant-tracking systems that publish each employer's openings through a
  * public, no-login JSON API. One reader covers every employer on that system, in any country.
+ * Roles are stored wherever they are; scoring decides whether a place suits the person.
  */
 
 const REMOTE_WORDS = /\b(remote|home[- ]based|work from home|anywhere|worldwide)\b/i;
@@ -30,15 +30,6 @@ function parseJson<T>(body: string, schema: z.ZodType<T>, source: string): T {
 function slugOf(board: Board): string {
   if (board.access.type !== 'ats') throw new Error(`${board.id} is not an employer board`);
   return encodeURIComponent(board.access.slug);
-}
-
-/**
- * Employers marked REMOTE hire in many countries, so only their roles open to someone in Africa
- * are kept. Employers tied to African countries keep every role.
- */
-function keepForBoard(board: Board, jobs: RawJob[]): RawJob[] {
-  if (!board.countries.includes('REMOTE')) return jobs;
-  return jobs.filter((job) => isOpenToAfrica(job.location));
 }
 
 /** Greenhouse sends the description as HTML with its markup entity-escaped. */
@@ -84,7 +75,7 @@ export const greenhouseProvider: Provider = async (board, { fetchText }) => {
       isRemote: REMOTE_WORDS.test(location ?? ''),
     };
   });
-  return keepForBoard(board, jobs);
+  return jobs;
 };
 
 const leverSchema = z.array(
@@ -117,7 +108,7 @@ export const leverProvider: Provider = async (board, { fetchText }) => {
       isRemote: job.workplaceType === 'remote' || REMOTE_WORDS.test(location ?? ''),
     };
   });
-  return keepForBoard(board, jobs);
+  return jobs;
 };
 
 const ashbySchema = z.object({
@@ -161,17 +152,87 @@ export const ashbyProvider: Provider = async (board, { fetchText }) => {
         isRemote: job.isRemote === true,
       };
     });
-  return keepForBoard(board, jobs);
+  return jobs;
+};
+
+const smartRecruitersSchema = z.object({
+  content: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      releasedDate: z.string().nullish(),
+      company: z.object({ identifier: z.string(), name: z.string() }),
+      location: z
+        .object({ fullLocation: z.string().nullish(), remote: z.boolean().nullish() })
+        .nullish(),
+    }),
+  ),
+});
+
+/** SmartRecruiters lists postings without descriptions; "Fetch full posting" fills them in. */
+export const smartRecruitersProvider: Provider = async (board, { fetchText }) => {
+  const body = await fetchText(
+    `https://api.smartrecruiters.com/v1/companies/${slugOf(board)}/postings?limit=100`,
+    { accept: 'application/json' },
+  );
+  return parseJson(body, smartRecruitersSchema, 'SmartRecruiters').content.map((job): RawJob => ({
+    externalId: job.id,
+    title: job.name.trim(),
+    company: job.company.name,
+    location: job.location?.fullLocation?.trim() || undefined,
+    url: `https://jobs.smartrecruiters.com/${encodeURIComponent(job.company.identifier)}/${job.id}`,
+    bodyHtml: '',
+    postedAt: job.releasedDate ? new Date(job.releasedDate) : undefined,
+    isRemote: job.location?.remote === true,
+  }));
+};
+
+const workableSchema = z.object({
+  jobs: z.array(
+    z.object({
+      shortcode: z.string(),
+      title: z.string(),
+      url: z.url(),
+      telecommuting: z.boolean().nullish(),
+      published_on: z.string().nullish(),
+      city: z.string().nullish(),
+      country: z.string().nullish(),
+      description: z.string().default(''),
+    }),
+  ),
+});
+
+export const workableProvider: Provider = async (board, { fetchText }) => {
+  const body = await fetchText(
+    `https://apply.workable.com/api/v1/widget/accounts/${slugOf(board)}?details=true`,
+    { accept: 'application/json' },
+  );
+  return parseJson(body, workableSchema, 'Workable').jobs.map((job): RawJob => ({
+    externalId: job.shortcode,
+    title: job.title.trim(),
+    company: board.name,
+    location: [job.city, job.country].filter((part) => part?.trim()).join(', ') || undefined,
+    url: job.url,
+    bodyHtml: job.description,
+    postedAt: job.published_on ? new Date(job.published_on) : undefined,
+    isRemote: job.telecommuting === true,
+  }));
 };
 
 /** The public API address for an employer board, used by the board verifier. */
 export function atsApiUrl(board: Board): string {
   if (board.access.type !== 'ats') throw new Error(`${board.id} is not an employer board`);
   const slug = encodeURIComponent(board.access.slug);
-  if (board.access.provider === 'greenhouse') {
-    return `https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`;
+  switch (board.access.provider) {
+    case 'greenhouse':
+      return `https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`;
+    case 'lever':
+      return `https://api.lever.co/v0/postings/${slug}?mode=json`;
+    case 'ashby':
+      return `https://api.ashbyhq.com/posting-api/job-board/${slug}`;
+    case 'smartrecruiters':
+      return `https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=1`;
+    case 'workable':
+      return `https://apply.workable.com/api/v1/widget/accounts/${slug}`;
   }
-  if (board.access.provider === 'lever')
-    return `https://api.lever.co/v0/postings/${slug}?mode=json`;
-  return `https://api.ashbyhq.com/posting-api/job-board/${slug}`;
 }

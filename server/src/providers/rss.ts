@@ -1,5 +1,4 @@
 import { XMLParser } from 'fast-xml-parser';
-import { isOpenToAfrica } from '../boards/countries.js';
 import { UpstreamError } from '../errors.js';
 import type { Provider, RawJob } from './types.js';
 
@@ -43,6 +42,17 @@ export function splitTitle(
   return role && company ? { title: role, company } : { title: cleaned };
 }
 
+/** Teamtailor career feeds carry the place in their own <tt:locations> element. */
+function teamtailorLocation(item: Record<string, unknown>): string {
+  const locations = (item['tt:locations'] as { 'tt:location'?: unknown } | undefined)?.[
+    'tt:location'
+  ];
+  const first = (Array.isArray(locations) ? locations[0] : locations) as
+    Record<string, unknown> | undefined;
+  if (!first) return '';
+  return [text(first['tt:city']), text(first['tt:country'])].filter(Boolean).join(', ');
+}
+
 /** Parses an RSS 2.0 document into raw jobs. Items without a title or link are skipped. */
 export function parseRss(xml: string, options: { isRemoteBoard: boolean }): RawJob[] {
   const document: unknown = parser.parse(xml);
@@ -56,17 +66,17 @@ export function parseRss(xml: string, options: { isRemoteBoard: boolean }): RawJ
     const rawTitle = text(item.title);
     if (!url || !rawTitle) continue;
 
-    const region = text(item.region);
-    if (options.isRemoteBoard && !isOpenToAfrica(region)) continue;
+    const location = text(item.region) || teamtailorLocation(item);
+    const isRemote = options.isRemoteBoard || text(item.remoteStatus) === 'fully';
 
     jobs.push({
       externalId: text(item.guid) || url,
       ...splitTitle(rawTitle, options.isRemoteBoard ? 'company-colon-role' : 'role-at-company'),
-      location: region || undefined,
+      location: location || undefined,
       url,
       bodyHtml: text(item['content:encoded']) || text(item.description),
       postedAt: parseDate(text(item.pubDate)),
-      isRemote: options.isRemoteBoard,
+      isRemote,
     });
   }
   return jobs;
@@ -77,5 +87,11 @@ export const rssProvider: Provider = async (board, { fetchText }) => {
   const xml = await fetchText(board.access.feedUrl, {
     accept: 'application/rss+xml, application/xml, text/xml',
   });
-  return parseRss(xml, { isRemoteBoard: board.countries.includes('REMOTE') });
+  const jobs = parseRss(xml, {
+    isRemoteBoard: board.countries.includes('REMOTE') && board.category !== 'employer',
+  });
+  // An employer's own feed does not repeat the employer's name on every item.
+  return board.category === 'employer'
+    ? jobs.map((job) => ({ ...job, company: job.company ?? board.name }))
+    : jobs;
 };

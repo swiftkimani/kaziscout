@@ -10,7 +10,7 @@ const accessSchema = z.discriminatedUnion('type', [
   // An employer's own openings, read from the public API of its applicant-tracking system.
   z.object({
     type: z.literal('ats'),
-    provider: z.enum(['greenhouse', 'lever', 'ashby']),
+    provider: z.enum(['greenhouse', 'lever', 'ashby', 'smartrecruiters', 'workable']),
     slug: z.string().regex(/^[A-Za-z0-9._-]+$/),
   }),
   // Live board with no public feed: KaziScout links out to it and never scrapes it.

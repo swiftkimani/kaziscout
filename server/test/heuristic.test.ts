@@ -75,6 +75,22 @@ describe('scoreHeuristically', () => {
     expect(onsiteOnly.gaps).toContain('Remote role, but your profile says on-site only');
   });
 
+  it('scores a remote role limited to another country below one open to the person', () => {
+    const usOnly = scoreHeuristically(job({ isRemote: true, location: 'USA Only' }), profile, NOW);
+    const emea = scoreHeuristically(job({ isRemote: true, location: 'EMEA' }), profile, NOW);
+
+    expect(usOnly.score).toBeLessThanOrEqual(2);
+    expect(emea.score).toBeGreaterThanOrEqual(4);
+    expect(usOnly.gaps).toContain('Remote, but limited to USA Only');
+    expect(emea.strengths).toContain('Remote role open to EMEA');
+  });
+
+  it('names a country outside Africa when the job is based there', () => {
+    const evaluation = scoreHeuristically(job({ countryCode: 'DE' }), profile, NOW);
+
+    expect(evaluation.gaps).toContain('Based in Germany, which is not in your profile');
+  });
+
   it('stays within 1 to 5 for an empty profile', () => {
     const empty: Profile = { ...profile, skills: [], targetTitles: [], countries: [] };
 

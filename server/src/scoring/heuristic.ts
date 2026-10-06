@@ -1,8 +1,10 @@
-import { AFRICAN_COUNTRIES } from '../boards/countries.js';
+import { COUNTRIES, judgeRemoteRestriction } from '../boards/countries.js';
 import type { Evaluation, JobEvaluator, Profile, ScorableJob } from './types.js';
 
 const WEIGHTS = { title: 0.35, skills: 0.35, location: 0.2, freshness: 0.1 } as const;
 const DAY_MS = 24 * 60 * 60 * 1000;
+// A job the person cannot take because of where it is can never rank as a good match.
+const UNREACHABLE_LOCATION_CAP = 2;
 // Words too common in job titles to count as a match on their own.
 const STOP_WORDS = new Set(['and', 'the', 'of', 'for', 'to', 'in', 'a', 'an', 'at', 'with', 'or']);
 
@@ -36,14 +38,33 @@ function scoreTitle(jobTitle: string, targetTitles: string[]): number {
   return best;
 }
 
-function scoreLocation(job: ScorableJob, profile: Profile): { value: number; reason: string } {
-  if (job.isRemote) {
-    return profile.isRemoteOk
-      ? { value: 1, reason: 'Remote role, and you are open to remote work' }
-      : { value: 0.2, reason: 'Remote role, but your profile says on-site only' };
+function scoreRemoteLocation(
+  job: ScorableJob,
+  profile: Profile,
+): { value: number; reason: string } {
+  if (!profile.isRemoteOk) {
+    return { value: 0.2, reason: 'Remote role, but your profile says on-site only' };
   }
+  const eligibility = judgeRemoteRestriction(job.location, profile.countries);
+  switch (eligibility.kind) {
+    case 'open':
+      return { value: 1, reason: 'Remote role with no region limit stated' };
+    case 'match':
+      return { value: 1, reason: `Remote role open to ${eligibility.place}` };
+    case 'excluded':
+      return { value: 0, reason: `Remote, but limited to ${eligibility.place}` };
+    case 'unclear':
+      return {
+        value: 0.5,
+        reason: `Remote, limited to "${eligibility.place}". Check that you qualify`,
+      };
+  }
+}
+
+function scoreLocation(job: ScorableJob, profile: Profile): { value: number; reason: string } {
+  if (job.isRemote) return scoreRemoteLocation(job, profile);
   if (!job.countryCode) return { value: 0.5, reason: 'The posting does not state a country' };
-  const country = AFRICAN_COUNTRIES[job.countryCode] ?? job.countryCode;
+  const country = COUNTRIES[job.countryCode] ?? job.countryCode;
   return profile.countries.includes(job.countryCode)
     ? { value: 1, reason: `Based in ${country}, one of your countries` }
     : { value: 0, reason: `Based in ${country}, which is not in your profile` };
@@ -79,7 +100,8 @@ export function scoreHeuristically(job: ScorableJob, profile: Profile, now: Date
     WEIGHTS.skills * skillsScore +
     WEIGHTS.location * location.value +
     WEIGHTS.freshness * freshness;
-  const score = Math.round((1 + 4 * total) * 10) / 10;
+  const uncapped = Math.round((1 + 4 * total) * 10) / 10;
+  const score = location.value === 0 ? Math.min(uncapped, UNREACHABLE_LOCATION_CAP) : uncapped;
 
   const strengths: string[] = [];
   const gaps: string[] = [];
