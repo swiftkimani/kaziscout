@@ -87,6 +87,69 @@ describe('ProfilePage', () => {
     expect(await screen.findByText('Too long')).toBeTruthy();
   });
 
+  it('fills the form from an imported CV, shows the follow-up questions, and saves nothing yet', async () => {
+    const requests = stubApi({
+      'GET /v1/profile': { data: null },
+      'GET /v1/meta': META,
+      'POST /v1/profile/import': {
+        data: {
+          draft: { ...SAVED, targetTitles: [], cvText: 'Wanjiru Kamau, Data Analyst…' },
+          questions: [
+            {
+              field: 'targetTitles',
+              question: 'Which job titles are you looking for?',
+              suggestion: 'Data Analyst',
+            },
+            { field: 'isRemoteOk', question: 'Are you open to remote work?', suggestion: 'yes' },
+          ],
+          readBy: 'rules',
+          characters: 629,
+        },
+      },
+    });
+    const user = userEvent.setup();
+    renderApp(<ProfilePage />);
+
+    const file = new File(['%PDF-1.4 sample'], 'cv.pdf', { type: 'application/pdf' });
+    await user.upload(await screen.findByLabelText('CV file'), file);
+
+    expect(await screen.findByText(/A few things to confirm/)).toBeTruthy();
+    expect(screen.getByText('Which job titles are you looking for?')).toBeTruthy();
+    expect(screen.getByText('Suggested: Data Analyst')).toBeTruthy();
+    expect(screen.getByLabelText('Full name')).toHaveProperty('value', 'Wanjiru Kamau');
+    expect(screen.getByLabelText('Skills')).toHaveProperty('value', 'SQL');
+    const sent = requests.find((request) => request.path === '/v1/profile/import')?.body;
+    expect(sent).toMatchObject({ filename: 'cv.pdf', contentBase64: expect.any(String) });
+    expect(requests.some((request) => request.method === 'PUT')).toBe(false);
+  });
+
+  it("reads the CV from the desktop clipboard when desktop assist is on, and shows the server's reason on failure", async () => {
+    const requests = stubApi({
+      'GET /v1/profile': { data: null },
+      'GET /v1/meta': { ...META, features: { ...META.features, desktopAssist: true } },
+      'POST /v1/profile/import': () => ({
+        status: 400,
+        json: {
+          error: {
+            code: 'VALIDATION_FAILED',
+            message:
+              "The clipboard doesn't hold a CV. Open your CV, select all the text, copy it, then try again.",
+          },
+        },
+      }),
+    });
+    const user = userEvent.setup();
+    renderApp(<ProfilePage />);
+
+    await screen.findByLabelText('Kenya');
+    await user.click(screen.getByRole('button', { name: 'Use CV text I copied' }));
+
+    expect(await screen.findByText(/The clipboard doesn't hold a CV/)).toBeTruthy();
+    expect(requests.find((request) => request.path === '/v1/profile/import')?.body).toEqual({
+      clipboard: true,
+    });
+  });
+
   it('narrows the country list as you type, across Africa and the rest of the world', async () => {
     stubApi({ 'GET /v1/profile': { data: null }, 'GET /v1/meta': META });
     const user = userEvent.setup();

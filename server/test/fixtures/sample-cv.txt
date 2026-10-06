@@ -1,0 +1,18 @@
+Wanjiru Kamau
+Data Analyst
+Nairobi, Kenya | +254 712 345 678 | wanjiru.kamau@example.com | linkedin.com/in/wanjiru-kamau
+
+SUMMARY
+Analyst with three years of experience turning county health data into reports that managers use.
+
+CORE COMPETENCIES
+Analysis and Reporting: SQL, Python, Excel, Power BI, dashboard design; comfortable presenting
+findings to non-technical teams.
+Data Engineering: PostgreSQL, Airflow, data cleaning
+
+EXPERIENCE
+Data Analyst, Turkana County Health Office, Lodwar, 2023 - 2026
+- Built monthly reporting dashboards used by twelve facility managers.
+
+EDUCATION
+BSc Statistics, University of Nairobi, 2022

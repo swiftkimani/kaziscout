@@ -21,6 +21,8 @@ Usage: ./kazi <command> [options]
   boards                 Sources and their status
       --scanned          Only the ones scanned automatically
   md <url>               Convert a web page to Markdown
+  cv <file>              Set up your profile from your CV (PDF, Word, text or Markdown),
+                         then answer a few follow-up questions
   profile                Show the saved profile, or change it with any of:
       --name <text>      --headline <text>   --email <address>   --phone <number>
       --roles <a,b>      Job titles you want, comma separated

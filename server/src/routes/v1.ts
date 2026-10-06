@@ -7,6 +7,7 @@ import type { BoardScanRepository } from '../repositories/board-scans.js';
 import type { JobRepository } from '../repositories/jobs.js';
 import type { ProfileRepository } from '../repositories/profile.js';
 import type { ApplyService } from '../services/apply.js';
+import type { CvImportService } from '../services/cv-import.js';
 import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
 import type { MarkdownService } from '../services/markdown.js';
@@ -16,6 +17,7 @@ import {
   applicationCreateBody,
   applicationUpdateBody,
   assessmentBody,
+  cvImportBody,
   evaluateBody,
   extractBody,
   idParam,
@@ -36,6 +38,7 @@ export interface RouteDeps {
   markdownService: MarkdownService;
   applyService: ApplyService;
   documentService: DocumentService;
+  cvImportService: CvImportService;
   /** Name of the configured AI model, if any. */
   aiModel?: string;
   now?: () => Date;
@@ -160,6 +163,22 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     deps.profiles.save(parse(profileBody, request.body), now());
     const rescored = await deps.evaluationService.rescoreAll();
     return { data: deps.profiles.get(), rescored };
+  });
+
+  // Drafts a profile from a CV. Nothing is saved: the person reviews the draft, then PUTs it.
+  app.post('/v1/profile/import', { ...EXPENSIVE, bodyLimit: 15 * 1024 * 1024 }, async (request) => {
+    const body = parse(cvImportBody, request.body);
+    if ('clipboard' in body)
+      return { data: await deps.cvImportService.import({ kind: 'clipboard' }) };
+    if ('text' in body)
+      return { data: await deps.cvImportService.import({ kind: 'text', text: body.text }) };
+    return {
+      data: await deps.cvImportService.import({
+        kind: 'file',
+        filename: body.filename,
+        bytes: Buffer.from(body.contentBase64, 'base64'),
+      }),
+    };
   });
 
   app.get('/v1/applications', () => ({ data: deps.applications.list(TRACKER_PAGE_SIZE) }));

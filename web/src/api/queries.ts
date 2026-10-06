@@ -12,6 +12,7 @@ import type {
   ApplicationStatus,
   Board,
   BoardScan,
+  CvImport,
   Job,
   JobDetail,
   MarkdownPage,
@@ -142,6 +143,16 @@ export function useSaveProfile() {
       client.setQueryData(['profile'], result.data);
       return invalidateJobs(client);
     },
+  });
+}
+
+export type CvImportRequest =
+  { filename: string; contentBase64: string } | { text: string } | { clipboard: true };
+
+export function useImportCv() {
+  return useMutation({
+    mutationFn: async (request: CvImportRequest) =>
+      (await api<{ data: CvImport }>('/v1/profile/import', { method: 'POST', body: request })).data,
   });
 }
 
