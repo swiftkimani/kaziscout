@@ -21,6 +21,9 @@ export function buildApplicationPack(job: Job, profile: Profile): string {
     `Posting: ${job.url}`,
     '',
     `Name: ${profile.fullName}`,
+    // A missing contact detail is stated, so nobody fills a form field with a guess.
+    `Email: ${profile.email || 'not in profile'}`,
+    `Phone: ${profile.phone || 'not in profile'}`,
     `Headline: ${profile.headline}`,
   ];
   if (evaluation?.pitch) lines.push('', 'Opening paragraph:', evaluation.pitch);

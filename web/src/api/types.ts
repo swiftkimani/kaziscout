@@ -80,6 +80,8 @@ export interface Board {
 
 export interface Profile {
   fullName: string;
+  email: string;
+  phone: string;
   headline: string;
   cvText: string;
   skills: string[];

@@ -52,6 +52,7 @@ const boards: Board[] = [
 
 const profile = {
   fullName: 'Wanjiru Kamau',
+  email: 'wanjiru@example.com',
   headline: 'Video editor',
   cvText: 'Five years editing digital video.',
   skills: ['Video', 'Editing'],
@@ -254,6 +255,26 @@ describe('profile and scoring', () => {
     expect(response.json()).toMatchObject({ error: { code: 'NOT_CONFIGURED' } });
   });
 
+  it('rejects an email or phone number that would not work on a form', async () => {
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/v1/profile',
+      payload: { ...profile, email: 'not-an-email', phone: 'call me' },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toMatchObject({
+      error: {
+        details: {
+          fields: {
+            email: ['Enter a valid email address'],
+            phone: ['Use digits, spaces and + only'],
+          },
+        },
+      },
+    });
+  });
+
   it('rejects a profile without a name', async () => {
     const response = await app.inject({
       method: 'PUT',
@@ -409,6 +430,8 @@ describe('desktop assist', () => {
       'APPLICATION PACK: Digital Video Editor | On Site at Solvo Global',
     );
     expect(desktop.clipboard).toContain('Name: Wanjiru Kamau');
+    expect(desktop.clipboard).toContain('Email: wanjiru@example.com');
+    expect(desktop.clipboard).toContain('Phone: not in profile');
     expect(desktop.clipboard).toContain('Skills to lead with: Video');
     const tracker = (await app.inject({ method: 'GET', url: '/v1/applications' })).json() as {
       data: { jobId: string; status: string }[];

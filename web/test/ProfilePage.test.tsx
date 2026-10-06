@@ -6,6 +6,8 @@ import { META, renderApp, stubApi } from './render';
 
 const SAVED = {
   fullName: 'Wanjiru Kamau',
+  email: 'wanjiru@example.com',
+  phone: '',
   headline: 'Data analyst',
   cvText: '',
   skills: ['SQL'],
@@ -21,6 +23,7 @@ describe('ProfilePage', () => {
     renderApp(<ProfilePage />);
 
     expect(await screen.findByLabelText('Full name')).toHaveProperty('value', 'Wanjiru Kamau');
+    expect(screen.getByLabelText('Email address')).toHaveProperty('value', 'wanjiru@example.com');
     expect(await screen.findByText('Selected: Kenya')).toBeTruthy();
     expect(screen.getByLabelText('Kenya')).toHaveProperty('checked', true);
   });

@@ -10,6 +10,8 @@ import { CountryPicker } from './CountryPicker';
 
 const EMPTY_PROFILE: Profile = {
   fullName: '',
+  email: '',
+  phone: '',
   headline: '',
   cvText: '',
   skills: [],
@@ -59,6 +61,24 @@ function ProfileForm({ initial }: { initial: Profile }) {
         error={nameError || fieldErrors.fullName}
         onChange={(event) => setProfile({ ...profile, fullName: event.target.value })}
         onBlur={(event) => validateName(event.target.value)}
+      />
+      <TextField
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        hint="Optional. Goes into your application pack so forms can be filled in."
+        value={profile.email}
+        error={fieldErrors.email}
+        onChange={(event) => setProfile({ ...profile, email: event.target.value })}
+      />
+      <TextField
+        label="Phone number"
+        type="tel"
+        autoComplete="tel"
+        hint="Optional. Include the country code, for example +254 712 345 678."
+        value={profile.phone}
+        error={fieldErrors.phone}
+        onChange={(event) => setProfile({ ...profile, phone: event.target.value })}
       />
       <TextField
         label="Headline"

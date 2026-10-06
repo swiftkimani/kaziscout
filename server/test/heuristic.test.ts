@@ -6,6 +6,8 @@ const NOW = new Date('2026-10-06T12:00:00Z');
 
 const profile: Profile = {
   fullName: 'Wanjiru Kamau',
+  email: '',
+  phone: '',
   headline: 'Full-stack developer',
   cvText: '',
   skills: ['React', 'TypeScript', 'Node.js', 'Java'],

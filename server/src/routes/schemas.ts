@@ -34,6 +34,14 @@ export const evaluateBody = z.object({
 
 export const profileBody = z.object({
   fullName: z.string().trim().min(1, 'Enter your name').max(120),
+  // Optional, but when given they must be usable on a form.
+  email: z.union([z.literal(''), z.email('Enter a valid email address')]).default(''),
+  phone: z
+    .string()
+    .trim()
+    .max(30)
+    .regex(/^[+\d][\d\s()-]*$|^$/, 'Use digits, spaces and + only')
+    .default(''),
   headline: z.string().trim().max(200).default(''),
   cvText: z.string().trim().max(50_000).default(''),
   skills: trimmedList(60, 60),

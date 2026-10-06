@@ -1,5 +1,8 @@
 export interface Profile {
   fullName: string;
+  /** Contact details for application forms. Empty when the person has not given them. */
+  email: string;
+  phone: string;
   headline: string;
   cvText: string;
   skills: string[];
