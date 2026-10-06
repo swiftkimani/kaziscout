@@ -1,0 +1,22 @@
+import type { Board } from '../boards/registry.js';
+import type { FetchText } from './http.js';
+
+/** A posting as a board publishes it, before KaziScout normalises and stores it. */
+export interface RawJob {
+  externalId: string;
+  title: string;
+  company?: string;
+  location?: string;
+  url: string;
+  /** Body as the board supplies it; HTML or plain text. */
+  bodyHtml: string;
+  postedAt?: Date;
+  isRemote: boolean;
+}
+
+export interface ProviderContext {
+  fetchText: FetchText;
+}
+
+/** Reads the current postings from one board. Implementations make no more than one request. */
+export type Provider = (board: Board, context: ProviderContext) => Promise<RawJob[]>;
