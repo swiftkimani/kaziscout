@@ -16,6 +16,8 @@ export interface RawJob {
 
 export interface ProviderContext {
   fetchText: FetchText;
+  /** Clock for sources that publish relative dates such as "Posted 3 Days Ago". */
+  now?: () => Date;
 }
 
 /** Reads the current postings from one board. Implementations make no more than one request. */

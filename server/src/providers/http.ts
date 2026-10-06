@@ -8,7 +8,13 @@ const MAX_BODY_BYTES = 5 * 1024 * 1024;
 const NETWORK_ATTEMPTS = 2;
 const RETRY_DELAY_MS = 1_000;
 
-export type FetchText = (url: string, init?: { accept?: string }) => Promise<string>;
+export interface FetchInit {
+  accept?: string;
+  /** When set, the request is a POST carrying this value as JSON. Some job APIs are search endpoints. */
+  postJson?: unknown;
+}
+
+export type FetchText = (url: string, init?: FetchInit) => Promise<string>;
 
 interface Fetched {
   status: number;
@@ -16,9 +22,16 @@ interface Fetched {
   body: ArrayBuffer;
 }
 
-async function fetchOnce(url: string, accept: string): Promise<Fetched> {
+async function fetchOnce(url: string, init: FetchInit): Promise<Fetched> {
+  const isPost = init.postJson !== undefined;
   const response = await fetch(url, {
-    headers: { 'user-agent': USER_AGENT, accept },
+    method: isPost ? 'POST' : 'GET',
+    headers: {
+      'user-agent': USER_AGENT,
+      accept: init.accept ?? '*/*',
+      ...(isPost ? { 'content-type': 'application/json' } : {}),
+    },
+    body: isPost ? JSON.stringify(init.postJson) : undefined,
     signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
     redirect: 'follow',
   });
@@ -30,6 +43,7 @@ async function fetchOnce(url: string, accept: string): Promise<Fetched> {
 /**
  * Fetches a URL as text with a timeout, an identifying user agent and a size cap. A network
  * failure is retried once, because boards drop the odd connection; an HTTP error is not.
+ * The POSTs made here are read-only searches, so retrying them is as safe as retrying a GET.
  */
 export const fetchText: FetchText = async (url, init = {}) => {
   const host = new URL(url).host;
@@ -38,7 +52,7 @@ export const fetchText: FetchText = async (url, init = {}) => {
   for (let attempt = 1; attempt <= NETWORK_ATTEMPTS && !fetched; attempt += 1) {
     if (attempt > 1) await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
     try {
-      fetched = await fetchOnce(url, init.accept ?? '*/*');
+      fetched = await fetchOnce(url, init);
     } catch (error) {
       reason = error instanceof Error ? error.message : String(error);
     }

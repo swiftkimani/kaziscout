@@ -1,0 +1,37 @@
+{
+ "total": 61,
+ "jobPostings": [
+  {
+   "title": "Operational Risk Advisor",
+   "externalPath": "/job/Absa-Headquarters-KE/Operational-Risk-Advisor_R-15991507",
+   "locationsText": "Absa Headquarters (KE)",
+   "postedOn": "Posted Today",
+   "remoteType": "Hybrid",
+   "bulletFields": [
+    "R-15991507",
+    "2026-10-14"
+   ]
+  },
+  {
+   "title": "Tesoureiro  -  PCP Mueda",
+   "externalPath": "/job/Pemba-Branch/Tesoureiro-----PCP-Mueda_R-15991077-2",
+   "locationsText": "Pemba Branch",
+   "postedOn": "Posted Today",
+   "bulletFields": [
+    "R-15991077",
+    "2026-10-12"
+   ]
+  },
+  {
+   "title": "Senior Specialist: Product Owner",
+   "externalPath": "/job/Sandton/Senior-Specialist--Product-Owner_R-15991473-1",
+   "locationsText": "Sandton",
+   "postedOn": "Posted Today",
+   "remoteType": "Hybrid",
+   "bulletFields": [
+    "R-15991473",
+    "2026-10-16"
+   ]
+  }
+ ]
+}

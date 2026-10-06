@@ -69,7 +69,7 @@ export interface Board {
   countries: string[];
   category: string;
   language: string;
-  access: { type: 'rss' | 'api' | 'ats' | 'listing' };
+  access: { type: 'rss' | 'api' | 'ats' | 'workday' | 'listing' };
   status: 'live' | 'blocked' | 'down';
   checkedAt: string;
   note?: string;

@@ -2028,5 +2028,99 @@
     "status": "live",
     "checkedAt": "2026-10-06",
     "note": "Remote software work for African developers. Read from its Teamtailor career feed."
+  },
+  {
+    "id": "absa",
+    "name": "Absa Group",
+    "url": "https://www.absa.africa",
+    "countries": [
+      "PAN"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "workday",
+      "host": "absa.wd3.myworkdayjobs.com",
+      "tenant": "absa",
+      "site": "ABSAcareersite"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
+  },
+  {
+    "id": "unhcr",
+    "name": "UNHCR",
+    "url": "https://www.unhcr.org",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "workday",
+      "host": "unhcr.wd3.myworkdayjobs.com",
+      "tenant": "unhcr",
+      "site": "External"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Posts in many countries. Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
+  },
+  {
+    "id": "fhi-360",
+    "name": "FHI 360",
+    "url": "https://www.fhi360.org",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "workday",
+      "host": "fhi.wd1.myworkdayjobs.com",
+      "tenant": "fhi",
+      "site": "FHI_360_External_Career_Portal"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Posts in many countries. Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
+  },
+  {
+    "id": "mastercard",
+    "name": "Mastercard",
+    "url": "https://www.mastercard.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "workday",
+      "host": "mastercard.wd1.myworkdayjobs.com",
+      "tenant": "mastercard",
+      "site": "CorporateCareers"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Posts in many countries. Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
+  },
+  {
+    "id": "time-doctor",
+    "name": "Time Doctor",
+    "url": "https://www.timedoctor.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "employer",
+    "language": "en",
+    "access": {
+      "type": "ats",
+      "provider": "recruitee",
+      "slug": "timedoctor"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote company; each role is scored against your countries."
   }
 ]

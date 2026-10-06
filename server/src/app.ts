@@ -83,7 +83,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     jobs,
     scans,
     evaluation: evaluationService,
-    providerContext: { fetchText },
+    providerContext: { fetchText, now },
     logger: app.log,
     now,
   });

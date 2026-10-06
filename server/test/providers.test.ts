@@ -6,8 +6,11 @@ import {
   ashbyProvider,
   greenhouseProvider,
   leverProvider,
+  parseWorkdayPostedOn,
+  recruiteeProvider,
   smartRecruitersProvider,
   workableProvider,
+  workdayProvider,
 } from '../src/providers/ats.js';
 import {
   himalayasProvider,
@@ -158,7 +161,7 @@ describe('remote API providers', () => {
 
 describe('employer career APIs', () => {
   const employer = (
-    provider: 'greenhouse' | 'lever' | 'ashby' | 'smartrecruiters' | 'workable',
+    provider: 'greenhouse' | 'lever' | 'ashby' | 'smartrecruiters' | 'workable' | 'recruitee',
     countries: string[],
   ): Board => ({
     ...remoteBoard,
@@ -231,6 +234,79 @@ describe('employer career APIs', () => {
     });
   });
 
+  it('reads Recruitee offers, using the country as the limit of a remote role', async () => {
+    const requested: string[] = [];
+    const jobs = await recruiteeProvider(employer('recruitee', ['REMOTE']), {
+      fetchText: (url) => {
+        requested.push(url);
+        return Promise.resolve(fixture('recruitee.json'));
+      },
+    });
+
+    expect(requested).toEqual(['https://example.recruitee.com/api/offers/']);
+    expect(jobs[0]).toMatchObject({
+      title: 'Lifecycle Marketing Manager',
+      company: 'Time Doctor',
+      location: 'United States',
+      url: 'https://timedoctor.careers/o/lifecycle-marketing-manager',
+      isRemote: true,
+    });
+    expect(jobs[0]?.postedAt?.toISOString()).toBe('2026-09-24T11:51:18.000Z');
+  });
+
+  it('reads Workday postings with a search request and builds their public links', async () => {
+    const now = new Date('2026-10-06T12:00:00Z');
+    const sent: { url: string; postJson: unknown }[] = [];
+    const board: Board = {
+      ...remoteBoard,
+      id: 'absa',
+      name: 'Absa',
+      countries: ['PAN'],
+      category: 'employer',
+      access: {
+        type: 'workday',
+        host: 'absa.wd3.myworkdayjobs.com',
+        tenant: 'absa',
+        site: 'ABSAcareersite',
+      },
+    };
+
+    const jobs = await workdayProvider(board, {
+      now: () => now,
+      fetchText: (url, init) => {
+        sent.push({ url, postJson: init?.postJson });
+        return Promise.resolve(fixture('workday.json'));
+      },
+    });
+
+    expect(sent).toEqual([
+      {
+        url: 'https://absa.wd3.myworkdayjobs.com/wday/cxs/absa/ABSAcareersite/jobs',
+        postJson: { appliedFacets: {}, limit: 20, offset: 0, searchText: '' },
+      },
+    ]);
+    expect(jobs[0]).toMatchObject({
+      title: 'Operational Risk Advisor',
+      company: 'Absa',
+      location: 'Absa Headquarters (KE)',
+      url: 'https://absa.wd3.myworkdayjobs.com/ABSAcareersite/job/Absa-Headquarters-KE/Operational-Risk-Advisor_R-15991507',
+      isRemote: false,
+    });
+    expect(jobs[0]?.postedAt).toEqual(now);
+    expect(jobs[1]?.title).toBe('Tesoureiro - PCP Mueda');
+  });
+
+  it.each([
+    ['Posted Today', '2026-10-06'],
+    ['Posted Yesterday', '2026-10-05'],
+    ['Posted 3 Days Ago', '2026-10-03'],
+    ['Posted 30+ Days Ago', '2026-09-06'],
+  ])('reads the Workday date "%s"', (postedOn, day) => {
+    const date = parseWorkdayPostedOn(postedOn, new Date('2026-10-06T12:00:00Z'));
+
+    expect(date?.toISOString().slice(0, 10)).toBe(day);
+  });
+
   it('reads Ashby jobs and adds the country from the postal address', async () => {
     const jobs = await ashbyProvider(employer('ashby', ['REMOTE']), {
       fetchText: () => Promise.resolve(fixture('ashby.json')),
@@ -252,6 +328,7 @@ describe('atsApiUrl', () => {
     ['ashby', 'https://api.ashbyhq.com/posting-api/job-board/acme'],
     ['smartrecruiters', 'https://api.smartrecruiters.com/v1/companies/acme/postings?limit=1'],
     ['workable', 'https://apply.workable.com/api/v1/widget/accounts/acme'],
+    ['recruitee', 'https://acme.recruitee.com/api/offers/'],
   ] as const)('builds the %s address the board verifier checks', (provider, url) => {
     const board: Board = { ...remoteBoard, access: { type: 'ats', provider, slug: 'acme' } };
 
