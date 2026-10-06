@@ -1,4 +1,4 @@
-import { COUNTRIES, judgeRemoteRestriction } from '../boards/countries.js';
+import { COUNTRIES, findStatedRestriction, judgeRemoteRestriction } from '../boards/countries.js';
 import type { Evaluation, JobEvaluator, Profile, ScorableJob } from './types.js';
 
 const WEIGHTS = { title: 0.35, skills: 0.35, location: 0.2, freshness: 0.1 } as const;
@@ -48,7 +48,7 @@ function scoreRemoteLocation(
   const eligibility = judgeRemoteRestriction(job.location, profile.countries);
   switch (eligibility.kind) {
     case 'open':
-      return { value: 1, reason: 'Remote role with no region limit stated' };
+      return scoreUnrestrictedRemote(job, profile);
     case 'match':
       return { value: 1, reason: `Remote role open to ${eligibility.place}` };
     case 'excluded':
@@ -59,6 +59,22 @@ function scoreRemoteLocation(
         reason: `Remote, limited to "${eligibility.place}". Check that you qualify`,
       };
   }
+}
+
+/** A role located only as "Remote" may still state a limit in its text, so that is checked too. */
+function scoreUnrestrictedRemote(
+  job: ScorableJob,
+  profile: Profile,
+): { value: number; reason: string } {
+  const stated = findStatedRestriction(job.body);
+  const eligibility = stated ? judgeRemoteRestriction(stated, profile.countries) : undefined;
+  if (eligibility?.kind === 'excluded') {
+    return { value: 0, reason: `Remote, but the posting asks for: ${stated}` };
+  }
+  if (eligibility?.kind === 'match') {
+    return { value: 1, reason: `Remote role, and the posting asks for: ${stated}` };
+  }
+  return { value: 1, reason: 'Remote role with no region limit stated' };
 }
 
 function scoreLocation(job: ScorableJob, profile: Profile): { value: number; reason: string } {

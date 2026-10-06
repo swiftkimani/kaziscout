@@ -11,6 +11,20 @@ describe('fetchText', () => {
     await expect(fetchText('https://board.example/feed')).resolves.toBe('<rss/>');
   });
 
+  it('sends a JSON search request as a POST when asked to', async () => {
+    let sent: RequestInit | undefined;
+    vi.stubGlobal('fetch', (_url: string, init: RequestInit) => {
+      sent = init;
+      return Promise.resolve(new Response('{}'));
+    });
+
+    await fetchText('https://jobs.example/search', { postJson: { limit: 20 } });
+
+    expect(sent?.method).toBe('POST');
+    expect(sent?.body).toBe('{"limit":20}');
+    expect(new Headers(sent?.headers).get('content-type')).toBe('application/json');
+  });
+
   it('reports an HTTP error with the host and status', async () => {
     vi.stubGlobal('fetch', () => Promise.resolve(new Response('no', { status: 503 })));
 

@@ -26,10 +26,10 @@ information: a role limited to "Europe" is wrong for a Kenyan and right for a Ge
 
 - Positive: one database serves any profile; changing your countries re-ranks everything without
   re-scanning.
-- Negative: scans store more jobs (about 3,200 instead of 1,900 on the test run). Region words
-  such as "Europe" or "APAC" cannot be resolved for non-African profiles without a continent
-  table, so those are marked "check that you qualify".
-- Follow-ups: add a country-to-continent table to resolve regions for every profile.
+- Negative: scans store more jobs (about 3,200 instead of 1,900 on the test run). A continent
+  table, added the same day, resolves region words such as "Europe", "APAC" and "LATAM" for
+  every profile; a test checks that no country is left without a region.
+- Follow-ups: none open.
 
 ## Alternatives considered
 

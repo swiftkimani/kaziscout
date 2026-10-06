@@ -14,20 +14,21 @@ Markdown, and tracks your applications. You review each one and press Submit you
 
 ## What it does
 
-|                                        |                                                                                                                                                                                                                                                                                                                                                                            |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Scans job boards**                   | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and worldwide remote boards.                                                                                                                                                                           |
-| **Reads employer career pages**        | Reads 30 employers directly through the public APIs of five hiring systems (Greenhouse, Lever, Ashby, SmartRecruiters, Workable) and Teamtailor career feeds: African employers such as M-KOPA, Moniepoint, Jumia, Paystack, Kuda, Andela and One Acre Fund, and employers that hire worldwide. Any employer on those systems, in any country, can be added with one line. |
-| **Lists the rest**                     | A directory of 126 checked sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                                                                                                                                          |
-| **Works for any country**              | Your profile can name any of 234 countries. Africa is where the board list is deepest, but jobs anywhere are detected, filtered and scored.                                                                                                                                                                                                                                |
-| **Scores each job 1 to 5**             | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. A remote role's region limit is judged against your countries, and a job you cannot take because of where it is never scores above 2.                                                                                                                                            |
-| **Works with any AI model**            | Connect OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio, and it writes a fuller assessment. With no model at all, everything else still works.                                                                                                                                                                       |
-| **Writes your documents**              | With a model connected, writes a cover letter and a CV tailored to the posting from your own CV, under a strict "reword, never invent" rule, and opens each on a clean page to print or save as PDF.                                                                                                                                                                       |
-| **Page to Markdown**                   | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                                                                                                                                                                      |
-| **Scans on a schedule and alerts you** | Optionally re-scans every so often and posts new strong matches to a webhook (Slack, Discord, ntfy, Zapier, n8n).                                                                                                                                                                                                                                                          |
-| **Tracks applications**                | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                                                                         |
-| **Helps you apply**                    | Builds an application pack (your details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it.                                                                                                                                                                   |
-| **Can be put behind a sign-in**        | Set an access token and the app and API require it, so you can run it on a home server or VPS. It is single-owner, not multi-user.                                                                                                                                                                                                                                         |
+|                                        |                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scans job boards**                   | Reads 25 boards through their public RSS feeds and APIs: Kenya, Nigeria, Ghana, Zimbabwe, Zambia, Malawi, Botswana, the Gambia, francophone and pan-African boards, and worldwide remote boards.                                                                                                                                                                                                      |
+| **Reads employer career pages**        | Reads 35 employers directly through the public APIs of seven hiring systems (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Workday, Recruitee) and Teamtailor career feeds: African employers such as M-KOPA, Moniepoint, Jumia, Paystack, Kuda, Absa, Andela and One Acre Fund, and employers that hire worldwide. Any employer on those systems, in any country, can be added with one line. |
+| **Lists the rest**                     | A directory of 131 checked sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                                                                                                                                                                     |
+| **Works for any country**              | Your profile can name any of 234 countries. Africa is where the board list is deepest, but jobs anywhere are detected, filtered and scored.                                                                                                                                                                                                                                                           |
+| **Scores each job 1 to 5**             | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. A remote role's region limit ("EMEA", "US only", "LATAM") is judged against your countries, including limits stated only in the posting text, and a job you cannot take because of where it is never scores above 2.                                                                                        |
+| **Works with any AI model**            | Connect OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio, and it writes a fuller assessment. With no model at all, everything else still works.                                                                                                                                                                                                  |
+| **Writes your documents**              | With a model connected, writes a cover letter and a CV tailored to the posting from your own CV, under a strict "reword, never invent" rule, and opens each on a clean page to print or save as PDF.                                                                                                                                                                                                  |
+| **Page to Markdown**                   | Paste any job page and get clean Markdown for reading or for an AI model. Uses Mozilla Readability locally, or [Firecrawl](https://firecrawl.dev) when you add a key (which also renders JavaScript).                                                                                                                                                                                                 |
+| **Scans on a schedule and alerts you** | Optionally re-scans every so often and posts new strong matches to a webhook (Slack, Discord, ntfy, Zapier, n8n).                                                                                                                                                                                                                                                                                     |
+| **Tracks applications**                | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                                                                                                    |
+| **Helps you apply**                    | Builds an application pack (your contact details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it. A practice form at `/practice-form` lets you or an AI agent rehearse first.                                                                                                          |
+| **Works in the terminal**              | Talk to it through an AI coding tool (Claude Code, OpenCode, Codex), which assesses jobs with its own model, or run `./kazi scan`, `./kazi jobs`, `./kazi show <id>` yourself.                                                                                                                                                                                                                        |
+| **Can be put behind a sign-in**        | Set an access token and the app and API require it, so you can run it on a home server or VPS. It is single-owner, not multi-user.                                                                                                                                                                                                                                                                    |
 
 Everything is stored in one SQLite file on your machine. Nothing leaves it except the requests
 you trigger: board scans, page fetches, and AI or Firecrawl calls if you configure them.
@@ -41,7 +42,7 @@ flowchart LR
   UI[Web UI<br/>React + Vite] -->|/v1 JSON| API[Fastify routes]
   API --> S[Services<br/>scan · evaluate · documents · markdown · apply · alerts]
   S --> R[Repositories] --> DB[(SQLite)]
-  S --> P[Providers<br/>RSS · remote job APIs · five hiring systems] --> Boards[(Job boards<br/>and employers)]
+  S --> P[Providers<br/>RSS · remote job APIs · seven hiring systems] --> Boards[(Job boards<br/>and employers)]
   S --> C[Page converter<br/>Readability or Firecrawl]
   S --> E[Evaluator and writer<br/>keyword, or any AI model]
   S --> D[Desktop assist<br/>computer-use-mcp]
@@ -87,10 +88,44 @@ Then:
 2. Fill in **Profile**. Every job is scored as soon as you save.
 3. Sort **Jobs** by best fit, open one, and save it to your tracker.
 
+## Use it in the terminal
+
+There are two ways, and they share one database with the web app.
+
+### With an AI coding tool, the way career-ops is used
+
+Open the repository in Claude Code, OpenCode, Codex or another AI coding tool and talk to it:
+
+> scan the boards and show me my best matches
+>
+> evaluate this one: https://careers.example.com/jobs/frontend-developer
+>
+> write me a cover letter for it
+
+The tool reads [skills/kaziscout/SKILL.md](skills/kaziscout/SKILL.md), runs the `./kazi` commands
+for you, and judges each job against your CV **using whatever model that tool runs on**. KaziScout
+needs no AI key of its own for this. In Claude Code and OpenCode the skill is also available as
+`/kaziscout`.
+
+### Directly
+
+```sh
+./kazi profile --name "Your Name" --roles "Frontend Developer" --skills "React,TypeScript" --countries KE
+./kazi profile --cv-file ~/Documents/cv.md
+./kazi scan                 # read every source (about a minute)
+./kazi jobs --min 4         # your strongest matches
+./kazi jobs --country KE --newest
+./kazi add https://...      # add a job you found yourself, and score it
+./kazi show <ID>            # fit, reasons, link and description
+./kazi track <ID>           # save it to your tracker
+./kazi md https://...       # any web page as clean Markdown
+./kazi help
+```
+
 ## Test
 
 ```sh
-pnpm test          # 124 server tests and 18 web tests; no network needed
+pnpm test          # 176 server tests and 41 web tests; no network needed
 pnpm typecheck
 pnpm lint
 pnpm format:check
@@ -127,8 +162,10 @@ The UI is a client of a small versioned API, which you can also call directly.
 | `POST /v1/scans`                                                         | Scan every board that has a public feed                                                           |
 | `POST /v1/boards/:id/scan`                                               | Scan one board                                                                                    |
 | `GET /v1/jobs`                                                           | List jobs. Filters: `search`, `board`, `country`, `remote`, `minScore`, `sort`, `limit`, `cursor` |
+| `POST /v1/jobs`                                                          | Add a job from its posting link. Body: `{"url": "..."}`                                           |
 | `GET /v1/jobs/:id`                                                       | One job with its evaluation and tracker entry                                                     |
 | `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                           |
+| `PUT /v1/jobs/:id/evaluation`                                            | Store an assessment made outside KaziScout, for example by an AI coding tool                      |
 | `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                          |
 | `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                        |
 | `GET` / `POST /v1/jobs/:id/documents`                                    | Read, or have the AI model write, the cover letter and tailored CV                                |
@@ -148,8 +185,10 @@ KaziScout prepares; an agent with desktop control can do the typing. Connect
 [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) to your agent (Claude Code,
 OpenCode, Codex and others), start KaziScout, and point the agent at
 [skills/kaziscout-apply/SKILL.md](skills/kaziscout-apply/SKILL.md). The skill tells the agent to
-fetch the application pack from the API, fill in the form through the accessibility tools, and
-stop before Submit so you can check it.
+fetch the application pack from the API, fill in the form, and stop before Submit so you can
+check it. For web forms the agent needs a browser tool (Claude in Chrome, Playwright MCP);
+computer-use covers native desktop apps. Rehearse on the built-in practice form at
+`/practice-form` first.
 
 ## Project structure
 
@@ -165,6 +204,7 @@ server/
   src/repositories/     SQL
   src/services/         scan, scheduler, alerts, evaluation, documents, markdown, apply
   src/routes/           HTTP handlers and request schemas
+  src/cli/              the ./kazi terminal commands
   src/db/               SQLite client and migrations
   test/                 tests and recorded feed fixtures
 web/
@@ -173,14 +213,14 @@ web/
   src/styles/tokens.css design tokens
 brand/                  logo and brand notes
 docs/                   board list, decisions, handoff journal
-skills/                 agent guide for assisted applications
+skills/                 guides for AI tools: running a job search, and assisted applications
 ```
 
 ## Adding a job board
 
 1. Add an entry to `server/data/boards.json`. Use `"access": {"type": "rss", "feedUrl": "..."}`
    if the board has a feed, or `{"type": "listing"}` if it does not. For an employer that
-   hires through Greenhouse, Lever, Ashby, SmartRecruiters or Workable, use
+   hires through Greenhouse, Lever, Ashby, SmartRecruiters, Workable or Recruitee, use
    `{"type": "ats", "provider": "greenhouse", "slug": "<name in its careers URL>"}`.
 2. Run `pnpm boards:verify`. It checks every board and regenerates `docs/BOARDS.md`.
 3. Open a pull request.
@@ -207,14 +247,17 @@ listings or sources that need a login.
   "5 years preferred". Use it to rank, then read the posting.
 - Board feeds carry what the board chooses to publish: often the latest 10 to 50 postings, and
   some feeds mix in career articles.
-- A role marked only "Remote" is treated as open to everyone, though some of those turn out to
-  be limited to one country. Region limits such as "Europe" are understood for African profiles;
-  for other profiles they are flagged as "check that you qualify".
+- A role marked only "Remote" is checked for a stated limit in its text, such as "must be based
+  in the United States". If the posting says nothing, it is treated as open to everyone, and some
+  of those still turn out to be limited.
 - AI assessment quality depends on the model. It was run live against a 1.5B local model, which
   handled short postings and failed on long ones. Use a 7B or larger local model, or a hosted one.
-- career-ops reads about 110 kinds of source. KaziScout reads nine (RSS, Teamtailor feeds, three
-  remote job APIs and five hiring systems); Workday, Recruitee, Personio and the rest are not
-  ported.
+- career-ops reads about 110 kinds of source. KaziScout reads eleven (RSS, Teamtailor feeds,
+  three remote job APIs and seven hiring systems). Personio was tried and left out: no real
+  employer could be found to verify it against. Workday and SmartRecruiters list roles without
+  descriptions, and Workday only its 20 newest.
+- Desktop accessibility tools cannot see web form fields in Chrome-family browsers, so an AI
+  agent filling a web application form needs a browser tool. See the agent skill.
 - AI-written documents are only as good as the model. A 1.5B local model produced a cover
   letter that was fluent and wrong. Read every document against your real CV before sending.
 - Sign-in is one shared access token for one owner. There are no user accounts.

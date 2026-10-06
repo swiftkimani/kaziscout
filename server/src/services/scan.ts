@@ -1,4 +1,4 @@
-import { detectCountry } from '../boards/countries.js';
+import { COUNTRIES, detectCountry } from '../boards/countries.js';
 import { type Board, isScannable } from '../boards/registry.js';
 import { runInTransaction, type Db } from '../db/client.js';
 import { AppError, NotFoundError, ValidationError } from '../errors.js';
@@ -23,6 +23,12 @@ function summarise(text: string): string {
   return `${text.slice(0, SUMMARY_LENGTH).replace(/\s+\S*$/, '')}…`;
 }
 
+/** Some employers write the country as a bracketed ISO code: "Absa Headquarters (KE)". */
+function countryFromCode(location: string | undefined): string | undefined {
+  const code = /\(([A-Z]{2})\)/.exec(location ?? '')?.[1];
+  return code && code in COUNTRIES ? code : undefined;
+}
+
 /** Turns a posting as the board published it into the shape KaziScout stores. */
 export function normaliseJob(board: Board, raw: RawJob): NewJob {
   const text = htmlToText(raw.bodyHtml);
@@ -35,7 +41,8 @@ export function normaliseJob(board: Board, raw: RawJob): NewJob {
     ? undefined
     : isNationalBoard
       ? onlyCountry
-      : (detectCountry(raw.location ?? '', 'world') ??
+      : (countryFromCode(raw.location) ??
+        detectCountry(raw.location ?? '', 'world') ??
         detectCountry(`${raw.title} ${text.slice(0, 600)}`));
 
   return {

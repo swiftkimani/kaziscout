@@ -31,6 +31,7 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
 | Build           | `pnpm build`                                  |
 | DB migrate      | `pnpm db:migrate` (also runs on server start) |
 | Re-check boards | `pnpm boards:verify`                          |
+| Terminal        | `./kazi help`                                 |
 
 ## Project-specific rules
 
@@ -38,6 +39,8 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
   may click a submit control or send an application.
 - **Open sources only.** A board or employer is scanned only through an RSS feed or public API. No HTML
   scraping of listings, no login-gated sources, one request per board per scan.
+- **A new source type needs a real employer to verify against** before it is written. Do not
+  add a reader that has only been checked against documentation.
 - **Boards live in `server/data/boards.json`,** not the database. After editing it, run
   `pnpm boards:verify`, which regenerates `docs/BOARDS.md`. Do not edit that file by hand.
 - **Every job links back** to its original posting and names its board.
@@ -55,6 +58,12 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
 - **Design tokens** live in `web/src/styles/tokens.css`; primitives in `web/src/components/ui/`.
   No raw colours, sizes or durations anywhere else.
 - **New tables** need a purpose comment in the migration and a note in the pull request.
+
+## Using KaziScout, as opposed to changing it
+
+If the person wants to run a job search (scan, see matches, evaluate a job, track an
+application), follow `skills/kaziscout/SKILL.md`. The rules in this file are for changing the
+code.
 
 ## Branches
 

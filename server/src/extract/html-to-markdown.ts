@@ -31,6 +31,23 @@ turndown.remove([
   'textarea',
 ]);
 
+// Cookie banners, consent dialogs and skip links sit inside the page body and are long enough for
+// Readability to mistake them for content, so they are removed before it looks.
+const OVERLAY_SELECTOR = [
+  '[id*="cookie" i]',
+  '[class*="cookie" i]',
+  '[id*="consent" i]',
+  '[class*="consent" i]',
+  '[id*="gdpr" i]',
+  '[class*="gdpr" i]',
+  '[role="dialog"]',
+  '[role="alertdialog"]',
+  '[aria-modal="true"]',
+  'a[href="#main-content"]',
+  'a[href="#main"]',
+  'a[href="#content"]',
+].join(', ');
+
 // Below this, Readability has usually latched onto a teaser rather than the page body.
 const MIN_ARTICLE_CHARS = 200;
 
@@ -41,6 +58,7 @@ const MIN_ARTICLE_CHARS = 200;
  */
 function extractMainContent(html: string): { title?: string; contentHtml: string } | undefined {
   const { document } = parseHTML(html);
+  for (const element of document.querySelectorAll(OVERLAY_SELECTOR)) element.remove();
   // linkedom implements the DOM surface Readability uses, but not the full Document type.
   const readable = document as unknown as ConstructorParameters<typeof Readability>[0];
   const article = new Readability(readable).parse();

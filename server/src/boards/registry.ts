@@ -10,8 +10,15 @@ const accessSchema = z.discriminatedUnion('type', [
   // An employer's own openings, read from the public API of its applicant-tracking system.
   z.object({
     type: z.literal('ats'),
-    provider: z.enum(['greenhouse', 'lever', 'ashby', 'smartrecruiters', 'workable']),
+    provider: z.enum(['greenhouse', 'lever', 'ashby', 'smartrecruiters', 'workable', 'recruitee']),
     slug: z.string().regex(/^[A-Za-z0-9._-]+$/),
+  }),
+  // An employer on Workday, whose career sites are addressed by host, tenant and site name.
+  z.object({
+    type: z.literal('workday'),
+    host: z.string().regex(/^[a-z0-9-]+\.wd\d+\.myworkdayjobs\.com$/),
+    tenant: z.string().regex(/^[A-Za-z0-9_-]+$/),
+    site: z.string().regex(/^[A-Za-z0-9_-]+$/),
   }),
   // Live board with no public feed: KaziScout links out to it and never scrapes it.
   z.object({ type: z.literal('listing') }),

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { COUNTRIES, detectCountry, judgeRemoteRestriction } from '../src/boards/countries.js';
+import {
+  COUNTRIES,
+  COUNTRIES_WITH_A_REGION,
+  detectCountry,
+  findStatedRestriction,
+  judgeRemoteRestriction,
+} from '../src/boards/countries.js';
 import { FirecrawlConverter, LocalConverter } from '../src/extract/converters.js';
 import { htmlToText, pageToMarkdown } from '../src/extract/html-to-markdown.js';
 import { assertPublicHttpUrl } from '../src/extract/safe-url.js';
@@ -35,6 +41,28 @@ describe('pageToMarkdown', () => {
     ]) {
       expect(markdown).not.toContain(noise);
     }
+  });
+});
+
+describe('pageToMarkdown on pages with consent banners', () => {
+  const BANNER_PAGE = `<html><head><title>Product Manager - Acme</title></head><body>
+<a href="#main-content">Skip to main content</a>
+<div class="cookie-banner" role="dialog"><h2>This website uses cookies to ensure you get the best experience.</h2>
+<p>Acme and our selected partners use cookies and similar technologies that are necessary to present this website, and to ensure you get the best experience of it. If you consent to it, we will also use cookies for analytics purposes.</p>
+<p>You can withdraw and manage your consent at any time, by clicking Manage cookies at the bottom of each website page.</p></div>
+<div id="main-content"><h1>Product Manager</h1>
+<p>Our client is looking for a Product Manager to join their growth team, reporting to the Head of Product, and to shape the tools that partners rely on every day.</p>
+<h2>Requirements</h2><ul><li>Three years in product</li><li>Comfortable reading JavaScript</li></ul>
+<p>You will work closely with design, engineering and analytics to define requirements, support discovery and deliver features that help partners manage their inventory.</p></div>
+</body></html>`;
+
+  it('drops the cookie banner and skip link and keeps the posting', () => {
+    const markdown = pageToMarkdown(BANNER_PAGE);
+
+    expect(markdown).toContain('Our client is looking for a Product Manager');
+    expect(markdown).toContain('- Three years in product');
+    expect(markdown).not.toMatch(/cookie/i);
+    expect(markdown).not.toContain('Skip to main content');
   });
 });
 
@@ -205,7 +233,46 @@ describe('judgeRemoteRestriction', () => {
     expect(judgeRemoteRestriction('Remote - Germany', ['DE']).kind).toBe('match');
   });
 
-  it('cannot place a non-African profile in a region, so says the restriction is unclear', () => {
-    expect(judgeRemoteRestriction('Europe', ['DE']).kind).toBe('unclear');
+  it.each([
+    ['Europe', ['DE'], 'match'],
+    ['EMEA', ['AE'], 'match'],
+    ['APAC', ['SG'], 'match'],
+    ['LATAM', ['MX'], 'match'],
+    ['North America', ['MX'], 'excluded'],
+    ['Americas', ['BR'], 'match'],
+    ['Europe', ['US'], 'excluded'],
+    ['Nordics', ['SE'], 'match'],
+  ] as const)('"%s" for a profile in %j is %s', (restriction, countries, kind) => {
+    expect(judgeRemoteRestriction(restriction, countries).kind).toBe(kind);
+  });
+
+  it('places every known country in a region, so no profile is left unresolved', () => {
+    const unplaced = Object.keys(COUNTRIES).filter((code) => !COUNTRIES_WITH_A_REGION.has(code));
+
+    expect(unplaced).toEqual([]);
+  });
+});
+
+describe('findStatedRestriction', () => {
+  it.each([
+    ['You must be based in the United States to apply.', 'United States to apply'],
+    ['Candidates need to be located in Europe or the UK.', 'Europe or the UK'],
+    ['This role is only open to candidates in Canada.', 'Canada'],
+    [
+      'Applicants must be authorized to work in the US without sponsorship.',
+      'US without sponsorship',
+    ],
+    ['Fully remote (US-only). Great benefits.', 'US-only'],
+    ['This position is available within EMEA time zones', 'EMEA time zones'],
+  ])('finds the limit in "%s"', (text, place) => {
+    expect(findStatedRestriction(text)).toBe(place);
+  });
+
+  it('finds nothing in a posting that states no limit', () => {
+    expect(
+      findStatedRestriction(
+        'We are a remote-first team based in many countries. Work from anywhere.',
+      ),
+    ).toBeUndefined();
   });
 });

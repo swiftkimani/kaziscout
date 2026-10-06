@@ -46,7 +46,10 @@ async function checkBoard(board: Board): Promise<Board['status']> {
       ? board.access.feedUrl
       : board.access.type === 'ats'
         ? atsApiUrl(board)
-        : board.url;
+        : // Workday's API only answers POST, so its public career site is checked instead.
+          board.access.type === 'workday'
+          ? `https://${board.access.host}/${board.access.site}`
+          : board.url;
   // One slow answer is not an outage, so a source is only "down" after failing twice.
   for (let attempt = 1; attempt <= RETRIES_BEFORE_DOWN; attempt += 1) {
     const result = classify(await httpStatus(target));
@@ -69,7 +72,9 @@ function describeCountries(board: Board): string {
 function describeAccess(board: Board): string {
   if (board.access.type === 'rss') return 'Scanned (RSS)';
   if (board.access.type === 'api') return 'Scanned (API)';
-  if (board.access.type === 'ats') return 'Scanned (employer careers API)';
+  if (board.access.type === 'ats' || board.access.type === 'workday') {
+    return 'Scanned (employer careers API)';
+  }
   return 'Link-out';
 }
 

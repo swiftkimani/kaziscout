@@ -1,6 +1,7 @@
 import { NotConfiguredError, NotFoundError, ValidationError } from '../errors.js';
 import type { Job, JobRepository } from '../repositories/jobs.js';
 import type { ProfileRepository } from '../repositories/profile.js';
+import { toEvaluation, type Assessment } from '../scoring/assessment.js';
 import type { Evaluation, JobEvaluator, Profile, ScorableJob } from '../scoring/types.js';
 
 const RESCORE_BATCH = 500;
@@ -63,6 +64,18 @@ export class EvaluationService {
       evaluator = this.deps.ai;
     }
     const evaluation = await evaluator.evaluate(toScorable(job), profile);
+    this.deps.jobs.saveEvaluation(jobId, evaluation, this.now());
+    return { ...job, score: evaluation.score, evaluation, evaluatedAt: this.now().toISOString() };
+  }
+
+  /**
+   * Stores an assessment written outside KaziScout, by an AI coding tool working in the terminal.
+   * This is how KaziScout runs on whatever model that tool uses, with no API key of its own.
+   */
+  recordAssessment(jobId: string, assessment: Assessment, model: string): Job {
+    const job = this.deps.jobs.findById(jobId);
+    if (!job) throw new NotFoundError('That job');
+    const evaluation = toEvaluation(assessment, model);
     this.deps.jobs.saveEvaluation(jobId, evaluation, this.now());
     return { ...job, score: evaluation.score, evaluation, evaluatedAt: this.now().toISOString() };
   }
