@@ -143,6 +143,26 @@ export function useUnfollowSource() {
   });
 }
 
+/** The best untracked, unhidden jobs, for going through one at a time. */
+export function useTriageQueue() {
+  return useQuery({
+    // Not under "jobs": saving or hiding during triage must not reshuffle the queue mid-review.
+    queryKey: ['triage'],
+    queryFn: async () =>
+      (await api<{ data: Job[] }>('/v1/jobs?sort=score&untracked=true&limit=30')).data,
+    staleTime: Infinity,
+  });
+}
+
+export function useHideJob() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (jobId: string) =>
+      api<{ data: Job }>(`/v1/jobs/${jobId}/hidden`, { method: 'PUT' }),
+    onSuccess: () => invalidateJobs(client),
+  });
+}
+
 export function useToday() {
   return useQuery({
     // Under "jobs" so scans, saves and scoring refresh it along with the job lists.

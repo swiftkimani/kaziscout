@@ -1,9 +1,18 @@
-import { BriefcaseBusiness, FileText, Globe, KanbanSquare, Sunrise, UserRound } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  FileText,
+  Globe,
+  KanbanSquare,
+  ListChecks,
+  Sunrise,
+  UserRound,
+} from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useSession, useSignOut } from '../api/queries';
 
 const NAV_ITEMS = [
   { to: '/today', label: 'Today', icon: Sunrise },
+  { to: '/review', label: 'Review', icon: ListChecks },
   { to: '/jobs', label: 'Jobs', icon: BriefcaseBusiness },
   { to: '/boards', label: 'Boards', icon: Globe },
   { to: '/tracker', label: 'Tracker', icon: KanbanSquare },

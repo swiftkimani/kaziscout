@@ -51,6 +51,7 @@ export interface Job {
   listedAt: string;
   score?: number;
   evaluation?: Evaluation;
+  isHidden?: boolean;
 }
 
 export interface JobDetail extends Job {
