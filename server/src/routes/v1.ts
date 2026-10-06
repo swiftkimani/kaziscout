@@ -153,6 +153,8 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
         ...job,
         application: deps.applications.findByJobId(id) ?? null,
         requirements: deps.insightService.requirementsFor(job),
+        // Other boards carrying this same role.
+        alsoOn: deps.jobs.listCopiesOf(id),
       },
     };
   });

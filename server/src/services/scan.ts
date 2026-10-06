@@ -125,6 +125,7 @@ export class ScanService {
           .filter((result) => result.isNew)
           .map((result) => result.id),
       );
+      this.deps.jobs.markDuplicates(newIds);
       await this.deps.evaluation.scoreNewJobs(newIds);
       await this.deps.completer?.complete(newIds);
       scan = {

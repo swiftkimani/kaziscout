@@ -65,6 +65,8 @@ export interface JobDetail extends Job {
   application: Application | null;
   /** Skills the posting names, each marked as shown or not by the profile and CV. */
   requirements?: Requirement[];
+  /** Other boards carrying this same role. */
+  alsoOn?: { boardId: string; url: string }[];
 }
 
 export interface BoardScan {

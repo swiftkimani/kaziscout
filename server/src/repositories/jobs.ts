@@ -92,6 +92,17 @@ function toJob(row: Row): Job {
   };
 }
 
+/**
+ * A key that is equal for two postings of the same role: the title and company with case,
+ * punctuation and spacing removed. Undefined without a company, because a bare title such as
+ * "Accountant" is shared by unrelated jobs.
+ */
+export function matchKey(title: string, company: string | undefined): string | undefined {
+  const squash = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const employer = squash(company ?? '');
+  return employer ? `${squash(title)}|${employer}` : undefined;
+}
+
 /** Stable id for a posting, so re-scanning a board updates rows instead of duplicating them. */
 export function jobId(boardId: string, externalId: string): string {
   return createHash('sha256').update(`${boardId}\n${externalId}`).digest('hex').slice(0, 20);
@@ -126,14 +137,15 @@ export class JobRepository {
       .prepare(
         `INSERT INTO jobs (id, board_id, external_id, title, company, location, country_code,
            is_remote, url, summary, description_md, posted_at, first_seen_at, last_seen_at, listed_at,
-           closes_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           closes_at, match_key)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT (id) DO UPDATE SET
            title = excluded.title, company = excluded.company, location = excluded.location,
            country_code = excluded.country_code, is_remote = excluded.is_remote,
            url = excluded.url, summary = excluded.summary,
            description_md = COALESCE(excluded.description_md, jobs.description_md),
            closes_at = COALESCE(excluded.closes_at, jobs.closes_at),
+           match_key = excluded.match_key,
            last_seen_at = excluded.last_seen_at`,
       )
       .run(
@@ -153,6 +165,7 @@ export class JobRepository {
         seenAt,
         postedAt ?? seenAt,
         job.closesAt?.toISOString() ?? null,
+        matchKey(job.title, job.company) ?? null,
       );
     return { id, isNew: existing === undefined };
   }
@@ -166,6 +179,8 @@ export class JobRepository {
   list(filter: JobFilter): JobPage {
     const where: string[] = [
       filter.visibility === 'hidden' ? 'hidden_at IS NOT NULL' : 'hidden_at IS NULL',
+      // A role posted on several boards is listed once, as the copy seen first.
+      'duplicate_of IS NULL',
     ];
     const params: (string | number)[] = [];
     if (filter.untrackedOnly) where.push('id NOT IN (SELECT job_id FROM applications)');
@@ -231,6 +246,37 @@ export class JobRepository {
       .run(evaluation.score, JSON.stringify(evaluation), now.toISOString(), id);
   }
 
+  /**
+   * Points each of the given jobs at an earlier posting of the same role on another board, when
+   * there is one. Returns how many were marked as duplicates.
+   */
+  markDuplicates(jobIds: string[]): number {
+    const findOriginal = this.db.prepare(
+      `SELECT o.id FROM jobs j JOIN jobs o
+         ON o.match_key = j.match_key AND o.id <> j.id AND o.board_id <> j.board_id
+        AND o.duplicate_of IS NULL
+       WHERE j.id = ? AND j.match_key IS NOT NULL AND j.duplicate_of IS NULL
+       ORDER BY o.first_seen_at, o.id LIMIT 1`,
+    );
+    const mark = this.db.prepare('UPDATE jobs SET duplicate_of = ? WHERE id = ?');
+    let marked = 0;
+    for (const id of jobIds) {
+      const original = findOriginal.get(id);
+      if (!original) continue;
+      mark.run(String(original.id), id);
+      marked += 1;
+    }
+    return marked;
+  }
+
+  /** The other boards carrying the same role as this job. */
+  listCopiesOf(id: string): { boardId: string; url: string }[] {
+    return this.db
+      .prepare('SELECT board_id, url FROM jobs WHERE duplicate_of = ? ORDER BY board_id')
+      .all(id)
+      .map((row) => ({ boardId: String(row.board_id), url: String(row.url) }));
+  }
+
   /** Hides or restores a job. Returns false when there is no such job. */
   setHidden(id: string, isHidden: boolean, now: Date): boolean {
     return (
@@ -249,7 +295,7 @@ export class JobRepository {
     return this.db
       .prepare(
         `SELECT ${JOB_COLUMNS} FROM jobs
-         WHERE first_seen_at >= ? AND score >= ? AND hidden_at IS NULL
+         WHERE first_seen_at >= ? AND score >= ? AND hidden_at IS NULL AND duplicate_of IS NULL
          ORDER BY score DESC, id DESC LIMIT ?`,
       )
       .all(since.toISOString(), minScore, limit)
@@ -261,7 +307,7 @@ export class JobRepository {
     return this.db
       .prepare(
         `SELECT ${JOB_COLUMNS} FROM jobs
-         WHERE closes_at >= ? AND closes_at <= ? AND hidden_at IS NULL
+         WHERE closes_at >= ? AND closes_at <= ? AND hidden_at IS NULL AND duplicate_of IS NULL
            AND (score >= ? OR id IN (SELECT job_id FROM applications WHERE status = 'saved'))
          ORDER BY closes_at, id LIMIT ?`,
       )
@@ -274,7 +320,8 @@ export class JobRepository {
     return this.db
       .prepare(
         `SELECT ${JOB_COLUMNS} FROM jobs
-         WHERE score >= ? AND score < ? AND hidden_at IS NULL ORDER BY score DESC, id DESC LIMIT ?`,
+         WHERE score >= ? AND score < ? AND hidden_at IS NULL AND duplicate_of IS NULL
+         ORDER BY score DESC, id DESC LIMIT ?`,
       )
       .all(min, max, limit)
       .map(toJob);

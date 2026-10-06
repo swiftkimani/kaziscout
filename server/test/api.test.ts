@@ -218,6 +218,56 @@ describe('jobs that arrive without a description', () => {
   });
 });
 
+describe('the same role on two boards', () => {
+  const feed = (company: string) => `<rss><channel>
+    <item><title>Data Engineer at ${company}</title><link>https://jobwebkenya.com/jobs/de/</link></item>
+  </channel></rss>`;
+  const secondBoard: Board = {
+    ...boards[0]!,
+    id: 'second',
+    name: 'Second Board',
+    access: { type: 'rss', feedUrl: 'https://second.example/feed/' },
+  };
+
+  async function scanBoth(companyOnSecond: string) {
+    await app.close();
+    app = await buildApp({
+      config: loadConfig({ LOG_LEVEL: 'silent' }),
+      db,
+      boards: [boards[0]!, secondBoard],
+      now: () => NOW,
+      fetchText: (url) =>
+        Promise.resolve(
+          url === FEED_URL
+            ? feed('Acme Ltd')
+            : feed(companyOnSecond).replace('jobwebkenya.com/jobs/de/', 'second.example/de/'),
+        ),
+    });
+    await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
+    await app.inject({ method: 'POST', url: '/v1/boards/second/scan' });
+    return (await app.inject({ method: 'GET', url: '/v1/jobs' })).json() as {
+      data: { id: string }[];
+    };
+  }
+
+  it('lists the role once and says where else it is posted', async () => {
+    const listing = await scanBoth('ACME  ltd.');
+    const detail = (
+      await app.inject({ method: 'GET', url: `/v1/jobs/${listing.data[0]?.id}` })
+    ).json() as {
+      data: { boardId: string; alsoOn: { boardId: string; url: string }[] };
+    };
+
+    expect(listing.data).toHaveLength(1);
+    expect(detail.data.boardId).toBe('jobwebkenya');
+    expect(detail.data.alsoOn).toEqual([{ boardId: 'second', url: 'https://second.example/de/' }]);
+  });
+
+  it('keeps both when the employer differs', async () => {
+    expect((await scanBoth('Other Company')).data).toHaveLength(2);
+  });
+});
+
 describe('job listing', () => {
   it('pages through jobs with a cursor without repeating any', async () => {
     await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });

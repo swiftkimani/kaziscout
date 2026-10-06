@@ -49,6 +49,13 @@ export function JobDetailPage() {
           <p className="row">
             <Badge>{board?.name ?? data.boardId}</Badge>
             {data.application && <Badge tone="info">In tracker: {data.application.status}</Badge>}
+            {(data.alsoOn ?? []).map((copy) => (
+              <a key={copy.boardId} href={copy.url} target="_blank" rel="noreferrer">
+                Also on{' '}
+                {boards.data?.find((candidate) => candidate.id === copy.boardId)?.name ??
+                  copy.boardId}
+              </a>
+            ))}
             <a href={data.url} target="_blank" rel="noreferrer" className="row">
               Open original posting
               <ExternalLink size={14} aria-hidden />
