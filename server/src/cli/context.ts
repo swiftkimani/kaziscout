@@ -73,6 +73,8 @@ export interface ApiJob {
     evaluator: string;
     model?: string;
     breakdown?: { title: number; skills: number; location: number; freshness: number };
+    warnings?: string[];
+    advice?: string;
   };
 }
 
@@ -86,7 +88,10 @@ export function formatScore(value: number | undefined): string {
 }
 
 export function describePlace(job: ApiJob): string {
-  if (job.isRemote) return job.location ? `Remote · ${job.location}` : 'Remote';
+  if (job.isRemote) {
+    const limit = job.location?.replace(/\bremote\b/gi, '').replace(/^[\s,·-]+|[\s,·-]+$/g, '');
+    return limit ? `Remote · ${limit}` : 'Remote';
+  }
   return job.location ?? job.countryCode ?? '';
 }
 

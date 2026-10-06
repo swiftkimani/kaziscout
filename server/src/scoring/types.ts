@@ -45,6 +45,10 @@ export interface Evaluation {
   strengths: string[];
   gaps: string[];
   matchedSkills: string[];
+  /** Signs the posting may not be genuine, such as asking applicants for a fee. */
+  warnings?: string[];
+  /** One line on what would raise a middling keyword score. */
+  advice?: string;
   /** A short tailored introduction for the application; only AI evaluators write one. */
   pitch?: string;
 }

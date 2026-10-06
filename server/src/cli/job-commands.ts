@@ -50,8 +50,10 @@ export const show: Command = async ({ io, need, call }) => {
         `  title ${percent(parts.title)} · skills ${percent(parts.skills)} · location ${percent(parts.location)} · freshness ${percent(parts.freshness)}`,
       );
     }
+    for (const warning of job.evaluation.warnings ?? []) io.out(`  ! ${warning}`);
     for (const item of strengths) io.out(`  + ${item}`);
     for (const item of gaps) io.out(`  - ${item}`);
+    if (job.evaluation.advice) io.out(`  ${job.evaluation.advice}`);
   } else {
     io.out('\nNot scored yet. Create a profile to score jobs: ./kazi profile --name "Your Name" …');
   }

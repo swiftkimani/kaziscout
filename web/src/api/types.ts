@@ -11,6 +11,8 @@ export interface Evaluation {
   gaps: string[];
   matchedSkills: string[];
   pitch?: string;
+  warnings?: string[];
+  advice?: string;
 }
 
 export const APPLICATION_STATUSES = [

@@ -24,14 +24,17 @@ export class SourceCatalog {
     return this.followed.list().some((board) => board.id === id);
   }
 
+  /** The source that already reads an employer the same way, if there is one. */
+  findByAccess(access: Board['access']): Board | undefined {
+    const wanted = JSON.stringify(access);
+    return this.all().find((board) => JSON.stringify(board.access) === wanted);
+  }
+
   /** The employer behind a job link, if it is one KaziScout could follow and does not already. */
   suggestFor(link: string): { name: string; link: string } | undefined {
     const detected = detectEmployerFromLink(link);
-    if (!detected) return undefined;
-    const known = this.all().some(
-      (board) => JSON.stringify(board.access) === JSON.stringify(detected.access),
-    );
-    return known ? undefined : { name: detected.name, link };
+    if (!detected || this.findByAccess(detected.access)) return undefined;
+    return { name: detected.name, link };
   }
 }
 
@@ -55,6 +58,11 @@ export class SourceService {
       throw new ValidationError(
         "That link isn't from a hiring system KaziScout can follow. It reads Greenhouse, Lever, Ashby, Workable, SmartRecruiters, Workday, Recruitee and Teamtailor.",
       );
+    }
+    const existing = this.deps.catalog.findByAccess(detected.access);
+    if (existing) {
+      // Following it again would scan the employer twice and store every job twice.
+      throw new ValidationError(`You already get ${existing.name}'s openings.`);
     }
     const now = this.deps.now?.() ?? new Date();
     const board = toFollowedBoard(detected, now.toISOString().slice(0, 10));

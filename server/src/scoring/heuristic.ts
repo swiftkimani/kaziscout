@@ -1,5 +1,6 @@
 import { COUNTRIES, findStatedRestriction, judgeRemoteRestriction } from '../boards/countries.js';
-import type { Evaluation, JobEvaluator, Profile, ScorableJob } from './types.js';
+import type { Evaluation, JobEvaluator, Profile, ScorableJob, ScoreBreakdown } from './types.js';
+import { findWarningSigns } from './warning-signs.js';
 
 const WEIGHTS = { title: 0.35, skills: 0.35, location: 0.2, freshness: 0.1 } as const;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -93,6 +94,28 @@ function scoreFreshness(listedAt: Date, now: Date): number {
   return 0.2;
 }
 
+const ADVICE: Readonly<Record<keyof ScoreBreakdown, string>> = {
+  title: 'add this kind of role to the titles you want, if it interests you',
+  skills: 'add any of its skills you really have to your profile',
+  location: 'check whether you can work from where it is',
+  freshness: 'apply soon, as it has been listed a while',
+};
+// Advice is for the middle ground: a strong match needs none, and a poor one is not worth chasing.
+const ADVICE_FROM = 2.5;
+const ADVICE_BELOW = 4;
+
+/** For a middling score, the one or two parts holding it back, as something the person can act on. */
+function adviceFor(score: number, breakdown: ScoreBreakdown): string | undefined {
+  if (score < ADVICE_FROM || score >= ADVICE_BELOW) return undefined;
+  const weakest = (Object.keys(WEIGHTS) as (keyof ScoreBreakdown)[])
+    .map((part) => ({ part, lost: WEIGHTS[part] * (1 - breakdown[part]) }))
+    .filter(({ lost }) => lost >= 0.05)
+    .sort((a, b) => b.lost - a.lost)
+    .slice(0, 2)
+    .map(({ part }) => ADVICE[part]);
+  return weakest.length > 0 ? `To raise this: ${weakest.join('; ')}.` : undefined;
+}
+
 function verdictFor(score: number): string {
   if (score >= 4) return 'Strong match. Worth applying.';
   if (score >= 3) return 'Reasonable match. Read the posting before deciding.';
@@ -128,16 +151,17 @@ export function scoreHeuristically(job: ScorableJob, profile: Profile, now: Date
   (location.value >= 0.5 ? strengths : gaps).push(location.reason);
   if (freshness < 0.6) gaps.push('Listed more than 30 days ago, so it may be closed');
 
+  const breakdown = { title: titleScore, skills: skillsScore, location: location.value, freshness };
+  const warnings = findWarningSigns(job.body);
+
   return {
     score,
     evaluator: 'heuristic',
-    breakdown: {
-      title: titleScore,
-      skills: skillsScore,
-      location: location.value,
-      freshness,
-    },
-    verdict: verdictFor(score),
+    breakdown,
+    advice: adviceFor(score, breakdown),
+    warnings: warnings.length > 0 ? warnings : undefined,
+    verdict:
+      warnings.length > 0 ? `Check this one carefully. ${verdictFor(score)}` : verdictFor(score),
     strengths,
     gaps,
     matchedSkills,

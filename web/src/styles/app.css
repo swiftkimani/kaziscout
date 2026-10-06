@@ -390,6 +390,10 @@ kbd {
   white-space: nowrap;
 }
 
+.warning-signs {
+  padding: var(--space-4);
+}
+
 .pitch {
   padding: var(--space-3) var(--space-4);
   border-left: var(--focus-width) solid var(--accent);

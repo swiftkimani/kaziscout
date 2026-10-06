@@ -160,6 +160,22 @@ describe('following an employer', () => {
     expect((suggestion.json() as { suggestedSource: unknown }).suggestedSource).toBeNull();
   });
 
+  it('refuses to follow an employer it already reads, so jobs are not stored twice', async () => {
+    const link = 'https://job-boards.greenhouse.io/acme/jobs/1';
+    await app.inject({ method: 'POST', url: '/v1/sources', payload: { url: link } });
+
+    const again = await app.inject({ method: 'POST', url: '/v1/sources', payload: { url: link } });
+    const boards = (await app.inject({ method: 'GET', url: '/v1/boards' })).json() as {
+      data: unknown[];
+    };
+
+    expect(again.statusCode).toBe(400);
+    expect((again.json() as { error: { message: string } }).error.message).toBe(
+      "You already get Acme's openings.",
+    );
+    expect(boards.data).toHaveLength(1);
+  });
+
   it('does not keep an employer whose openings cannot be read', async () => {
     const response = await app.inject({
       method: 'POST',

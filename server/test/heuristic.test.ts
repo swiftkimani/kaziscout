@@ -120,6 +120,36 @@ describe('scoreHeuristically', () => {
     expect(evaluation.breakdown?.location).toBe(0);
   });
 
+  it('says what would raise a middling score, and says nothing for a strong one', () => {
+    const middling = scoreHeuristically(
+      job({ title: 'Office Administrator', body: 'Filing, scheduling and some React.' }),
+      profile,
+      NOW,
+    );
+
+    expect(middling.score).toBeGreaterThanOrEqual(2.5);
+    expect(middling.score).toBeLessThan(4);
+    expect(middling.advice).toBe(
+      'To raise this: add this kind of role to the titles you want, if it interests you; add any of its skills you really have to your profile.',
+    );
+    expect(scoreHeuristically(job(), profile, NOW).advice).toBeUndefined();
+  });
+
+  it('warns about a posting that asks applicants for a fee', () => {
+    const evaluation = scoreHeuristically(
+      job({
+        body: 'React developer needed. A registration fee of KSh 1,500 is payable via M-Pesa.',
+      }),
+      profile,
+      NOW,
+    );
+
+    expect(evaluation.warnings).toEqual([
+      'Asks applicants to pay a fee. Genuine employers do not charge to apply.',
+    ]);
+    expect(evaluation.verdict).toContain('Check this one carefully.');
+  });
+
   it('stays within 1 to 5 for an empty profile', () => {
     const empty: Profile = { ...profile, skills: [], targetTitles: [], countries: [] };
 
