@@ -27,7 +27,7 @@ Markdown, and tracks your applications. You review each one and press Submit you
 | **Scans on a schedule and alerts you** | Optionally re-scans every so often and posts new strong matches to a webhook (Slack, Discord, ntfy, Zapier, n8n).                                                                                                                                                                                                                                                                                     |
 | **Tracks applications**                | Saved, applied, interview, offer, rejected, withdrawn, with notes.                                                                                                                                                                                                                                                                                                                                    |
 | **Helps you apply**                    | Builds an application pack (your contact details, matching skills, gaps to address) and copies it to your clipboard, through [computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) if you enable it. A practice form at `/practice-form` lets you or an AI agent rehearse first.                                                                                                          |
-| **Works in the terminal**              | `./kazi scan`, `./kazi jobs`, `./kazi show <id>` and more, using the same logic as the web app.                                                                                                                                                                                                                                                                                                       |
+| **Works in the terminal**              | Talk to it through an AI coding tool (Claude Code, OpenCode, Codex), which assesses jobs with its own model, or run `./kazi scan`, `./kazi jobs`, `./kazi show <id>` yourself.                                                                                                                                                                                                                        |
 | **Can be put behind a sign-in**        | Set an access token and the app and API require it, so you can run it on a home server or VPS. It is single-owner, not multi-user.                                                                                                                                                                                                                                                                    |
 
 Everything is stored in one SQLite file on your machine. Nothing leaves it except the requests
@@ -90,25 +90,42 @@ Then:
 
 ## Use it in the terminal
 
-Everything the web app does with jobs is also available from the terminal:
+There are two ways, and they share one database with the web app.
+
+### With an AI coding tool, the way career-ops is used
+
+Open the repository in Claude Code, OpenCode, Codex or another AI coding tool and talk to it:
+
+> scan the boards and show me my best matches
+>
+> evaluate this one: https://careers.example.com/jobs/frontend-developer
+>
+> write me a cover letter for it
+
+The tool reads [skills/kaziscout/SKILL.md](skills/kaziscout/SKILL.md), runs the `./kazi` commands
+for you, and judges each job against your CV **using whatever model that tool runs on**. KaziScout
+needs no AI key of its own for this. In Claude Code and OpenCode the skill is also available as
+`/kaziscout`.
+
+### Directly
 
 ```sh
 ./kazi profile --name "Your Name" --roles "Frontend Developer" --skills "React,TypeScript" --countries KE
+./kazi profile --cv-file ~/Documents/cv.md
 ./kazi scan                 # read every source (about a minute)
 ./kazi jobs --min 4         # your strongest matches
 ./kazi jobs --country KE --newest
+./kazi add https://...      # add a job you found yourself, and score it
 ./kazi show <ID>            # fit, reasons, link and description
 ./kazi track <ID>           # save it to your tracker
 ./kazi md https://...       # any web page as clean Markdown
 ./kazi help
 ```
 
-The terminal and the web app share one database, so a scan in one shows up in the other.
-
 ## Test
 
 ```sh
-pnpm test          # 167 server tests and 41 web tests; no network needed
+pnpm test          # 176 server tests and 41 web tests; no network needed
 pnpm typecheck
 pnpm lint
 pnpm format:check
@@ -145,8 +162,10 @@ The UI is a client of a small versioned API, which you can also call directly.
 | `POST /v1/scans`                                                         | Scan every board that has a public feed                                                           |
 | `POST /v1/boards/:id/scan`                                               | Scan one board                                                                                    |
 | `GET /v1/jobs`                                                           | List jobs. Filters: `search`, `board`, `country`, `remote`, `minScore`, `sort`, `limit`, `cursor` |
+| `POST /v1/jobs`                                                          | Add a job from its posting link. Body: `{"url": "..."}`                                           |
 | `GET /v1/jobs/:id`                                                       | One job with its evaluation and tracker entry                                                     |
 | `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                           |
+| `PUT /v1/jobs/:id/evaluation`                                            | Store an assessment made outside KaziScout, for example by an AI coding tool                      |
 | `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                          |
 | `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                        |
 | `GET` / `POST /v1/jobs/:id/documents`                                    | Read, or have the AI model write, the cover letter and tailored CV                                |
@@ -185,6 +204,7 @@ server/
   src/repositories/     SQL
   src/services/         scan, scheduler, alerts, evaluation, documents, markdown, apply
   src/routes/           HTTP handlers and request schemas
+  src/cli/              the ./kazi terminal commands
   src/db/               SQLite client and migrations
   test/                 tests and recorded feed fixtures
 web/
@@ -193,7 +213,7 @@ web/
   src/styles/tokens.css design tokens
 brand/                  logo and brand notes
 docs/                   board list, decisions, handoff journal
-skills/                 agent guide for assisted applications
+skills/                 guides for AI tools: running a job search, and assisted applications
 ```
 
 ## Adding a job board

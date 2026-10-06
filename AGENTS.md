@@ -59,6 +59,12 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
   No raw colours, sizes or durations anywhere else.
 - **New tables** need a purpose comment in the migration and a note in the pull request.
 
+## Using KaziScout, as opposed to changing it
+
+If the person wants to run a job search (scan, see matches, evaluate a job, track an
+application), follow `skills/kaziscout/SKILL.md`. The rules in this file are for changing the
+code.
+
 ## Branches
 
 `dev` is the default branch and takes pull requests. `main` is protected and only takes pull

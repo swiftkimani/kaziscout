@@ -27,6 +27,7 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 ## Done
 
+- 2026-10-06 Skill for AI coding tools; add a job by link; store an outside assessment.
 - 2026-10-06 Terminal interface; practice application form; email and phone in the profile.
 - 2026-10-06 Workday and Recruitee readers; continent table; limits read from posting text.
 - 2026-10-06 Tests for every web screen; draft contributor licence agreement.
@@ -47,8 +48,9 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 These need something only the owner can supply.
 
-1. Try AI assessment and document writing with a capable model (7B+ local, or a hosted one with
-   a key) and judge the quality. Everything so far was run on a 1.5B model.
+1. Try the built-in AI assessment and document writing with a capable model (7B+ local, or a
+   hosted one with a key). The built-in path has only run on a 1.5B model. The terminal skill
+   path has run on a capable model and judged a job sensibly.
 2. Run the Firecrawl converter and the Claude client with real keys.
 3. Have a lawyer review `CLA.md` before relying on it for a commercial licence.
 4. Apply for a ReliefWeb app name (https://apidoc.reliefweb.int/parameters#appname), then add a
