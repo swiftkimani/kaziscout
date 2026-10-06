@@ -13,7 +13,10 @@ const envSchema = z.object({
   DATABASE_PATH: z.string().default('./var/kaziscout.sqlite'),
   FIRECRAWL_API_KEY: optionalSecret,
   ANTHROPIC_API_KEY: optionalSecret,
-  AI_MODEL: z.string().default('claude-opus-5-5'),
+  // Any OpenAI-compatible server (OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Ollama, LM Studio).
+  AI_BASE_URL: optionalSecret.pipe(z.url().optional()),
+  AI_API_KEY: optionalSecret,
+  AI_MODEL: optionalSecret,
   DESKTOP_ASSIST_ENABLED: z
     .enum(['true', 'false'])
     .default('false')

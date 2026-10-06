@@ -23,14 +23,14 @@ export class EvaluationService {
       jobs: JobRepository;
       profiles: ProfileRepository;
       heuristic: JobEvaluator;
-      /** Absent when no Anthropic API key is configured. */
-      claude?: JobEvaluator;
+      /** Absent when no AI model is configured. */
+      ai?: JobEvaluator;
       now?: () => Date;
     },
   ) {}
 
-  get isClaudeAvailable(): boolean {
-    return this.deps.claude !== undefined;
+  get isAiAvailable(): boolean {
+    return this.deps.ai !== undefined;
   }
 
   private now(): Date {
@@ -54,11 +54,13 @@ export class EvaluationService {
     const profile = this.requireProfile();
 
     let evaluator = this.deps.heuristic;
-    if (evaluatorName === 'claude') {
-      if (!this.deps.claude) {
-        throw new NotConfiguredError('Set ANTHROPIC_API_KEY to evaluate jobs with Claude.');
+    if (evaluatorName === 'ai') {
+      if (!this.deps.ai) {
+        throw new NotConfiguredError(
+          'No AI model is configured. Set AI_BASE_URL and AI_MODEL, or ANTHROPIC_API_KEY.',
+        );
       }
-      evaluator = this.deps.claude;
+      evaluator = this.deps.ai;
     }
     const evaluation = await evaluator.evaluate(toScorable(job), profile);
     this.deps.jobs.saveEvaluation(jobId, evaluation, this.now());
@@ -78,8 +80,8 @@ export class EvaluationService {
   }
 
   /**
-   * Re-scores every job offline after the profile changes. Jobs assessed by Claude keep their
-   * assessment, because it cost money and is not reproducible offline.
+   * Re-scores every job offline after the profile changes. Jobs assessed by an AI model keep
+   * their assessment, because it took time or money and is not reproducible offline.
    */
   async rescoreAll(): Promise<number> {
     const profile = this.requireProfile();
@@ -91,7 +93,7 @@ export class EvaluationService {
       if (lastId === undefined) return rescored;
       for (const id of ids) {
         const job = this.deps.jobs.findById(id);
-        if (!job || job.evaluation?.evaluator === 'claude') continue;
+        if (!job || job.evaluation?.evaluator === 'ai') continue;
         const evaluation = await this.deps.heuristic.evaluate(toScorable(job), profile);
         this.deps.jobs.saveEvaluation(id, evaluation, this.now());
         rescored += 1;

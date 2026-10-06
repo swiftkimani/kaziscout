@@ -24,13 +24,15 @@ export interface ScorableJob {
 export interface Evaluation {
   /** 1.0 (poor fit) to 5.0 (excellent fit), one decimal place. */
   score: number;
-  evaluator: 'heuristic' | 'claude';
+  evaluator: 'heuristic' | 'ai';
+  /** The model that wrote an AI assessment. */
+  model?: string;
   /** One sentence the UI shows under the score. */
   verdict: string;
   strengths: string[];
   gaps: string[];
   matchedSkills: string[];
-  /** A short tailored introduction for the application; only the Claude evaluator writes one. */
+  /** A short tailored introduction for the application; only AI evaluators write one. */
   pitch?: string;
 }
 

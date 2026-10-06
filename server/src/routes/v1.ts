@@ -32,6 +32,8 @@ export interface RouteDeps {
   evaluationService: EvaluationService;
   markdownService: MarkdownService;
   applyService: ApplyService;
+  /** Name of the configured AI model, if any. */
+  aiModel?: string;
   now?: () => Date;
 }
 
@@ -46,7 +48,7 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
   app.get('/v1/meta', () => ({
     countries: AFRICAN_COUNTRIES,
     features: {
-      claude: deps.evaluationService.isClaudeAvailable,
+      aiModel: deps.aiModel ?? null,
       desktopAssist: deps.applyService.isDesktopAssistAvailable,
       converter: deps.markdownService.converterName,
     },

@@ -2,7 +2,8 @@
 
 export interface Evaluation {
   score: number;
-  evaluator: 'heuristic' | 'claude';
+  evaluator: 'heuristic' | 'ai';
+  model?: string;
   verdict: string;
   strengths: string[];
   gaps: string[];
@@ -68,7 +69,7 @@ export interface Board {
   countries: string[];
   category: string;
   language: string;
-  access: { type: 'rss' | 'api' | 'listing' };
+  access: { type: 'rss' | 'api' | 'ats' | 'listing' };
   status: 'live' | 'blocked' | 'down';
   checkedAt: string;
   note?: string;
@@ -89,7 +90,7 @@ export interface Profile {
 
 export interface Meta {
   countries: Record<string, string>;
-  features: { claude: boolean; desktopAssist: boolean; converter: 'firecrawl' | 'local' };
+  features: { aiModel: string | null; desktopAssist: boolean; converter: 'firecrawl' | 'local' };
 }
 
 export interface MarkdownPage {

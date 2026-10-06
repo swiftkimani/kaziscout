@@ -15,9 +15,8 @@ import { BoardScanRepository } from './repositories/board-scans.js';
 import { JobRepository } from './repositories/jobs.js';
 import { ProfileRepository } from './repositories/profile.js';
 import { registerV1Routes } from './routes/v1.js';
-import { ClaudeEvaluator } from './scoring/claude.js';
+import { createAiEvaluator, type AiEvaluator } from './scoring/ai-evaluator.js';
 import { HeuristicEvaluator } from './scoring/heuristic.js';
-import type { JobEvaluator } from './scoring/types.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
 import { EvaluationService } from './services/evaluation.js';
@@ -31,7 +30,7 @@ export interface AppOptions {
   /** Overrides for tests; production uses the real network, clock and desktop. */
   fetchText?: FetchText;
   resolveHost?: ResolveHost;
-  claude?: JobEvaluator;
+  ai?: AiEvaluator;
   desktop?: DesktopAssistant;
   now?: () => Date;
 }
@@ -54,11 +53,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   const profiles = new ProfileRepository(db);
   const scans = new BoardScanRepository(db);
 
-  const claude =
-    options.claude ??
-    (config.ANTHROPIC_API_KEY
-      ? new ClaudeEvaluator(config.ANTHROPIC_API_KEY, config.AI_MODEL)
-      : undefined);
+  const ai = options.ai ?? createAiEvaluator(config);
   const desktop =
     options.desktop ?? (config.DESKTOP_ASSIST_ENABLED ? new ComputerUseDesktop() : undefined);
   const converter: PageConverter = config.FIRECRAWL_API_KEY
@@ -69,7 +64,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     jobs,
     profiles,
     heuristic: new HeuristicEvaluator(now),
-    claude,
+    ai: ai?.evaluator,
     now,
   });
   const scanService = new ScanService({
@@ -141,6 +136,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     evaluationService,
     markdownService,
     applyService,
+    aiModel: ai?.model,
     now,
   });
 

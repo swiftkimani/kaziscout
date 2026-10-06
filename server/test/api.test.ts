@@ -213,14 +213,14 @@ describe('profile and scoring', () => {
     );
   });
 
-  it('says how to enable Claude when no API key is configured', async () => {
+  it('says how to enable AI assessment when no model is configured', async () => {
     const jobId = await scanAndGetFirstJobId();
     await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
 
     const response = await app.inject({
       method: 'POST',
       url: `/v1/jobs/${jobId}/evaluate`,
-      payload: { evaluator: 'claude' },
+      payload: { evaluator: 'ai' },
     });
 
     expect(response.statusCode).toBe(409);

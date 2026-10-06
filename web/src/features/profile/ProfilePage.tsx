@@ -113,7 +113,7 @@ function ProfileForm({ initial }: { initial: Profile }) {
       />
       <TextAreaField
         label="CV"
-        hint="Paste your CV as plain text. It stays on this computer unless you ask Claude to assess a job."
+        hint="Paste your CV as plain text. It stays on this computer unless you ask an AI model to assess a job."
         rows={12}
         value={profile.cvText}
         error={fieldErrors.cvText}

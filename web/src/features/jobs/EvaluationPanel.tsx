@@ -22,8 +22,10 @@ export function EvaluationPanel({ evaluation }: { evaluation?: Evaluation }) {
       <div className="row-between">
         <h2 id="fit-heading">Fit</h2>
         {evaluation && (
-          <Badge tone={evaluation.evaluator === 'claude' ? 'info' : 'neutral'}>
-            {evaluation.evaluator === 'claude' ? 'Assessed by Claude' : 'Keyword score'}
+          <Badge tone={evaluation.evaluator === 'ai' ? 'info' : 'neutral'}>
+            {evaluation.evaluator === 'ai'
+              ? `Assessed by ${evaluation.model ?? 'AI'}`
+              : 'Keyword score'}
           </Badge>
         )}
       </div>

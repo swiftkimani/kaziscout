@@ -29,7 +29,7 @@ export const idParam = z.object({ id: z.string().min(1).max(60) });
 export const numericIdParam = z.object({ id: z.coerce.number().int().positive() });
 
 export const evaluateBody = z.object({
-  evaluator: z.enum(['heuristic', 'claude']).default('heuristic'),
+  evaluator: z.enum(['heuristic', 'ai']).default('heuristic'),
 });
 
 export const profileBody = z.object({

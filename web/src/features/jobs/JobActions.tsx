@@ -12,10 +12,10 @@ export function JobActions({ job, features }: { job: JobDetail; features?: Meta[
   const refresh = () => client.invalidateQueries({ queryKey: ['jobs'] });
 
   const evaluate = useMutation({
-    mutationFn: () => jobActions.evaluate(job.id, 'claude'),
+    mutationFn: () => jobActions.evaluate(job.id, 'ai'),
     onSuccess: async () => {
       await refresh();
-      toast.success('Claude assessed this job.');
+      toast.success(`${features?.aiModel ?? 'The AI model'} assessed this job.`);
     },
     onError: (error) => toast.error(error, "Couldn't assess this job. Try again."),
   });
@@ -77,13 +77,13 @@ export function JobActions({ job, features }: { job: JobDetail; features?: Meta[
       >
         Fetch full posting
       </Button>
-      {features?.claude && (
+      {features?.aiModel && (
         <Button
           icon={<Sparkles size={16} aria-hidden />}
           isBusy={evaluate.isPending}
           onClick={() => evaluate.mutate()}
         >
-          Assess with Claude
+          Assess with AI
         </Button>
       )}
     </div>

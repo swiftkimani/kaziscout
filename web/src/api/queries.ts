@@ -71,7 +71,7 @@ export function useJob(id: string) {
 }
 
 export const jobActions = {
-  evaluate: (jobId: string, evaluator: 'heuristic' | 'claude') =>
+  evaluate: (jobId: string, evaluator: 'heuristic' | 'ai') =>
     api<{ data: Job }>(`/v1/jobs/${jobId}/evaluate`, { method: 'POST', body: { evaluator } }),
   fetchFullPosting: (jobId: string) =>
     api<{ data: MarkdownPage }>(`/v1/jobs/${jobId}/markdown`, { method: 'POST' }),
