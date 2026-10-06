@@ -418,6 +418,88 @@ describe('application documents', () => {
   });
 });
 
+describe('jobs added by hand and assessed from outside', () => {
+  it('adds a job from its link, scores it against the profile, and does not duplicate it', async () => {
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
+
+    const first = await app.inject({
+      method: 'POST',
+      url: '/v1/jobs',
+      payload: { url: 'https://jobwebkenya.com/jobs/some-posting/' },
+    });
+    await app.inject({
+      method: 'POST',
+      url: '/v1/jobs',
+      payload: { url: 'https://jobwebkenya.com/jobs/some-posting/' },
+    });
+    const listing = (await app.inject({ method: 'GET', url: '/v1/jobs?board=manual' })).json() as {
+      data: unknown[];
+    };
+
+    expect(first.statusCode).toBe(201);
+    expect(first.json()).toMatchObject({
+      data: {
+        boardId: 'manual',
+        title: 'Posting',
+        descriptionMd: '# Full posting',
+        score: expect.any(Number),
+      },
+    });
+    expect(listing.data).toHaveLength(1);
+  });
+
+  it('refuses to add a job from an address on the local network', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/jobs',
+      payload: { url: 'http://192.168.1.1/admin' },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toMatchObject({ error: { code: 'UNSAFE_URL' } });
+  });
+
+  it('stores an outside assessment and keeps it when the profile is saved again', async () => {
+    const jobId = await scanAndGetFirstJobId();
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
+
+    const stored = await app.inject({
+      method: 'PUT',
+      url: `/v1/jobs/${jobId}/evaluation`,
+      payload: {
+        score: 3.14,
+        verdict: 'A fair stretch.',
+        model: 'terminal-agent',
+        gaps: ['No Avid'],
+      },
+    });
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
+    const after = (await app.inject({ method: 'GET', url: `/v1/jobs/${jobId}` })).json() as {
+      data: { score: number; evaluation: { evaluator: string; model: string; gaps: string[] } };
+    };
+
+    expect(stored.statusCode).toBe(200);
+    expect(after.data.score).toBe(3.1);
+    expect(after.data.evaluation).toMatchObject({
+      evaluator: 'ai',
+      model: 'terminal-agent',
+      gaps: ['No Avid'],
+    });
+  });
+
+  it('rejects an outside assessment with no verdict', async () => {
+    const jobId = await scanAndGetFirstJobId();
+
+    const response = await app.inject({
+      method: 'PUT',
+      url: `/v1/jobs/${jobId}/evaluation`,
+      payload: { score: 4, model: 'terminal-agent' },
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+});
+
 describe('desktop assist', () => {
   it('copies the application pack and saves the job to the tracker', async () => {
     const jobId = await scanAndGetFirstJobId();

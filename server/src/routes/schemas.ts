@@ -32,6 +32,19 @@ export const evaluateBody = z.object({
   evaluator: z.enum(['heuristic', 'ai']).default('heuristic'),
 });
 
+export const addJobBody = z.object({ url: z.string().trim().min(1).max(2000) });
+
+/** An assessment written by an outside agent. Same shape the built-in AI evaluator must return. */
+export const assessmentBody = z.object({
+  score: z.number().min(1).max(5),
+  verdict: z.string().trim().min(1).max(600),
+  strengths: z.array(z.string().trim().min(1).max(300)).max(8).default([]),
+  gaps: z.array(z.string().trim().min(1).max(300)).max(8).default([]),
+  matchedSkills: z.array(z.string().trim().min(1).max(60)).max(40).default([]),
+  pitch: z.string().trim().max(1500).default(''),
+  model: z.string().trim().min(1).max(80),
+});
+
 export const profileBody = z.object({
   fullName: z.string().trim().min(1, 'Enter your name').max(120),
   // Optional, but when given they must be usable on a form.

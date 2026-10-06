@@ -1,6 +1,6 @@
 import { buildApp } from './app.js';
 import { loadBoards } from './boards/registry.js';
-import { runCli } from './cli.js';
+import { runCli } from './cli/run.js';
 import { loadConfig } from './config.js';
 import { migrate, openDb } from './db/client.js';
 

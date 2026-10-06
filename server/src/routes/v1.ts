@@ -12,8 +12,10 @@ import type { EvaluationService } from '../services/evaluation.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
 import {
+  addJobBody,
   applicationCreateBody,
   applicationUpdateBody,
+  assessmentBody,
   evaluateBody,
   extractBody,
   idParam,
@@ -92,6 +94,21 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
       cursor: query.cursor,
     });
     return { data: page.data, next_cursor: page.nextCursor };
+  });
+
+  app.post('/v1/jobs', EXPENSIVE, async (request, reply) => {
+    const { url } = parse(addJobBody, request.body);
+    const job = await deps.markdownService.addJobFromUrl(url, now());
+    void reply.code(201).header('location', `/v1/jobs/${job.id}`);
+    // Score it straight away if there is a profile to score against.
+    await deps.evaluationService.scoreNewJobs([job.id]);
+    return { data: deps.jobs.findById(job.id) };
+  });
+
+  app.put('/v1/jobs/:id/evaluation', (request) => {
+    const { id } = parse(idParam, request.params);
+    const { model, ...assessment } = parse(assessmentBody, request.body);
+    return { data: deps.evaluationService.recordAssessment(id, assessment, model) };
   });
 
   app.get('/v1/jobs/:id', (request) => {
