@@ -7,6 +7,7 @@ import { ExtractPage } from './features/extract/ExtractPage';
 import { DocumentPrintPage } from './features/jobs/DocumentPrintPage';
 import { JobDetailPage } from './features/jobs/JobDetailPage';
 import { JobsPage } from './features/jobs/JobsPage';
+import { PracticeFormPage } from './features/practice/PracticeFormPage';
 import { ProfilePage } from './features/profile/ProfilePage';
 import { TrackerPage } from './features/tracker/TrackerPage';
 
@@ -43,6 +44,7 @@ export function App() {
         <Route path="tracker" element={<TrackerPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="markdown" element={<ExtractPage />} />
+        <Route path="practice-form" element={<PracticeFormPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
