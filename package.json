@@ -1,0 +1,39 @@
+{
+  "name": "kaziscout",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Job-search agent for Africa: scan African job boards, score roles against your CV, turn messy postings into clean Markdown, and track applications.",
+  "author": "Benard Kimani (https://github.com/swiftkimani)",
+  "license": "MIT",
+  "homepage": "https://github.com/swiftkimani/kaziscout#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swiftkimani/kaziscout.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.6.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./server\" --filter \"./web\" dev",
+    "build": "pnpm --filter \"./web\" build && pnpm --filter \"./server\" build",
+    "start": "pnpm --filter \"./server\" start",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:migrate": "pnpm --filter \"./server\" db:migrate",
+    "boards:verify": "pnpm --filter \"./server\" boards:verify"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.0"
+  }
+}

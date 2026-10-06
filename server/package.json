@@ -1,0 +1,35 @@
+{
+  "name": "@kaziscout/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../.env src/main.ts",
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
+    "start": "node --env-file-if-exists=../.env dist/main.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx --env-file-if-exists=../.env src/db/migrate-cli.ts",
+    "boards:verify": "tsx src/boards/verify-cli.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/static": "^10.1.5",
+    "@mozilla/readability": "^0.6.0",
+    "@zavora-ai/computer-use-mcp": "^7.4.0",
+    "fast-xml-parser": "^5.11.2",
+    "fastify": "^5.12.5",
+    "linkedom": "^0.18.13",
+    "turndown": "^7.2.4",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/turndown": "^5.0.6",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.3"
+  }
+}

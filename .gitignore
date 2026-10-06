@@ -1,0 +1,21 @@
+# deps & builds
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# local data
+*.sqlite
+*.sqlite-*
+server/var/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

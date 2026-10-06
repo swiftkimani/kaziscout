@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+server/test/fixtures
+server/data/boards.json
+docs/BOARDS.md
