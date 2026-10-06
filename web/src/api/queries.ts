@@ -105,6 +105,44 @@ export function useWriteDocuments(jobId: string) {
   });
 }
 
+export function useAddJob() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (url: string) =>
+      api<{ data: Job; suggestedSource: { name: string; link: string } | null }>('/v1/jobs', {
+        method: 'POST',
+        body: { url },
+      }),
+    onSuccess: () => invalidateJobs(client),
+  });
+}
+
+function invalidateSources(client: QueryClient): Promise<unknown> {
+  return Promise.all([client.invalidateQueries({ queryKey: ['boards'] }), invalidateJobs(client)]);
+}
+
+export function useFollowSource() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (url: string) =>
+      (
+        await api<{ data: { board: Board; scan: BoardScan } }>('/v1/sources', {
+          method: 'POST',
+          body: { url },
+        })
+      ).data,
+    onSuccess: () => invalidateSources(client),
+  });
+}
+
+export function useUnfollowSource() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/v1/sources/${id}`, { method: 'DELETE' }),
+    onSuccess: () => invalidateSources(client),
+  });
+}
+
 export function useToday() {
   return useQuery({
     // Under "jobs" so scans, saves and scoring refresh it along with the job lists.

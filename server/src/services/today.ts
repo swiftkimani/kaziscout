@@ -31,14 +31,14 @@ export class TodayService {
       jobs: JobRepository;
       applications: ApplicationRepository;
       scans: BoardScanRepository;
-      boards: Board[];
+      boards: () => Board[];
       now?: () => Date;
     },
   ) {}
 
   get(): Today {
     const now = this.deps.now?.() ?? new Date();
-    const names = new Map(this.deps.boards.map((board) => [board.id, board.name]));
+    const names = new Map(this.deps.boards().map((board) => [board.id, board.name]));
     return {
       newStrong: this.deps.jobs.listNewStrong(
         new Date(now.getTime() - NEW_WINDOW_MS),

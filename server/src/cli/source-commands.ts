@@ -53,6 +53,22 @@ export const boards: Command = async ({ io, values, call }) => {
   io.out(`\n${shown.length} sources, ${scanned} scanned automatically.`);
 };
 
+/** Follows the employer behind a job link, so all of its openings are scanned from now on. */
+export const follow: Command = async ({ io, need, call }) => {
+  const { data } = await call<{ data: { board: { id: string; name: string }; scan: Scan } }>(
+    'POST',
+    '/v1/sources',
+    { url: need('a job link from the employer') },
+  );
+  io.out(`Following ${data.board.name}: ${data.scan.jobsFound} openings found.`);
+  io.out(`Stop with: ./kazi unfollow ${data.board.id}`);
+};
+
+export const unfollow: Command = async ({ io, need, call }) => {
+  await call('DELETE', `/v1/sources/${encodeURIComponent(need('a source id'))}`);
+  io.out('No longer following that employer. Jobs already found are kept.');
+};
+
 /** The day's short lists: what is new, what is closing, what needs a follow-up. */
 export const today: Command = async ({ io, call }) => {
   const { data } = await call<{ data: Today }>('GET', '/v1/today');

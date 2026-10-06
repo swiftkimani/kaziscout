@@ -19,6 +19,9 @@ Usage: ./kazi <command> [options]
   pack <job-id>          The application pack for a job
   track <job-id>         Save a job to the tracker
   tracker                What you are tracking, by status
+  follow <job-link>      Follow the employer behind a job link (Greenhouse, Lever, Ashby,
+                         Workable, SmartRecruiters, Workday, Recruitee, Teamtailor)
+  unfollow <source-id>   Stop following an employer
   boards                 Sources and their status
       --scanned          Only the ones scanned automatically
   md <url>               Convert a web page to Markdown

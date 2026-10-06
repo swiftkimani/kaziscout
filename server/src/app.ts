@@ -15,6 +15,7 @@ import { ApplicationRepository } from './repositories/applications.js';
 import { BoardScanRepository } from './repositories/board-scans.js';
 import { JobRepository } from './repositories/jobs.js';
 import { DocumentRepository } from './repositories/documents.js';
+import { FollowedSourceRepository } from './repositories/followed-sources.js';
 import { ProfileRepository } from './repositories/profile.js';
 import { registerV1Routes } from './routes/v1.js';
 import { createAiClient, type AiClient } from './ai/client.js';
@@ -31,6 +32,7 @@ import { MarkdownService } from './services/markdown.js';
 import { PostingCompleter } from './services/posting-completer.js';
 import { ScanService } from './services/scan.js';
 import { ScanScheduler } from './services/scheduler.js';
+import { SourceCatalog, SourceService } from './services/sources.js';
 import { TodayService } from './services/today.js';
 
 export interface AppOptions {
@@ -66,6 +68,8 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   const applications = new ApplicationRepository(db);
   const profiles = new ProfileRepository(db);
   const scans = new BoardScanRepository(db);
+  const followed = new FollowedSourceRepository(db);
+  const catalog = new SourceCatalog(boards, followed);
 
   const ai = options.ai ?? createAiClient(config);
   const desktop =
@@ -94,7 +98,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   });
   const scanService = new ScanService({
     db,
-    boards,
+    boards: () => catalog.all(),
     jobs,
     scans,
     evaluation: evaluationService,
@@ -110,7 +114,13 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     ai,
     now,
   });
-  const todayService = new TodayService({ jobs, applications, scans, boards, now });
+  const todayService = new TodayService({
+    jobs,
+    applications,
+    scans,
+    boards: () => catalog.all(),
+    now,
+  });
   const applyService = new ApplyService({ jobs, profiles, applications, desktop, now });
 
   app.setErrorHandler((error, request, reply) => {
@@ -156,7 +166,8 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   });
 
   registerV1Routes(app, {
-    boards,
+    catalog,
+    sourceService: new SourceService({ catalog, followed, scans: scanService, now }),
     jobs,
     applications,
     profiles,

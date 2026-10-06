@@ -50,7 +50,7 @@ export interface CliContext {
   /** Returns the argument, or stops with a message saying what was expected. */
   need: (what: string) => string;
   /** Calls one of the app's own routes in-process and returns its JSON body. */
-  call: <T>(method: 'GET' | 'POST' | 'PUT', url: string, payload?: object) => Promise<T>;
+  call: <T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, payload?: object) => Promise<T>;
 }
 
 export type Command = (context: CliContext) => Promise<void>;

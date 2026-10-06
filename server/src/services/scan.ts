@@ -81,7 +81,8 @@ export class ScanService {
   constructor(
     private readonly deps: {
       db: Db;
-      boards: Board[];
+      /** Asked on every scan, so an employer followed a moment ago is included. */
+      boards: () => Board[];
       jobs: JobRepository;
       scans: BoardScanRepository;
       evaluation: EvaluationService;
@@ -103,7 +104,7 @@ export class ScanService {
   }
 
   private async scanOne(boardId: string): Promise<{ scan: BoardScan; newIds: string[] }> {
-    const board = this.deps.boards.find((candidate) => candidate.id === boardId);
+    const board = this.deps.boards().find((candidate) => candidate.id === boardId);
     if (!board) throw new NotFoundError('That board');
     const provider = providerFor(board);
     if (!provider || !isScannable(board)) {
@@ -163,7 +164,7 @@ export class ScanService {
     const scans: BoardScan[] = [];
     const newJobIds: string[] = [];
     await runWithConcurrency(
-      this.deps.boards.filter(isScannable),
+      this.deps.boards().filter(isScannable),
       BOARD_CONCURRENCY,
       async (board) => {
         const result = await this.scanOne(board.id);

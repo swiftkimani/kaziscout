@@ -78,6 +78,8 @@ export interface Board {
   checkedAt: string;
   note?: string;
   isScannable: boolean;
+  /** An employer the person added, as opposed to one shipped in the registry. */
+  isFollowed: boolean;
   jobCount: number;
   lastScan: BoardScan | null;
 }

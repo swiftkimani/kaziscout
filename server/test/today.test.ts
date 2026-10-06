@@ -58,7 +58,13 @@ function setUp() {
     );
     return id;
   };
-  const today = new TodayService({ jobs, applications, scans, boards: [board], now: () => NOW });
+  const today = new TodayService({
+    jobs,
+    applications,
+    scans,
+    boards: () => [board],
+    now: () => NOW,
+  });
   return { jobs, applications, scans, add, today };
 }
 

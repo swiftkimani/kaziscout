@@ -59,14 +59,21 @@ export const show: Command = async ({ io, need, call }) => {
 };
 
 export const add: Command = async ({ io, need, call }) => {
-  const { data: job } = await call<{ data: ApiJob }>('POST', '/v1/jobs', {
-    url: need('a posting link'),
-  });
+  const link = need('a posting link');
+  const { data: job, suggestedSource } = await call<{
+    data: ApiJob;
+    suggestedSource: { name: string; link: string } | null;
+  }>('POST', '/v1/jobs', { url: link });
   io.out(`Added: ${job.title}`);
   io.out(
     `Fit ${formatScore(job.score)} of 5${job.evaluation ? `: ${job.evaluation.verdict}` : ' (no profile yet)'}`,
   );
   io.out(`\nSee it with: ./kazi show ${job.id}`);
+  if (suggestedSource) {
+    io.out(
+      `\n${suggestedSource.name} posts its openings where KaziScout can read them.\nFollow all of them with: ./kazi follow ${link}`,
+    );
+  }
 };
 
 export const assess: Command = async ({ io, values, need, call }) => {

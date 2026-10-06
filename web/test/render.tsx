@@ -75,6 +75,7 @@ export const BOARD = {
   status: 'live',
   checkedAt: '2026-10-06',
   isScannable: true,
+  isFollowed: false,
   jobCount: 2,
   lastScan: null,
 };

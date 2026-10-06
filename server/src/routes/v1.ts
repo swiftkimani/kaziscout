@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { AFRICAN_COUNTRIES, COUNTRIES } from '../boards/countries.js';
-import { type Board, isScannable } from '../boards/registry.js';
+import { isScannable } from '../boards/registry.js';
 import { NotFoundError } from '../errors.js';
 import type { ApplicationRepository } from '../repositories/applications.js';
 import type { BoardScanRepository } from '../repositories/board-scans.js';
@@ -12,6 +12,7 @@ import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
+import type { SourceCatalog, SourceService } from '../services/sources.js';
 import type { TodayService } from '../services/today.js';
 import {
   addJobBody,
@@ -29,7 +30,8 @@ import {
 } from './schemas.js';
 
 export interface RouteDeps {
-  boards: Board[];
+  catalog: SourceCatalog;
+  sourceService: SourceService;
   jobs: JobRepository;
   applications: ApplicationRepository;
   profiles: ProfileRepository;
@@ -72,7 +74,8 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     const lastScans = deps.scans.latestByBoard();
     const jobCounts = deps.jobs.countByBoard();
     return {
-      data: deps.boards.map((board) => ({
+      data: deps.catalog.all().map((board) => ({
+        isFollowed: deps.catalog.isFollowed(board.id),
         ...board,
         isScannable: isScannable(board),
         jobCount: jobCounts.get(board.id) ?? 0,
@@ -109,7 +112,24 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     void reply.code(201).header('location', `/v1/jobs/${job.id}`);
     // Score it straight away if there is a profile to score against.
     await deps.evaluationService.scoreNewJobs([job.id]);
-    return { data: deps.jobs.findById(job.id) };
+    return {
+      data: deps.jobs.findById(job.id),
+      // When the link is from a hiring system KaziScout reads, offer to follow that employer.
+      suggestedSource: deps.catalog.suggestFor(url) ?? null,
+    };
+  });
+
+  app.post('/v1/sources', EXPENSIVE, async (request, reply) => {
+    const { url } = parse(addJobBody, request.body);
+    void reply.code(201);
+    return { data: await deps.sourceService.follow(url) };
+  });
+
+  app.delete('/v1/sources/:id', (request, reply) => {
+    const { id } = parse(idParam, request.params);
+    deps.sourceService.unfollow(id);
+    void reply.code(204);
+    return null;
   });
 
   app.put('/v1/jobs/:id/evaluation', (request) => {

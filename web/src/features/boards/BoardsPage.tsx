@@ -1,6 +1,6 @@
 import { ExternalLink, Radar } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useBoards, useMeta, useScan } from '../../api/queries';
+import { useBoards, useMeta, useScan, useUnfollowSource } from '../../api/queries';
 import type { Board } from '../../api/types';
 import { Button } from '../../components/ui/Button';
 import { Badge, EmptyState, ErrorState, Skeleton } from '../../components/ui/Feedback';
@@ -29,6 +29,7 @@ export function BoardsPage() {
   const boards = useBoards();
   const meta = useMeta();
   const scan = useScan();
+  const unfollow = useUnfollowSource();
   const toast = useToast();
   const [search, setSearch] = useState('');
   const [access, setAccess] = useState('all');
@@ -122,6 +123,22 @@ export function BoardsPage() {
                       <ExternalLink size={14} aria-hidden />
                     </a>
                     {board.note && <p className="table__note">{board.note}</p>}
+                    {board.isFollowed && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        isBusy={unfollow.isPending && unfollow.variables === board.id}
+                        onClick={() =>
+                          unfollow.mutate(board.id, {
+                            onSuccess: () => toast.success(`No longer following ${board.name}.`),
+                            onError: (error) =>
+                              toast.error(error, `Couldn't unfollow ${board.name}. Try again.`),
+                          })
+                        }
+                      >
+                        Unfollow
+                      </Button>
+                    )}
                   </th>
                   <td>
                     {coverage(board, countries)}
