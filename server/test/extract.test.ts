@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { COUNTRIES, detectCountry, judgeRemoteRestriction } from '../src/boards/countries.js';
+import {
+  COUNTRIES,
+  COUNTRIES_WITH_A_REGION,
+  detectCountry,
+  findStatedRestriction,
+  judgeRemoteRestriction,
+} from '../src/boards/countries.js';
 import { FirecrawlConverter, LocalConverter } from '../src/extract/converters.js';
 import { htmlToText, pageToMarkdown } from '../src/extract/html-to-markdown.js';
 import { assertPublicHttpUrl } from '../src/extract/safe-url.js';
@@ -205,7 +211,46 @@ describe('judgeRemoteRestriction', () => {
     expect(judgeRemoteRestriction('Remote - Germany', ['DE']).kind).toBe('match');
   });
 
-  it('cannot place a non-African profile in a region, so says the restriction is unclear', () => {
-    expect(judgeRemoteRestriction('Europe', ['DE']).kind).toBe('unclear');
+  it.each([
+    ['Europe', ['DE'], 'match'],
+    ['EMEA', ['AE'], 'match'],
+    ['APAC', ['SG'], 'match'],
+    ['LATAM', ['MX'], 'match'],
+    ['North America', ['MX'], 'excluded'],
+    ['Americas', ['BR'], 'match'],
+    ['Europe', ['US'], 'excluded'],
+    ['Nordics', ['SE'], 'match'],
+  ] as const)('"%s" for a profile in %j is %s', (restriction, countries, kind) => {
+    expect(judgeRemoteRestriction(restriction, countries).kind).toBe(kind);
+  });
+
+  it('places every known country in a region, so no profile is left unresolved', () => {
+    const unplaced = Object.keys(COUNTRIES).filter((code) => !COUNTRIES_WITH_A_REGION.has(code));
+
+    expect(unplaced).toEqual([]);
+  });
+});
+
+describe('findStatedRestriction', () => {
+  it.each([
+    ['You must be based in the United States to apply.', 'United States to apply'],
+    ['Candidates need to be located in Europe or the UK.', 'Europe or the UK'],
+    ['This role is only open to candidates in Canada.', 'Canada'],
+    [
+      'Applicants must be authorized to work in the US without sponsorship.',
+      'US without sponsorship',
+    ],
+    ['Fully remote (US-only). Great benefits.', 'US-only'],
+    ['This position is available within EMEA time zones', 'EMEA time zones'],
+  ])('finds the limit in "%s"', (text, place) => {
+    expect(findStatedRestriction(text)).toBe(place);
+  });
+
+  it('finds nothing in a posting that states no limit', () => {
+    expect(
+      findStatedRestriction(
+        'We are a remote-first team based in many countries. Work from anywhere.',
+      ),
+    ).toBeUndefined();
   });
 });

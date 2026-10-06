@@ -85,6 +85,31 @@ describe('scoreHeuristically', () => {
     expect(emea.strengths).toContain('Remote role open to EMEA');
   });
 
+  it('reads a location limit from the posting when the location says only "Remote"', () => {
+    const usOnly = scoreHeuristically(
+      job({
+        isRemote: true,
+        location: 'Remote',
+        body: 'React and TypeScript. You must be based in the United States.',
+      }),
+      profile,
+      NOW,
+    );
+    const open = scoreHeuristically(
+      job({
+        isRemote: true,
+        location: 'Remote',
+        body: 'React and TypeScript. Work from anywhere.',
+      }),
+      profile,
+      NOW,
+    );
+
+    expect(usOnly.score).toBeLessThanOrEqual(2);
+    expect(usOnly.gaps).toContain('Remote, but the posting asks for: United States');
+    expect(open.strengths).toContain('Remote role with no region limit stated');
+  });
+
   it('names a country outside Africa when the job is based there', () => {
     const evaluation = scoreHeuristically(job({ countryCode: 'DE' }), profile, NOW);
 
