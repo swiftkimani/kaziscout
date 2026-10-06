@@ -99,6 +99,8 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
       countryCode: query.country,
       isRemote: query.remote === undefined ? undefined : query.remote === 'true',
       minScore: query.minScore,
+      visibility: query.hidden === 'only' ? 'hidden' : 'visible',
+      untrackedOnly: query.untracked === 'true',
       sort: query.sort,
       limit: query.limit,
       cursor: query.cursor,
@@ -143,6 +145,18 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
     const job = deps.jobs.findById(id);
     if (!job) throw new NotFoundError('That job');
     return { data: { ...job, application: deps.applications.findByJobId(id) ?? null } };
+  });
+
+  app.put('/v1/jobs/:id/hidden', (request) => {
+    const { id } = parse(idParam, request.params);
+    if (!deps.jobs.setHidden(id, true, now())) throw new NotFoundError('That job');
+    return { data: deps.jobs.findById(id) };
+  });
+
+  app.delete('/v1/jobs/:id/hidden', (request) => {
+    const { id } = parse(idParam, request.params);
+    if (!deps.jobs.setHidden(id, false, now())) throw new NotFoundError('That job');
+    return { data: deps.jobs.findById(id) };
   });
 
   app.post('/v1/jobs/:id/evaluate', EXPENSIVE, async (request) => {

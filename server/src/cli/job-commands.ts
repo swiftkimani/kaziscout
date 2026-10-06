@@ -100,6 +100,16 @@ export const pack: Command = async ({ io, need, call }) => {
   io.out(data.pack);
 };
 
+export const hide: Command = async ({ io, need, call }) => {
+  await call('PUT', `/v1/jobs/${encodeURIComponent(need('a job id'))}/hidden`);
+  io.out('Hidden. It will not appear in your lists again. Undo with: ./kazi unhide <ID>');
+};
+
+export const unhide: Command = async ({ io, need, call }) => {
+  await call('DELETE', `/v1/jobs/${encodeURIComponent(need('a job id'))}/hidden`);
+  io.out('Restored to your lists.');
+};
+
 export const track: Command = async ({ io, need, call }) => {
   await call('POST', '/v1/applications', { jobId: need('a job id') });
   io.out('Saved to your tracker.');

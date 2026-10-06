@@ -236,6 +236,40 @@ describe('job listing', () => {
     expect(pageTwo.next_cursor).toBeNull();
   });
 
+  it('leaves hidden jobs out of lists until they are restored, even after another scan', async () => {
+    const jobId = await scanAndGetFirstJobId();
+
+    const hidden = await app.inject({ method: 'PUT', url: `/v1/jobs/${jobId}/hidden` });
+    await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
+    const visible = (await app.inject({ method: 'GET', url: '/v1/jobs' })).json() as {
+      data: { id: string }[];
+    };
+    const onlyHidden = (
+      await app.inject({ method: 'GET', url: '/v1/jobs?hidden=only' })
+    ).json() as { data: { id: string }[] };
+    await app.inject({ method: 'DELETE', url: `/v1/jobs/${jobId}/hidden` });
+    const restored = (await app.inject({ method: 'GET', url: '/v1/jobs' })).json() as {
+      data: unknown[];
+    };
+
+    expect(hidden.json()).toMatchObject({ data: { id: jobId, isHidden: true } });
+    expect(visible.data.map((job) => job.id)).not.toContain(jobId);
+    expect(onlyHidden.data.map((job) => job.id)).toEqual([jobId]);
+    expect(restored.data).toHaveLength(2);
+  });
+
+  it('can leave out jobs already in the tracker, for triage', async () => {
+    const jobId = await scanAndGetFirstJobId();
+    await app.inject({ method: 'POST', url: '/v1/applications', payload: { jobId } });
+
+    const untracked = (
+      await app.inject({ method: 'GET', url: '/v1/jobs?untracked=true' })
+    ).json() as { data: { id: string }[] };
+
+    expect(untracked.data).toHaveLength(1);
+    expect(untracked.data[0]?.id).not.toBe(jobId);
+  });
+
   it('rejects an invalid filter with the field named', async () => {
     const response = await app.inject({ method: 'GET', url: '/v1/jobs?country=XX' });
 

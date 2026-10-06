@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { CLI_OPTIONS, CliError, type CliContext, type CliIo, type Command } from './context.js';
 import { cv } from './cv-command.js';
 import { HELP } from './help.js';
-import { add, assess, jobs, pack, show, track, tracker } from './job-commands.js';
+import { add, assess, hide, jobs, pack, show, track, tracker, unhide } from './job-commands.js';
 import { profile } from './profile-commands.js';
 import { boards, follow, markdown, scan, today, unfollow } from './source-commands.js';
 
@@ -18,6 +18,8 @@ const COMMANDS: Readonly<Record<string, Command>> = {
   pack,
   track,
   tracker,
+  hide,
+  unhide,
   boards,
   follow,
   unfollow,

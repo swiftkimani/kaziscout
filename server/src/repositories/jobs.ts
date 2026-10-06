@@ -20,6 +20,8 @@ export interface Job {
   score?: number;
   evaluation?: Evaluation;
   evaluatedAt?: string;
+  /** True once the person has dismissed the job. */
+  isHidden: boolean;
 }
 
 export interface NewJob {
@@ -43,6 +45,10 @@ export interface JobFilter {
   countryCode?: string;
   isRemote?: boolean;
   minScore?: number;
+  /** 'visible' (the default) leaves hidden jobs out; 'hidden' lists only those. */
+  visibility?: 'visible' | 'hidden';
+  /** Leave out jobs already in the tracker, for triage. */
+  untrackedOnly?: boolean;
   sort: 'newest' | 'score';
   limit: number;
   cursor?: string;
@@ -54,7 +60,7 @@ export interface JobPage {
 }
 
 const JOB_COLUMNS = `id, board_id, title, company, location, country_code, is_remote, url, summary,
-  description_md, posted_at, closes_at, listed_at, first_seen_at, score, evaluation_json, evaluated_at`;
+  description_md, posted_at, closes_at, listed_at, first_seen_at, score, evaluation_json, evaluated_at, hidden_at`;
 
 type Row = Record<string, unknown>;
 
@@ -82,6 +88,7 @@ function toJob(row: Row): Job {
     score: typeof row.score === 'number' ? row.score : undefined,
     evaluation: evaluationJson ? (JSON.parse(evaluationJson) as Evaluation) : undefined,
     evaluatedAt: optional(row.evaluated_at),
+    isHidden: row.hidden_at !== null,
   };
 }
 
@@ -157,8 +164,11 @@ export class JobRepository {
 
   /** Keyset-paginated listing; the cursor carries the sort value and id of the last row. */
   list(filter: JobFilter): JobPage {
-    const where: string[] = [];
+    const where: string[] = [
+      filter.visibility === 'hidden' ? 'hidden_at IS NOT NULL' : 'hidden_at IS NULL',
+    ];
     const params: (string | number)[] = [];
+    if (filter.untrackedOnly) where.push('id NOT IN (SELECT job_id FROM applications)');
     const sortColumn = filter.sort === 'score' ? 'COALESCE(score, 0)' : 'listed_at';
 
     if (filter.search) {
@@ -221,6 +231,15 @@ export class JobRepository {
       .run(evaluation.score, JSON.stringify(evaluation), now.toISOString(), id);
   }
 
+  /** Hides or restores a job. Returns false when there is no such job. */
+  setHidden(id: string, isHidden: boolean, now: Date): boolean {
+    return (
+      this.db
+        .prepare('UPDATE jobs SET hidden_at = ? WHERE id = ?')
+        .run(isHidden ? now.toISOString() : null, id).changes > 0
+    );
+  }
+
   saveDescription(id: string, markdown: string): void {
     this.db.prepare('UPDATE jobs SET description_md = ? WHERE id = ?').run(markdown, id);
   }
@@ -230,7 +249,8 @@ export class JobRepository {
     return this.db
       .prepare(
         `SELECT ${JOB_COLUMNS} FROM jobs
-         WHERE first_seen_at >= ? AND score >= ? ORDER BY score DESC, id DESC LIMIT ?`,
+         WHERE first_seen_at >= ? AND score >= ? AND hidden_at IS NULL
+         ORDER BY score DESC, id DESC LIMIT ?`,
       )
       .all(since.toISOString(), minScore, limit)
       .map(toJob);
@@ -241,7 +261,7 @@ export class JobRepository {
     return this.db
       .prepare(
         `SELECT ${JOB_COLUMNS} FROM jobs
-         WHERE closes_at >= ? AND closes_at <= ?
+         WHERE closes_at >= ? AND closes_at <= ? AND hidden_at IS NULL
            AND (score >= ? OR id IN (SELECT job_id FROM applications WHERE status = 'saved'))
          ORDER BY closes_at, id LIMIT ?`,
       )
