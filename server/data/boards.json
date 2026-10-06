@@ -1,0 +1,1533 @@
+[
+  {
+    "id": "jobwebkenya",
+    "name": "Jobweb Kenya",
+    "url": "https://jobwebkenya.com",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobwebkenya.com/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "corporate-staffing",
+    "name": "Corporate Staffing Services",
+    "url": "https://www.corporatestaffing.co.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.corporatestaffing.co.ke/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Feed mixes vacancies with career articles."
+  },
+  {
+    "id": "career-point-kenya",
+    "name": "Career Point Kenya",
+    "url": "https://www.careerpointkenya.co.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.careerpointkenya.co.ke/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Feed mixes vacancies with career articles."
+  },
+  {
+    "id": "summit-recruitment",
+    "name": "Summit Recruitment & Search",
+    "url": "https://summitrecruitment-search.com",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://summitrecruitment-search.com/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "opportunities-young-kenyans",
+    "name": "Opportunities for Young Kenyans",
+    "url": "https://opportunitiesforyoungkenyans.co.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "opportunities",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://opportunitiesforyoungkenyans.co.ke/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Internships, fellowships and entry-level roles."
+  },
+  {
+    "id": "brightermonday-ke",
+    "name": "BrighterMonday Kenya",
+    "url": "https://www.brightermonday.co.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "myjobmag-ke",
+    "name": "MyJobMag Kenya",
+    "url": "https://www.myjobmag.co.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "myjobs-in-kenya",
+    "name": "MyJobsInKenya",
+    "url": "https://myjobsinkenya.com",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobs-in-kenya",
+    "name": "Jobs in Kenya",
+    "url": "https://www.jobsinkenya.co.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "fuzu",
+    "name": "Fuzu",
+    "url": "https://www.fuzu.com",
+    "countries": [
+      "KE",
+      "UG",
+      "NG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "kenyajob",
+    "name": "KenyaJob",
+    "url": "https://www.kenyajob.com",
+    "countries": [
+      "KE"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "psc-kenya",
+    "name": "Public Service Commission of Kenya",
+    "url": "https://psckjobs.go.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "government",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "ajira-digital",
+    "name": "Ajira Digital",
+    "url": "https://ajiradigital.go.ke",
+    "countries": [
+      "KE"
+    ],
+    "category": "government",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Government programme for online work."
+  },
+  {
+    "id": "brightermonday-ug",
+    "name": "BrighterMonday Uganda",
+    "url": "https://www.brightermonday.co.ug",
+    "countries": [
+      "UG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "great-uganda-jobs",
+    "name": "Great Uganda Jobs",
+    "url": "https://www.greatugandajobs.com",
+    "countries": [
+      "UG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "everjobs-ug",
+    "name": "Everjobs Uganda",
+    "url": "https://everjobs.ug",
+    "countries": [
+      "UG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "ugandajob",
+    "name": "UgandaJob",
+    "url": "https://www.ugandajob.com",
+    "countries": [
+      "UG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "zoom-tanzania",
+    "name": "ZoomTanzania",
+    "url": "https://www.zoomtanzania.net",
+    "countries": [
+      "TZ"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "ajira-tanzania",
+    "name": "Ajira Portal Tanzania",
+    "url": "https://www.ajira.go.tz",
+    "countries": [
+      "TZ"
+    ],
+    "category": "government",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Public Service Recruitment Secretariat."
+  },
+  {
+    "id": "mabumbe",
+    "name": "Mabumbe",
+    "url": "https://mabumbe.com",
+    "countries": [
+      "TZ"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "job-in-rwanda",
+    "name": "Job in Rwanda",
+    "url": "https://www.jobinrwanda.com",
+    "countries": [
+      "RW"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "ethiojobs",
+    "name": "Ethiojobs",
+    "url": "https://ethiojobs.net",
+    "countries": [
+      "ET"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "hahu-jobs",
+    "name": "HaHuJobs",
+    "url": "https://www.hahu.jobs",
+    "countries": [
+      "ET"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "afriwork",
+    "name": "Afriwork",
+    "url": "https://afriworket.com",
+    "countries": [
+      "ET"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "somali-jobs",
+    "name": "Somali Jobs",
+    "url": "https://somalijobs.com",
+    "countries": [
+      "SO"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "sudan-careers",
+    "name": "Sudan Careers",
+    "url": "https://sudancareers.com",
+    "countries": [
+      "SD"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "hot-nigerian-jobs",
+    "name": "Hot Nigerian Jobs",
+    "url": "https://www.hotnigerianjobs.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.hotnigerianjobs.com/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobzilla-ng",
+    "name": "Jobzilla Nigeria",
+    "url": "https://www.jobzilla.ng",
+    "countries": [
+      "NG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.jobzilla.ng/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobgurus",
+    "name": "Jobgurus Nigeria",
+    "url": "https://jobgurus.com.ng",
+    "countries": [
+      "NG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobgurus.com.ng/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobberman-ng",
+    "name": "Jobberman Nigeria",
+    "url": "https://www.jobberman.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Ngcareers now redirects here."
+  },
+  {
+    "id": "myjobmag-ng",
+    "name": "MyJobMag Nigeria",
+    "url": "https://www.myjobmag.com",
+    "countries": [
+      "NG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobweb-ghana",
+    "name": "Jobweb Ghana",
+    "url": "https://jobwebghana.com",
+    "countries": [
+      "GH"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobwebghana.com/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobberman-gh",
+    "name": "Jobberman Ghana",
+    "url": "https://www.jobberman.com.gh",
+    "countries": [
+      "GH"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobs-in-ghana",
+    "name": "Jobs in Ghana",
+    "url": "https://www.jobsinghana.com",
+    "countries": [
+      "GH"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "ghanajob",
+    "name": "GhanaJob",
+    "url": "https://www.ghanajob.com",
+    "countries": [
+      "GH"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "gamjobs",
+    "name": "Gamjobs",
+    "url": "https://gamjobs.com",
+    "countries": [
+      "GM"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://gamjobs.com/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "senjob",
+    "name": "Senjob",
+    "url": "https://senjob.com",
+    "countries": [
+      "SN"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "educarriere",
+    "name": "Educarriere",
+    "url": "https://educarriere.ci",
+    "countries": [
+      "CI"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "emploi-ci",
+    "name": "Emploi.ci",
+    "url": "https://www.emploi.ci",
+    "countries": [
+      "CI"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobinfocamer",
+    "name": "JobInfoCamer",
+    "url": "https://jobinfocamer.com",
+    "countries": [
+      "CM"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "emploi-cm",
+    "name": "Emploi.cm",
+    "url": "https://www.emploi.cm",
+    "countries": [
+      "CM"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "emploi-cd",
+    "name": "Emploi.cd",
+    "url": "https://www.emploi.cd",
+    "countries": [
+      "CD"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "mediacongo",
+    "name": "MediaCongo Emplois",
+    "url": "https://www.mediacongo.net",
+    "countries": [
+      "CD"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "News site with a large jobs section."
+  },
+  {
+    "id": "novojob",
+    "name": "Novojob",
+    "url": "https://www.novojob.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.novojob.com/rss"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Francophone Africa."
+  },
+  {
+    "id": "option-carriere",
+    "name": "Option Carriere",
+    "url": "https://www.optioncarriere.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "aggregator",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Francophone aggregator."
+  },
+  {
+    "id": "africawork",
+    "name": "Africawork",
+    "url": "https://www.africawork.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "careers24",
+    "name": "Careers24",
+    "url": "https://www.careers24.com",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "pnet",
+    "name": "Pnet",
+    "url": "https://www.pnet.co.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "career-junction",
+    "name": "CareerJunction",
+    "url": "https://www.careerjunction.co.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "job-mail",
+    "name": "Job Mail",
+    "url": "https://www.jobmail.co.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "job-placements",
+    "name": "Job Placements",
+    "url": "https://www.jobplacements.com",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "myjobmag-za",
+    "name": "MyJobMag South Africa",
+    "url": "https://www.myjobmag.co.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "bizcommunity",
+    "name": "Bizcommunity Jobs",
+    "url": "https://www.bizcommunity.com",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Media, marketing and retail roles."
+  },
+  {
+    "id": "careerjet-za",
+    "name": "Careerjet South Africa",
+    "url": "https://www.careerjet.co.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "aggregator",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "indeed-za",
+    "name": "Indeed South Africa",
+    "url": "https://za.indeed.com",
+    "countries": [
+      "ZA"
+    ],
+    "category": "aggregator",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobvine",
+    "name": "Jobvine",
+    "url": "https://www.jobvine.co.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "dpsa",
+    "name": "DPSA Public Service Vacancies",
+    "url": "https://www.dpsa.gov.za",
+    "countries": [
+      "ZA"
+    ],
+    "category": "government",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Weekly public service vacancy circular."
+  },
+  {
+    "id": "vacancy-mail",
+    "name": "VacancyMail",
+    "url": "https://vacancymail.co.zw",
+    "countries": [
+      "ZW"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://vacancymail.co.zw/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "iharare-jobs",
+    "name": "iHarare Jobs",
+    "url": "https://ihararejobs.com",
+    "countries": [
+      "ZW"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://ihararejobs.com/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "careers-malawi",
+    "name": "Careers Malawi",
+    "url": "https://careersmw.com",
+    "countries": [
+      "MW"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://careersmw.com/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "job-search-malawi",
+    "name": "Job Search Malawi",
+    "url": "https://jobsearchmalawi.com",
+    "countries": [
+      "MW"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobsearchmalawi.com/?feed=job_feed"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "job-search-zambia",
+    "name": "Job Search Zambia",
+    "url": "https://jobsearchzm.com",
+    "countries": [
+      "ZM"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobsearchzm.com/?feed=job_feed"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "go-zambia-jobs",
+    "name": "Go Zambia Jobs",
+    "url": "https://gozambiajobs.com",
+    "countries": [
+      "ZM"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobs-botswana",
+    "name": "Jobs Botswana",
+    "url": "https://jobsbotswana.info",
+    "countries": [
+      "BW"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobsbotswana.info/jobs/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobartis",
+    "name": "Jobartis",
+    "url": "https://www.jobartis.com",
+    "countries": [
+      "AO"
+    ],
+    "category": "general",
+    "language": "pt",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "emprego-mz",
+    "name": "Emprego Mocambique",
+    "url": "https://www.emprego.co.mz",
+    "countries": [
+      "MZ"
+    ],
+    "category": "general",
+    "language": "pt",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "myjob-mu",
+    "name": "MyJob.mu",
+    "url": "https://myjob.mu",
+    "countries": [
+      "MU"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "wuzzuf",
+    "name": "Wuzzuf",
+    "url": "https://wuzzuf.net",
+    "countries": [
+      "EG"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "forasna",
+    "name": "Forasna",
+    "url": "https://forasna.com",
+    "countries": [
+      "EG"
+    ],
+    "category": "general",
+    "language": "ar",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "bayt",
+    "name": "Bayt",
+    "url": "https://www.bayt.com",
+    "countries": [
+      "EG",
+      "MA",
+      "DZ",
+      "TN",
+      "LY",
+      "SD"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06",
+    "note": "Middle East and North Africa."
+  },
+  {
+    "id": "tanqeeb",
+    "name": "Tanqeeb",
+    "url": "https://tanqeeb.com",
+    "countries": [
+      "EG",
+      "MA",
+      "DZ",
+      "TN",
+      "LY",
+      "SD"
+    ],
+    "category": "aggregator",
+    "language": "ar",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06",
+    "note": "Answers automated checks with HTTP 202."
+  },
+  {
+    "id": "rekrute",
+    "name": "ReKrute",
+    "url": "https://www.rekrute.com",
+    "countries": [
+      "MA"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "emploi-ma",
+    "name": "Emploi.ma",
+    "url": "https://www.emploi.ma",
+    "countries": [
+      "MA"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "emploitic",
+    "name": "Emploitic",
+    "url": "https://emploitic.com",
+    "countries": [
+      "DZ"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "keejob",
+    "name": "Keejob",
+    "url": "https://www.keejob.com",
+    "countries": [
+      "TN"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "tanitjobs",
+    "name": "Tanitjobs",
+    "url": "https://www.tanitjobs.com",
+    "countries": [
+      "TN"
+    ],
+    "category": "general",
+    "language": "fr",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "libyan-jobs",
+    "name": "Libyan Jobs",
+    "url": "https://libyanjobs.ly",
+    "countries": [
+      "LY"
+    ],
+    "category": "general",
+    "language": "ar",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "jobnet-africa",
+    "name": "JobnetAfrica",
+    "url": "https://jobnetafrica.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://jobnetafrica.com/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "careers-in-africa",
+    "name": "Careers in Africa",
+    "url": "https://www.careersinafrica.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "shortlist",
+    "name": "Shortlist",
+    "url": "https://www.shortlist.net",
+    "countries": [
+      "PAN"
+    ],
+    "category": "general",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "ngo-jobs-in-africa",
+    "name": "NGO Jobs in Africa",
+    "url": "https://ngojobsinafrica.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "ngo",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Its feed last updated in May 2026, so it is not scanned."
+  },
+  {
+    "id": "reliefweb",
+    "name": "ReliefWeb Jobs",
+    "url": "https://reliefweb.int/jobs",
+    "countries": [
+      "PAN"
+    ],
+    "category": "ngo",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06",
+    "note": "Has a public API, but it only serves approved app names; not scanned yet."
+  },
+  {
+    "id": "unjobs",
+    "name": "UNjobs",
+    "url": "https://unjobs.org",
+    "countries": [
+      "PAN"
+    ],
+    "category": "ngo",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "impactpool",
+    "name": "Impactpool",
+    "url": "https://www.impactpool.org",
+    "countries": [
+      "PAN"
+    ],
+    "category": "ngo",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "devex",
+    "name": "Devex Jobs",
+    "url": "https://www.devex.com/jobs",
+    "countries": [
+      "PAN"
+    ],
+    "category": "ngo",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "development-aid",
+    "name": "DevelopmentAid",
+    "url": "https://www.developmentaid.org",
+    "countries": [
+      "PAN"
+    ],
+    "category": "ngo",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "blocked",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "opportunities-for-africans",
+    "name": "Opportunities for Africans",
+    "url": "https://www.opportunitiesforafricans.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "opportunities",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.opportunitiesforafricans.com/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Fellowships, scholarships and graduate programmes."
+  },
+  {
+    "id": "opportunity-desk",
+    "name": "Opportunity Desk",
+    "url": "https://opportunitydesk.org",
+    "countries": [
+      "PAN"
+    ],
+    "category": "opportunities",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://opportunitydesk.org/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Global opportunities, many open to Africans."
+  },
+  {
+    "id": "global-south-opportunities",
+    "name": "Global South Opportunities",
+    "url": "https://www.globalsouthopportunities.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "opportunities",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://www.globalsouthopportunities.com/feed/"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "after-school-africa",
+    "name": "After School Africa",
+    "url": "https://www.afterschoolafrica.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "opportunities",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "andela",
+    "name": "Andela",
+    "url": "https://www.andela.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "tech",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Talent network for engineers."
+  },
+  {
+    "id": "gebeya",
+    "name": "Gebeya",
+    "url": "https://gebeya.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "tech",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Pan-African tech talent marketplace."
+  },
+  {
+    "id": "tunga",
+    "name": "Tunga",
+    "url": "https://tunga.io",
+    "countries": [
+      "PAN"
+    ],
+    "category": "tech",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Remote software work for African developers."
+  },
+  {
+    "id": "remote4africa",
+    "name": "Remote4Africa",
+    "url": "https://remote4africa.com",
+    "countries": [
+      "PAN"
+    ],
+    "category": "remote",
+    "language": "en",
+    "access": {
+      "type": "listing"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06"
+  },
+  {
+    "id": "remotive",
+    "name": "Remotive",
+    "url": "https://remotive.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "remote",
+    "language": "en",
+    "access": {
+      "type": "api",
+      "provider": "remotive"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open worldwide or to Africa are kept."
+  },
+  {
+    "id": "himalayas",
+    "name": "Himalayas",
+    "url": "https://himalayas.app",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "remote",
+    "language": "en",
+    "access": {
+      "type": "api",
+      "provider": "himalayas"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open worldwide or to Africa are kept."
+  },
+  {
+    "id": "remoteok",
+    "name": "Remote OK",
+    "url": "https://remoteok.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "remote",
+    "language": "en",
+    "access": {
+      "type": "api",
+      "provider": "remoteok"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open worldwide or to Africa are kept."
+  },
+  {
+    "id": "we-work-remotely",
+    "name": "We Work Remotely",
+    "url": "https://weworkremotely.com",
+    "countries": [
+      "REMOTE"
+    ],
+    "category": "remote",
+    "language": "en",
+    "access": {
+      "type": "rss",
+      "feedUrl": "https://weworkremotely.com/remote-jobs.rss"
+    },
+    "status": "live",
+    "checkedAt": "2026-10-06",
+    "note": "Only roles open worldwide or to Africa are kept."
+  }
+]
