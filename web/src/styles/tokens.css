@@ -1,0 +1,89 @@
+/* Design tokens. Every colour, size and duration used by a component comes from here. */
+:root {
+  /* Spacing: 4-pt scale */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Type */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --leading-body: 1.5;
+  --leading-heading: 1.2;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 650;
+  --measure: 72ch;
+
+  /* Radii: controls, panels, pills */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 2px rgb(15 61 46 / 8%);
+  --shadow-2: 0 8px 24px rgb(15 61 46 / 14%);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-spin: 800ms;
+  --duration-pulse: 1400ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Layout */
+  --sidebar-width: 232px;
+  --toast-width: 360px;
+  --filter-min: 180px;
+  --column-min: 320px;
+  --content-max: 1120px;
+  --target-min: 44px;
+  --border-width: 1px;
+  --focus-width: 3px;
+
+  /* Colour roles. Light only: white content with a dark brand sidebar (see AGENTS.md). */
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #efede6;
+  --border: #dedad0;
+  --border-strong: #8a8f86;
+  --text: #1a231e;
+  --text-muted: #56615a;
+  --primary: #14694b;
+  --primary-hover: #0f5139;
+  --primary-fg: #ffffff;
+  --primary-soft: #e3f1ea;
+  --accent: #e8a13a;
+  --accent-text: #8a5a0b;
+  --accent-soft: #fbf0dc;
+  --success: #17703f;
+  --success-soft: #e2f3e8;
+  --warning: #8a5a0b;
+  --warning-soft: #fbf0dc;
+  --danger: #b3261e;
+  --danger-soft: #fbe9e7;
+  --info: #1f5f8b;
+  --info-soft: #e4eff7;
+  --focus-ring: #1f5f8b;
+
+  /* Brand surface (sidebar) */
+  --brand-bg: #0f3d2e;
+  --brand-fg: #f6f5f1;
+  --brand-fg-muted: #b9cdc3;
+  --brand-active: #1b5a45;
+}

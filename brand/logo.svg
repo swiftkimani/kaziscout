@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" role="img" aria-labelledby="t">
+  <title id="t">KaziScout</title>
+  <rect width="64" height="64" rx="14" fill="#0f3d2e"/>
+  <path d="M17 14h9v36h-9z" fill="#f6f5f1"/>
+  <path d="M30 32 45 14h11L41 32l15 18H45z" fill="#e8a13a"/>
+  <text x="80" y="43" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#14694b">Kazi</tspan><tspan fill="#c47f17">Scout</tspan>
+  </text>
+</svg>

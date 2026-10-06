@@ -1,0 +1,100 @@
+/** Shapes returned by the KaziScout API. Kept in step with server/src by hand. */
+
+export interface Evaluation {
+  score: number;
+  evaluator: 'heuristic' | 'claude';
+  verdict: string;
+  strengths: string[];
+  gaps: string[];
+  matchedSkills: string[];
+  pitch?: string;
+}
+
+export const APPLICATION_STATUSES = [
+  'saved',
+  'applied',
+  'interview',
+  'offer',
+  'rejected',
+  'withdrawn',
+] as const;
+
+export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+
+export interface Application {
+  id: number;
+  jobId: string;
+  status: ApplicationStatus;
+  notes: string;
+  appliedAt?: string;
+  updatedAt: string;
+  job: { title: string; company?: string; url: string; boardId: string; score?: number };
+}
+
+export interface Job {
+  id: string;
+  boardId: string;
+  title: string;
+  company?: string;
+  location?: string;
+  countryCode?: string;
+  isRemote: boolean;
+  url: string;
+  summary: string;
+  descriptionMd?: string;
+  postedAt?: string;
+  listedAt: string;
+  score?: number;
+  evaluation?: Evaluation;
+}
+
+export interface JobDetail extends Job {
+  application: Application | null;
+}
+
+export interface BoardScan {
+  boardId: string;
+  startedAt: string;
+  outcome: 'ok' | 'error';
+  jobsFound: number;
+  jobsNew: number;
+  errorMessage?: string;
+}
+
+export interface Board {
+  id: string;
+  name: string;
+  url: string;
+  countries: string[];
+  category: string;
+  language: string;
+  access: { type: 'rss' | 'api' | 'listing' };
+  status: 'live' | 'blocked' | 'down';
+  checkedAt: string;
+  note?: string;
+  isScannable: boolean;
+  jobCount: number;
+  lastScan: BoardScan | null;
+}
+
+export interface Profile {
+  fullName: string;
+  headline: string;
+  cvText: string;
+  skills: string[];
+  targetTitles: string[];
+  countries: string[];
+  isRemoteOk: boolean;
+}
+
+export interface Meta {
+  countries: Record<string, string>;
+  features: { claude: boolean; desktopAssist: boolean; converter: 'firecrawl' | 'local' };
+}
+
+export interface MarkdownPage {
+  url: string;
+  title?: string;
+  markdown: string;
+  converter: 'firecrawl' | 'local';
+}
