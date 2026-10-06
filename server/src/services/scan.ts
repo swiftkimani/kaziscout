@@ -8,6 +8,7 @@ import type { ProviderContext, RawJob } from '../providers/types.js';
 import type { BoardScan, BoardScanRepository } from '../repositories/board-scans.js';
 import type { JobRepository, NewJob } from '../repositories/jobs.js';
 import type { EvaluationService } from './evaluation.js';
+import type { PostingCompleter } from './posting-completer.js';
 
 const SUMMARY_LENGTH = 320;
 // Boards are independent sites, so a few can be read at once without burdening any one of them.
@@ -82,6 +83,8 @@ export class ScanService {
       jobs: JobRepository;
       scans: BoardScanRepository;
       evaluation: EvaluationService;
+      /** Fetches full postings for promising jobs that arrive without a description. */
+      completer?: PostingCompleter;
       providerContext: ProviderContext;
       logger: ScanLogger;
       now?: () => Date;
@@ -120,6 +123,7 @@ export class ScanService {
           .map((result) => result.id),
       );
       await this.deps.evaluation.scoreNewJobs(newIds);
+      await this.deps.completer?.complete(newIds);
       scan = {
         boardId,
         startedAt: startedAt.toISOString(),

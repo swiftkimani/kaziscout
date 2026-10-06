@@ -16,6 +16,35 @@ function PointList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
+const BREAKDOWN_PARTS = [
+  ['title', 'Title'],
+  ['skills', 'Skills'],
+  ['location', 'Location'],
+  ['freshness', 'Freshness'],
+] as const;
+
+/** The four parts of the keyword score as labelled meters, so the number explains itself. */
+function ScoreBreakdown({ breakdown }: { breakdown: NonNullable<Evaluation['breakdown']> }) {
+  return (
+    <dl className="breakdown">
+      {BREAKDOWN_PARTS.map(([key, label]) => {
+        const percent = Math.round(breakdown[key] * 100);
+        return (
+          <div key={key} className="breakdown__row">
+            <dt>{label}</dt>
+            <dd>
+              <meter className="breakdown__meter" min={0} max={100} value={percent}>
+                {percent}%
+              </meter>
+              <span className="breakdown__value">{percent}%</span>
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
 export function EvaluationPanel({ evaluation }: { evaluation?: Evaluation }) {
   return (
     <section className="panel" aria-labelledby="fit-heading">
@@ -32,6 +61,7 @@ export function EvaluationPanel({ evaluation }: { evaluation?: Evaluation }) {
       {evaluation ? (
         <div className="stack">
           <p>{evaluation.verdict}</p>
+          {evaluation.breakdown && <ScoreBreakdown breakdown={evaluation.breakdown} />}
           <PointList title="Why you fit" items={evaluation.strengths} />
           <PointList title="Gaps to address" items={evaluation.gaps} />
           {evaluation.pitch && (

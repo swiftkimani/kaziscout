@@ -29,6 +29,7 @@ describe('JobDetailPage', () => {
     expect(screen.getByRole('heading', { name: 'Requirements' })).toBeTruthy();
     expect(screen.getByText('Strong match. Worth applying.')).toBeTruthy();
     expect(screen.getByText('Keyword score')).toBeTruthy();
+    expect(screen.getByText('Skills').closest('div')?.textContent).toContain('50%');
     expect(screen.getByRole('link', { name: /Open original posting/ }).getAttribute('href')).toBe(
       JOB.url,
     );

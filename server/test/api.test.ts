@@ -179,6 +179,45 @@ describe('scanning', () => {
   });
 });
 
+describe('jobs that arrive without a description', () => {
+  const titleOnlyFeed = `<rss><channel>
+    <item><title>Digital Video Editor at Acme</title><link>https://jobwebkenya.com/jobs/editor/</link></item>
+    <item><title>Registered Nurse at Acme</title><link>https://jobwebkenya.com/jobs/nurse/</link></item>
+  </channel></rss>`;
+
+  it('fetches the full posting for a promising title and leaves the rest alone', async () => {
+    await app.close();
+    const fetched: string[] = [];
+    app = await buildApp({
+      config: loadConfig({ LOG_LEVEL: 'silent' }),
+      db,
+      boards,
+      now: () => NOW,
+      resolveHost: () => Promise.resolve(['93.184.216.34']),
+      fetchText: (url) => {
+        fetched.push(url);
+        return Promise.resolve(
+          url === FEED_URL
+            ? titleOnlyFeed
+            : '<html><title>Editor</title><body><h1>Editor</h1><p>Video editing daily.</p></body></html>',
+        );
+      },
+    });
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
+
+    await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });
+    const jobs = (await app.inject({ method: 'GET', url: '/v1/jobs?sort=score' })).json() as {
+      data: { title: string; descriptionMd?: string; evaluation: { matchedSkills: string[] } }[];
+    };
+
+    expect(fetched).toEqual([FEED_URL, 'https://jobwebkenya.com/jobs/editor/']);
+    expect(jobs.data[0]).toMatchObject({ title: 'Digital Video Editor' });
+    expect(jobs.data[0]?.descriptionMd).toContain('Video editing daily.');
+    expect(jobs.data[0]?.evaluation.matchedSkills).toEqual(['Video', 'Editing']);
+    expect(jobs.data[1]?.descriptionMd).toBeUndefined();
+  });
+});
+
 describe('job listing', () => {
   it('pages through jobs with a cursor without repeating any', async () => {
     await app.inject({ method: 'POST', url: '/v1/boards/jobwebkenya/scan' });

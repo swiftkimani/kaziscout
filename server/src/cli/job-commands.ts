@@ -43,6 +43,13 @@ export const show: Command = async ({ io, need, call }) => {
     const { evaluator, model, verdict, strengths, gaps } = job.evaluation;
     const by = evaluator === 'ai' ? `assessed by ${model ?? 'AI'}` : 'keyword score';
     io.out(`\nFit ${formatScore(job.score)} of 5 (${by}): ${verdict}`);
+    const parts = job.evaluation.breakdown;
+    if (parts) {
+      const percent = (value: number) => `${Math.round(value * 100)}%`;
+      io.out(
+        `  title ${percent(parts.title)} · skills ${percent(parts.skills)} · location ${percent(parts.location)} · freshness ${percent(parts.freshness)}`,
+      );
+    }
     for (const item of strengths) io.out(`  + ${item}`);
     for (const item of gaps) io.out(`  - ${item}`);
   } else {

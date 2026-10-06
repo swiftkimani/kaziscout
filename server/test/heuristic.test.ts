@@ -32,6 +32,7 @@ describe('scoreHeuristically', () => {
     expect(evaluation.score).toBe(5);
     expect(evaluation.matchedSkills).toEqual(['React', 'TypeScript', 'Node.js']);
     expect(evaluation.verdict).toContain('Strong match');
+    expect(evaluation.breakdown).toEqual({ title: 1, skills: 1, location: 1, freshness: 1 });
   });
 
   it('gives the lowest scores to an unrelated job in another country', () => {
@@ -116,6 +117,7 @@ describe('scoreHeuristically', () => {
     const evaluation = scoreHeuristically(job({ countryCode: 'DE' }), profile, NOW);
 
     expect(evaluation.gaps).toContain('Based in Germany, which is not in your profile');
+    expect(evaluation.breakdown?.location).toBe(0);
   });
 
   it('stays within 1 to 5 for an empty profile', () => {

@@ -72,6 +72,7 @@ export interface ApiJob {
     gaps: string[];
     evaluator: string;
     model?: string;
+    breakdown?: { title: number; skills: number; location: number; freshness: number };
   };
 }
 

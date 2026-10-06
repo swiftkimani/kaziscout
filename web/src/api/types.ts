@@ -4,6 +4,8 @@ export interface Evaluation {
   score: number;
   evaluator: 'heuristic' | 'ai';
   model?: string;
+  /** Each part of the keyword score from 0 to 1. Absent on AI assessments. */
+  breakdown?: { title: number; skills: number; location: number; freshness: number };
   verdict: string;
   strengths: string[];
   gaps: string[];

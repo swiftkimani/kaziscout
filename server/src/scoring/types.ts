@@ -24,10 +24,20 @@ export interface ScorableJob {
   listedAt: Date;
 }
 
+/** The four things the keyword score weighs, each from 0 (no match) to 1 (full match). */
+export interface ScoreBreakdown {
+  title: number;
+  skills: number;
+  location: number;
+  freshness: number;
+}
+
 export interface Evaluation {
   /** 1.0 (poor fit) to 5.0 (excellent fit), one decimal place. */
   score: number;
   evaluator: 'heuristic' | 'ai';
+  /** How each part of the keyword score did, from 0 to 1. Absent on AI assessments. */
+  breakdown?: ScoreBreakdown;
   /** The model that wrote an AI assessment. */
   model?: string;
   /** One sentence the UI shows under the score. */

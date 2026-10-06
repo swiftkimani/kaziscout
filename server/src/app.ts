@@ -27,6 +27,7 @@ import { CvImportService } from './services/cv-import.js';
 import { DocumentService } from './services/documents.js';
 import { EvaluationService } from './services/evaluation.js';
 import { MarkdownService } from './services/markdown.js';
+import { PostingCompleter } from './services/posting-completer.js';
 import { ScanService } from './services/scan.js';
 import { ScanScheduler } from './services/scheduler.js';
 
@@ -78,20 +79,27 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     ai: ai ? new AiJobEvaluator(ai) : undefined,
     now,
   });
+  const markdownService = new MarkdownService({
+    converter,
+    jobs,
+    resolveHost: options.resolveHost,
+  });
+  const completer = new PostingCompleter({
+    jobs,
+    markdown: markdownService,
+    evaluation: evaluationService,
+    logger: app.log,
+  });
   const scanService = new ScanService({
     db,
     boards,
     jobs,
     scans,
     evaluation: evaluationService,
+    completer,
     providerContext: { fetchText, now },
     logger: app.log,
     now,
-  });
-  const markdownService = new MarkdownService({
-    converter,
-    jobs,
-    resolveHost: options.resolveHost,
   });
   const documentService = new DocumentService({
     jobs,

@@ -131,6 +131,12 @@ export function scoreHeuristically(job: ScorableJob, profile: Profile, now: Date
   return {
     score,
     evaluator: 'heuristic',
+    breakdown: {
+      title: titleScore,
+      skills: skillsScore,
+      location: location.value,
+      freshness,
+    },
     verdict: verdictFor(score),
     strengths,
     gaps,
