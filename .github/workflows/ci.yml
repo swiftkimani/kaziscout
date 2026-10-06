@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
 
 permissions:
@@ -24,3 +24,27 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+  # main only takes pull requests from this repository's dev branch. GitHub's branch protection
+  # cannot express that, so this job does, and main requires it to pass.
+  source-branch:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check where this pull request comes from
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          THIS_REPO: ${{ github.repository }}
+        run: |
+          if [ "$BASE" != "main" ]; then
+            echo "Pull request into $BASE: allowed."
+            exit 0
+          fi
+          if [ "$HEAD" = "dev" ] && [ "$HEAD_REPO" = "$THIS_REPO" ]; then
+            echo "Release pull request from dev into main: allowed."
+            exit 0
+          fi
+          echo "::error::main only accepts pull requests from this repository's dev branch. Open your pull request against dev instead."
+          exit 1

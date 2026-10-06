@@ -236,8 +236,9 @@ Full acknowledgements, including data sources, are in [CREDITS.md](CREDITS.md).
 
 ## Contributing
 
-Read [AGENTS.md](AGENTS.md) for the project rules and [docs/CONTEXT.md](docs/CONTEXT.md) for the
-current state of the work. Commits follow Conventional Commits.
+Pull requests go to the `dev` branch; `main` is only updated from `dev`. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the branch flow, [AGENTS.md](AGENTS.md) for the project
+rules and [docs/CONTEXT.md](docs/CONTEXT.md) for the current state of the work.
 
 ## Licence
 

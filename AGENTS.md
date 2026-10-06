@@ -56,6 +56,12 @@ TanStack Query · plain CSS with design tokens · pnpm workspace (`server`, `web
   No raw colours, sizes or durations anywhere else.
 - **New tables** need a purpose comment in the migration and a note in the pull request.
 
+## Branches
+
+`dev` is the default branch and takes pull requests. `main` is protected and only takes pull
+requests from `dev`. Never push to either directly; work on a `feat/` or `fix/` branch and open a
+pull request against `dev`. See `CONTRIBUTING.md`.
+
 ## Overrides of the global standards
 
 - **Light theme only.** The global standard asks for light and dark token values. This project
