@@ -27,6 +27,7 @@ First public release: a working local job-search agent for Africa with a web UI.
 
 ## Done
 
+- 2026-10-06 Profile set up from a CV with follow-up questions; desktop assist on under `pnpm dev`.
 - 2026-10-06 Skill for AI coding tools; add a job by link; store an outside assessment.
 - 2026-10-06 Terminal interface; practice application form; email and phone in the profile.
 - 2026-10-06 Workday and Recruitee readers; continent table; limits read from posting text.
@@ -85,6 +86,10 @@ Can be done by anyone:
 
 ## Known issues / deferred
 
+- Dependencies added for CV reading: `unpdf` (MIT, no dependencies, PDF text) and `mammoth`
+  (BSD-2-Clause, Word text). Node has no built-in reader for either format.
+- The rule-based CV reader takes the first country near the top of the CV as home, and reads
+  skills only from a section headed Skills, Competencies, Expertise or Technologies.
 - Cannot be closed in code: BrighterMonday, Jobberman, Fuzu and other large boards publish no
   feed and are link-out only; ReliefWeb needs an approved app name; 23 sources refuse automated
   checks and are marked "blocked".

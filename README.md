@@ -22,6 +22,7 @@ and press Submit yourself.
 | **Reads employer career pages**        | Reads 35 employers directly through the public APIs of seven hiring systems (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Workday, Recruitee) and Teamtailor career feeds: African employers such as M-KOPA, Moniepoint, Jumia, Paystack, Kuda, Absa, Andela and One Acre Fund, and employers that hire worldwide. Any employer on those systems, in any country, can be added with one line. |
 | **Lists the rest**                     | A directory of 131 checked sources. Boards without a public feed are linked, never scraped. See [docs/BOARDS.md](docs/BOARDS.md).                                                                                                                                                                                                                                                                     |
 | **Works for any country**              | Your profile can name any of 234 countries. Africa is where the board list is deepest, but jobs anywhere are detected, filtered and scored.                                                                                                                                                                                                                                                           |
+| **Sets itself up from your CV**        | Give it your CV as a PDF, Word, text or Markdown file, or copy the text. It fills in your name, contact details, headline, skills and country, then asks follow-up questions about what the CV does not say: the roles you want, where you can work, whether remote suits you. Nothing is saved until you confirm.                                                                                    |
 | **Scores each job 1 to 5**             | Offline keyword scoring on title, skills, location and freshness, with the reasons shown. A remote role's region limit ("EMEA", "US only", "LATAM") is judged against your countries, including limits stated only in the posting text, and a job you cannot take because of where it is never scores above 2.                                                                                        |
 | **Works with any AI model**            | Connect OpenAI, Gemini, DeepSeek, Groq, OpenRouter, Claude, or a free local model through Ollama or LM Studio, and it writes a fuller assessment. With no model at all, everything else still works.                                                                                                                                                                                                  |
 | **Writes your documents**              | With a model connected, writes a cover letter and a CV tailored to the posting from your own CV, under a strict "reword, never invent" rule, and opens each on a clean page to print or save as PDF.                                                                                                                                                                                                  |
@@ -86,9 +87,14 @@ pnpm start             # http://127.0.0.1:8787
 
 Then:
 
-1. Open **Boards** or **Jobs** and choose **Scan all boards**.
-2. Fill in **Profile**. Every job is scored as soon as you save.
+1. Open **Profile**, choose **Choose CV file**, answer the follow-up questions and save.
+2. Open **Jobs** and choose **Scan all boards**. Every job is scored against your profile.
 3. Sort **Jobs** by best fit, open one, and save it to your tracker.
+
+`pnpm dev` turns on desktop assist, which uses
+[computer-use-mcp](https://github.com/zavora-ai/computer-use-mcp) to read a CV you have copied and
+to copy application packs to your clipboard. Set `DESKTOP_ASSIST_ENABLED=false` to switch it off.
+`pnpm start` leaves it off unless you turn it on.
 
 ## Use it in the terminal
 
@@ -112,8 +118,8 @@ needs no AI key of its own for this. In Claude Code and OpenCode the skill is al
 ### Directly
 
 ```sh
-./kazi profile --name "Your Name" --roles "Frontend Developer" --skills "React,TypeScript" --countries KE
-./kazi profile --cv-file ~/Documents/cv.md
+./kazi cv ~/Documents/cv.pdf   # set up your profile from your CV; asks follow-up questions
+./kazi profile --roles "Frontend Developer, Full-Stack Developer"   # change any answer later
 ./kazi scan                 # read every source (about a minute)
 ./kazi jobs --min 4         # your strongest matches
 ./kazi jobs --country KE --newest
@@ -127,7 +133,7 @@ needs no AI key of its own for this. In Claude Code and OpenCode the skill is al
 ## Test
 
 ```sh
-pnpm test          # 176 server tests and 41 web tests; no network needed
+pnpm test          # 195 server tests and 43 web tests; no network needed
 pnpm typecheck
 pnpm lint
 pnpm format:check
@@ -137,46 +143,47 @@ pnpm format:check
 
 All settings are optional. See [.env.example](.env.example).
 
-| Variable                 | Default                  | Purpose                                                                                         |
-| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------- |
-| `PORT`                   | `8787`                   | Port the server listens on                                                                      |
-| `HOST`                   | `127.0.0.1`              | Interface to bind. Anything else requires `ACCESS_TOKEN`.                                       |
-| `LOG_LEVEL`              | `info`                   | `debug`, `info`, `warn`, `error` or `silent`                                                    |
-| `DATABASE_PATH`          | `./var/kaziscout.sqlite` | SQLite file, relative to `server/`                                                              |
-| `ACCESS_TOKEN`           | none                     | Sign-in token. Required before listening beyond this computer.                                  |
-| `SCAN_INTERVAL_MINUTES`  | `0`                      | Minutes between automatic scans. `0` is off; minimum 15.                                        |
-| `ALERT_WEBHOOK_URL`      | none                     | Where to post new strong matches after a scheduled scan.                                        |
-| `ALERT_MIN_SCORE`        | `4`                      | Lowest score that triggers an alert.                                                            |
-| `FIRECRAWL_API_KEY`      | none                     | Convert pages with Firecrawl instead of the local converter                                     |
-| `AI_BASE_URL`            | none                     | Base URL of any OpenAI-compatible server. Enables "Assess with AI".                             |
-| `AI_API_KEY`             | none                     | Key for that server. Local servers such as Ollama need none.                                    |
-| `AI_MODEL`               | none                     | Model name. Required with `AI_BASE_URL`.                                                        |
-| `ANTHROPIC_API_KEY`      | none                     | Use Claude instead, when `AI_BASE_URL` is empty. `AI_MODEL` then defaults to `claude-opus-5-5`. |
-| `DESKTOP_ASSIST_ENABLED` | `false`                  | Copy application packs through computer-use-mcp                                                 |
+| Variable                 | Default                           | Purpose                                                                                         |
+| ------------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `PORT`                   | `8787`                            | Port the server listens on                                                                      |
+| `HOST`                   | `127.0.0.1`                       | Interface to bind. Anything else requires `ACCESS_TOKEN`.                                       |
+| `LOG_LEVEL`              | `info`                            | `debug`, `info`, `warn`, `error` or `silent`                                                    |
+| `DATABASE_PATH`          | `./var/kaziscout.sqlite`          | SQLite file, relative to `server/`                                                              |
+| `ACCESS_TOKEN`           | none                              | Sign-in token. Required before listening beyond this computer.                                  |
+| `SCAN_INTERVAL_MINUTES`  | `0`                               | Minutes between automatic scans. `0` is off; minimum 15.                                        |
+| `ALERT_WEBHOOK_URL`      | none                              | Where to post new strong matches after a scheduled scan.                                        |
+| `ALERT_MIN_SCORE`        | `4`                               | Lowest score that triggers an alert.                                                            |
+| `FIRECRAWL_API_KEY`      | none                              | Convert pages with Firecrawl instead of the local converter                                     |
+| `AI_BASE_URL`            | none                              | Base URL of any OpenAI-compatible server. Enables "Assess with AI".                             |
+| `AI_API_KEY`             | none                              | Key for that server. Local servers such as Ollama need none.                                    |
+| `AI_MODEL`               | none                              | Model name. Required with `AI_BASE_URL`.                                                        |
+| `ANTHROPIC_API_KEY`      | none                              | Use Claude instead, when `AI_BASE_URL` is empty. `AI_MODEL` then defaults to `claude-opus-5-5`. |
+| `DESKTOP_ASSIST_ENABLED` | `false` (`true` under `pnpm dev`) | Use computer-use-mcp for the clipboard: reading a copied CV and copying application packs       |
 
 ## API
 
 The UI is a client of a small versioned API, which you can also call directly.
 
-| Method and path                                                          | Purpose                                                                                           |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `GET /v1/boards`                                                         | Board directory with last scan result and job counts                                              |
-| `POST /v1/scans`                                                         | Scan every board that has a public feed                                                           |
-| `POST /v1/boards/:id/scan`                                               | Scan one board                                                                                    |
-| `GET /v1/jobs`                                                           | List jobs. Filters: `search`, `board`, `country`, `remote`, `minScore`, `sort`, `limit`, `cursor` |
-| `POST /v1/jobs`                                                          | Add a job from its posting link. Body: `{"url": "..."}`                                           |
-| `GET /v1/jobs/:id`                                                       | One job with its evaluation and tracker entry                                                     |
-| `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                           |
-| `PUT /v1/jobs/:id/evaluation`                                            | Store an assessment made outside KaziScout, for example by an AI coding tool                      |
-| `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                          |
-| `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                        |
-| `GET` / `POST /v1/jobs/:id/documents`                                    | Read, or have the AI model write, the cover letter and tailored CV                                |
-| `POST /v1/jobs/:id/assist`                                               | Copy the pack to the clipboard through computer-use-mcp                                           |
-| `POST /v1/extract`                                                       | Convert any public page to Markdown. Body: `{"url": "..."}`                                       |
-| `GET` / `PUT /v1/profile`                                                | Read or save the profile                                                                          |
-| `GET` / `POST /v1/applications`, `PATCH` / `DELETE /v1/applications/:id` | The tracker                                                                                       |
-| `GET` / `POST` / `DELETE /v1/session`                                    | Sign-in state, sign in with the access token, sign out                                            |
-| `GET /health`                                                            | Liveness check                                                                                    |
+| Method and path                                                          | Purpose                                                                                                |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `GET /v1/boards`                                                         | Board directory with last scan result and job counts                                                   |
+| `POST /v1/scans`                                                         | Scan every board that has a public feed                                                                |
+| `POST /v1/boards/:id/scan`                                               | Scan one board                                                                                         |
+| `GET /v1/jobs`                                                           | List jobs. Filters: `search`, `board`, `country`, `remote`, `minScore`, `sort`, `limit`, `cursor`      |
+| `POST /v1/jobs`                                                          | Add a job from its posting link. Body: `{"url": "..."}`                                                |
+| `GET /v1/jobs/:id`                                                       | One job with its evaluation and tracker entry                                                          |
+| `POST /v1/jobs/:id/evaluate`                                             | Score a job. Body: `{"evaluator": "heuristic" \| "ai"}`                                                |
+| `PUT /v1/jobs/:id/evaluation`                                            | Store an assessment made outside KaziScout, for example by an AI coding tool                           |
+| `POST /v1/jobs/:id/markdown`                                             | Replace the job's description with its full posting page                                               |
+| `GET /v1/jobs/:id/application-pack`                                      | The text pack for applying                                                                             |
+| `GET` / `POST /v1/jobs/:id/documents`                                    | Read, or have the AI model write, the cover letter and tailored CV                                     |
+| `POST /v1/jobs/:id/assist`                                               | Copy the pack to the clipboard through computer-use-mcp                                                |
+| `POST /v1/extract`                                                       | Convert any public page to Markdown. Body: `{"url": "..."}`                                            |
+| `GET` / `PUT /v1/profile`                                                | Read or save the profile                                                                               |
+| `POST /v1/profile/import`                                                | Draft a profile from a CV file, pasted text or the clipboard, with follow-up questions. Saves nothing. |
+| `GET` / `POST /v1/applications`, `PATCH` / `DELETE /v1/applications/:id` | The tracker                                                                                            |
+| `GET` / `POST` / `DELETE /v1/session`                                    | Sign-in state, sign in with the access token, sign out                                                 |
+| `GET /health`                                                            | Liveness check                                                                                         |
 
 Errors use one envelope:
 `{"error": {"code": "NOT_FOUND", "message": "...", "details": {}, "request_id": "..."}}`.
@@ -263,6 +270,9 @@ listings or sources that need a login.
 - AI-written documents are only as good as the model. A 1.5B local model produced a cover
   letter that was fluent and wrong. Read every document against your real CV before sending.
 - Sign-in is one shared access token for one owner. There are no user accounts.
+- Without an AI model, the CV is read by fixed rules: they find a name, contact details, a
+  headline, a country and a skills section, and nothing subtler. A scanned PDF has no text to read.
+- Computer use here means the clipboard. It does not open a file picker or read your screen.
 - KaziScout never submits an application. That is deliberate.
 
 ## Credits
