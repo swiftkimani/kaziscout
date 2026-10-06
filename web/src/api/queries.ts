@@ -8,6 +8,7 @@ import {
 import { api } from './client';
 import type {
   Application,
+  ApplicationDocuments,
   ApplicationStatus,
   Board,
   BoardScan,
@@ -83,6 +84,24 @@ export const jobActions = {
   assist: (jobId: string) =>
     api<{ data: { pack: string } }>(`/v1/jobs/${jobId}/assist`, { method: 'POST' }),
 };
+
+export function useDocuments(jobId: string) {
+  return useQuery({
+    queryKey: ['documents', jobId],
+    queryFn: async () =>
+      (await api<{ data: ApplicationDocuments | null }>(`/v1/jobs/${jobId}/documents`)).data,
+  });
+}
+
+export function useWriteDocuments(jobId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () =>
+      (await api<{ data: ApplicationDocuments }>(`/v1/jobs/${jobId}/documents`, { method: 'POST' }))
+        .data,
+    onSuccess: (documents) => client.setQueryData(['documents', jobId], documents),
+  });
+}
 
 export function useBoards() {
   return useQuery({

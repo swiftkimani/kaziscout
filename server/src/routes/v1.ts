@@ -7,6 +7,7 @@ import type { BoardScanRepository } from '../repositories/board-scans.js';
 import type { JobRepository } from '../repositories/jobs.js';
 import type { ProfileRepository } from '../repositories/profile.js';
 import type { ApplyService } from '../services/apply.js';
+import type { DocumentService } from '../services/documents.js';
 import type { EvaluationService } from '../services/evaluation.js';
 import type { MarkdownService } from '../services/markdown.js';
 import type { ScanService } from '../services/scan.js';
@@ -32,6 +33,7 @@ export interface RouteDeps {
   evaluationService: EvaluationService;
   markdownService: MarkdownService;
   applyService: ApplyService;
+  documentService: DocumentService;
   /** Name of the configured AI model, if any. */
   aiModel?: string;
   now?: () => Date;
@@ -113,6 +115,16 @@ export function registerV1Routes(app: FastifyInstance, deps: RouteDeps): void {
   app.get('/v1/jobs/:id/application-pack', (request) => {
     const { id } = parse(idParam, request.params);
     return { data: { pack: deps.applyService.getPack(id).pack } };
+  });
+
+  app.get('/v1/jobs/:id/documents', (request) => {
+    const { id } = parse(idParam, request.params);
+    return { data: deps.documentService.get(id) ?? null };
+  });
+
+  app.post('/v1/jobs/:id/documents', EXPENSIVE, async (request) => {
+    const { id } = parse(idParam, request.params);
+    return { data: await deps.documentService.write(id) };
   });
 
   app.post('/v1/jobs/:id/assist', EXPENSIVE, async (request) => {

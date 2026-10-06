@@ -1,14 +1,6 @@
 import { z } from 'zod';
 import { UpstreamError } from '../errors.js';
-import {
-  assessmentSchema,
-  describeJob,
-  describeProfile,
-  INSTRUCTIONS,
-  JSON_FORMAT_INSTRUCTIONS,
-  toEvaluation,
-} from './assessment.js';
-import type { Evaluation, JobEvaluator, Profile, ScorableJob } from './types.js';
+import type { AiClient, GenerateRequest } from './client.js';
 
 // Local models on a laptop can take minutes on a long posting.
 const TIMEOUT_MS = 180_000;
@@ -30,11 +22,12 @@ function extractJson(reply: string): unknown {
 }
 
 /**
- * Asks any model served over the OpenAI chat-completions protocol for an assessment. That covers
- * OpenAI, Gemini, DeepSeek, Groq, Mistral and OpenRouter, and local servers such as Ollama and
- * LM Studio. The reply is validated here because not every server enforces a JSON schema.
+ * Any model served over the OpenAI chat-completions protocol. That covers OpenAI, Gemini,
+ * DeepSeek, Groq, Mistral and OpenRouter, and local servers such as Ollama and LM Studio.
+ * The reply is validated here because not every server enforces a JSON schema.
  */
-export class OpenAiCompatibleEvaluator implements JobEvaluator {
+export class OpenAiCompatibleClient implements AiClient {
+  readonly model: string;
   private readonly endpoint: string;
 
   constructor(
@@ -46,11 +39,12 @@ export class OpenAiCompatibleEvaluator implements JobEvaluator {
       fetchImpl?: typeof fetch;
     },
   ) {
+    this.model = options.model;
     this.endpoint = `${options.baseUrl.replace(/\/+$/, '')}/chat/completions`;
   }
 
-  async evaluate(job: ScorableJob, profile: Profile): Promise<Evaluation> {
-    const { model, apiKey, fetchImpl = fetch } = this.options;
+  async generate<T>(request: GenerateRequest<T>): Promise<T> {
+    const { apiKey, fetchImpl = fetch } = this.options;
     const host = new URL(this.endpoint).host;
 
     let response: Response;
@@ -62,14 +56,14 @@ export class OpenAiCompatibleEvaluator implements JobEvaluator {
           ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
         },
         body: JSON.stringify({
-          model,
+          model: this.model,
           response_format: { type: 'json_object' },
           messages: [
             {
               role: 'system',
-              content: `${INSTRUCTIONS}\n\n${JSON_FORMAT_INSTRUCTIONS}\n\n${describeProfile(profile)}`,
+              content: `${request.instructions}\n\n${request.formatHint}\n\n${request.context}`,
             },
-            { role: 'user', content: describeJob(job) },
+            { role: 'user', content: request.input },
           ],
         }),
         signal: AbortSignal.timeout(TIMEOUT_MS),
@@ -91,12 +85,12 @@ export class OpenAiCompatibleEvaluator implements JobEvaluator {
 
     const completion = completionSchema.safeParse(await response.json().catch(() => undefined));
     const reply = completion.success ? completion.data.choices[0]?.message.content : undefined;
-    const assessment = assessmentSchema.safeParse(reply ? extractJson(reply) : undefined);
-    if (!assessment.success) {
+    const parsed = request.schema.safeParse(reply ? extractJson(reply) : undefined);
+    if (!parsed.success) {
       throw new UpstreamError(
-        `${model} returned an assessment that could not be read. A larger model may do better.`,
+        `${this.model} returned a reply that could not be read. A larger model may do better.`,
       );
     }
-    return toEvaluation(assessment.data, model);
+    return parsed.data;
   }
 }

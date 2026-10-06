@@ -265,6 +265,43 @@
   font-size: var(--text-sm);
 }
 
+.document {
+  max-width: var(--measure);
+  margin: var(--space-0) auto;
+  padding: var(--space-8);
+  background: var(--surface);
+}
+
+.document__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+.document .prose h1 {
+  font-size: var(--text-2xl);
+}
+
+.document .prose h2 {
+  font-size: var(--text-lg);
+}
+
+@media print {
+  .document__bar {
+    display: none;
+  }
+
+  .document {
+    max-width: none;
+    padding: var(--space-0);
+  }
+}
+
 .table-wrap {
   overflow-x: auto;
   border: var(--border-width) solid var(--border);

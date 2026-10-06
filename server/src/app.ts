@@ -14,13 +14,16 @@ import { fetchText as defaultFetchText, type FetchText } from './providers/http.
 import { ApplicationRepository } from './repositories/applications.js';
 import { BoardScanRepository } from './repositories/board-scans.js';
 import { JobRepository } from './repositories/jobs.js';
+import { DocumentRepository } from './repositories/documents.js';
 import { ProfileRepository } from './repositories/profile.js';
 import { registerV1Routes } from './routes/v1.js';
-import { createAiEvaluator, type AiEvaluator } from './scoring/ai-evaluator.js';
+import { createAiClient, type AiClient } from './ai/client.js';
+import { AiJobEvaluator } from './scoring/ai-evaluator.js';
 import { HeuristicEvaluator } from './scoring/heuristic.js';
 import { AlertService } from './services/alerts.js';
 import { ApplyService, type DesktopAssistant } from './services/apply.js';
 import { ComputerUseDesktop } from './services/computer-use-desktop.js';
+import { DocumentService } from './services/documents.js';
 import { EvaluationService } from './services/evaluation.js';
 import { MarkdownService } from './services/markdown.js';
 import { ScanService } from './services/scan.js';
@@ -33,7 +36,7 @@ export interface AppOptions {
   /** Overrides for tests; production uses the real network, clock and desktop. */
   fetchText?: FetchText;
   resolveHost?: ResolveHost;
-  ai?: AiEvaluator;
+  ai?: AiClient;
   desktop?: DesktopAssistant;
   now?: () => Date;
 }
@@ -60,7 +63,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   const profiles = new ProfileRepository(db);
   const scans = new BoardScanRepository(db);
 
-  const ai = options.ai ?? createAiEvaluator(config);
+  const ai = options.ai ?? createAiClient(config);
   const desktop =
     options.desktop ?? (config.DESKTOP_ASSIST_ENABLED ? new ComputerUseDesktop() : undefined);
   const converter: PageConverter = config.FIRECRAWL_API_KEY
@@ -71,7 +74,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     jobs,
     profiles,
     heuristic: new HeuristicEvaluator(now),
-    ai: ai?.evaluator,
+    ai: ai ? new AiJobEvaluator(ai) : undefined,
     now,
   });
   const scanService = new ScanService({
@@ -88,6 +91,13 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     converter,
     jobs,
     resolveHost: options.resolveHost,
+  });
+  const documentService = new DocumentService({
+    jobs,
+    profiles,
+    documents: new DocumentRepository(db),
+    ai,
+    now,
   });
   const applyService = new ApplyService({ jobs, profiles, applications, desktop, now });
 
@@ -143,6 +153,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     evaluationService,
     markdownService,
     applyService,
+    documentService,
     aiModel: ai?.model,
     now,
   });

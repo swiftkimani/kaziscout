@@ -1,37 +1,26 @@
-import type { Config } from '../config.js';
-import { ClaudeEvaluator } from './claude.js';
-import { OpenAiCompatibleEvaluator } from './openai-compatible.js';
-import type { JobEvaluator } from './types.js';
+import type { AiClient } from '../ai/client.js';
+import {
+  assessmentSchema,
+  describeJob,
+  describeProfile,
+  INSTRUCTIONS,
+  JSON_FORMAT_INSTRUCTIONS,
+  toEvaluation,
+} from './assessment.js';
+import type { Evaluation, JobEvaluator, Profile, ScorableJob } from './types.js';
 
-const DEFAULT_CLAUDE_MODEL = 'claude-opus-5-5';
+/** Asks the configured AI model for a written assessment of one job. */
+export class AiJobEvaluator implements JobEvaluator {
+  constructor(private readonly client: AiClient) {}
 
-export interface AiEvaluator {
-  evaluator: JobEvaluator;
-  /** Model name shown in the UI next to each assessment. */
-  model: string;
-}
-
-/**
- * Chooses the AI evaluator from configuration, or returns undefined when none is configured.
- * AI_BASE_URL selects any OpenAI-compatible server; otherwise ANTHROPIC_API_KEY selects Claude.
- */
-export function createAiEvaluator(config: Config): AiEvaluator | undefined {
-  if (config.AI_BASE_URL) {
-    if (!config.AI_MODEL) {
-      throw new Error('AI_BASE_URL is set, so AI_MODEL must name the model to use.');
-    }
-    return {
-      model: config.AI_MODEL,
-      evaluator: new OpenAiCompatibleEvaluator({
-        baseUrl: config.AI_BASE_URL,
-        model: config.AI_MODEL,
-        apiKey: config.AI_API_KEY,
-      }),
-    };
+  async evaluate(job: ScorableJob, profile: Profile): Promise<Evaluation> {
+    const assessment = await this.client.generate({
+      schema: assessmentSchema,
+      formatHint: JSON_FORMAT_INSTRUCTIONS,
+      instructions: INSTRUCTIONS,
+      context: describeProfile(profile),
+      input: describeJob(job),
+    });
+    return toEvaluation(assessment, this.client.model);
   }
-  if (config.ANTHROPIC_API_KEY) {
-    const model = config.AI_MODEL ?? DEFAULT_CLAUDE_MODEL;
-    return { model, evaluator: new ClaudeEvaluator(config.ANTHROPIC_API_KEY, model) };
-  }
-  return undefined;
 }

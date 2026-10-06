@@ -103,3 +103,11 @@ export interface MarkdownPage {
   markdown: string;
   converter: 'firecrawl' | 'local';
 }
+
+export interface ApplicationDocuments {
+  jobId: string;
+  coverLetterMd: string;
+  cvMd: string;
+  model: string;
+  createdAt: string;
+}

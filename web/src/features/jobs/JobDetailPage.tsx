@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useBoards, useJob, useMeta } from '../../api/queries';
 import { Badge, ErrorState, ScoreBadge, Skeleton } from '../../components/ui/Feedback';
 import { EvaluationPanel } from './EvaluationPanel';
+import { DocumentsPanel } from './DocumentsPanel';
 import { describePlace, formatListedAt } from './format';
 import { JobActions } from './JobActions';
 
@@ -71,7 +72,10 @@ export function JobDetailPage() {
             </p>
           )}
         </section>
-        <EvaluationPanel evaluation={data.evaluation} />
+        <div className="stack">
+          <EvaluationPanel evaluation={data.evaluation} />
+          <DocumentsPanel jobId={data.id} aiModel={meta.data?.features.aiModel ?? null} />
+        </div>
       </div>
     </div>
   );

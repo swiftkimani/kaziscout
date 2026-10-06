@@ -4,6 +4,7 @@ import { AuthGate } from './components/AuthGate';
 import { EmptyState } from './components/ui/Feedback';
 import { BoardsPage } from './features/boards/BoardsPage';
 import { ExtractPage } from './features/extract/ExtractPage';
+import { DocumentPrintPage } from './features/jobs/DocumentPrintPage';
 import { JobDetailPage } from './features/jobs/JobDetailPage';
 import { JobsPage } from './features/jobs/JobsPage';
 import { ProfilePage } from './features/profile/ProfilePage';
@@ -20,6 +21,14 @@ function NotFoundPage() {
 export function App() {
   return (
     <Routes>
+      <Route
+        path="jobs/:id/print/:kind"
+        element={
+          <AuthGate>
+            <DocumentPrintPage />
+          </AuthGate>
+        }
+      />
       <Route
         element={
           <AuthGate>

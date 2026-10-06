@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../src/app.js';
 import type { Board } from '../src/boards/registry.js';
+import type { AiClient, GenerateRequest } from '../src/ai/client.js';
 import { loadBoards } from '../src/boards/registry.js';
 import { loadConfig } from '../src/config.js';
 import { migrate, openDb, type Db } from '../src/db/client.js';
@@ -70,19 +71,37 @@ class FakeDesktop implements DesktopAssistant {
   }
 }
 
+/** Stands in for a model: records what it was asked and replies with fixed documents. */
+class FakeAi implements AiClient {
+  readonly model = 'fake-model';
+  requests: GenerateRequest<unknown>[] = [];
+  generate<T>(request: GenerateRequest<T>): Promise<T> {
+    this.requests.push(request);
+    return Promise.resolve(
+      request.schema.parse({
+        coverLetter: 'Dear hiring team at Solvo Global,',
+        tailoredCv: '# Wanjiru Kamau',
+      }),
+    );
+  }
+}
+
 let db: Db;
 let app: FastifyInstance;
 let desktop: FakeDesktop;
+let ai: FakeAi;
 
 beforeEach(async () => {
   db = openDb(':memory:');
   migrate(db);
   desktop = new FakeDesktop();
+  ai = new FakeAi();
   app = await buildApp({
     config: loadConfig({ LOG_LEVEL: 'silent' }),
     db,
     boards,
     desktop,
+    ai,
     now: () => NOW,
     resolveHost: () => Promise.resolve(['93.184.216.34']),
     fetchText: (url) => {
@@ -214,6 +233,14 @@ describe('profile and scoring', () => {
   });
 
   it('says how to enable AI assessment when no model is configured', async () => {
+    await app.close();
+    app = await buildApp({
+      config: loadConfig({ LOG_LEVEL: 'silent' }),
+      db,
+      boards,
+      now: () => NOW,
+      fetchText: () => Promise.resolve(feedXml),
+    });
     const jobId = await scanAndGetFirstJobId();
     await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
 
@@ -329,6 +356,44 @@ describe('page to Markdown', () => {
     };
 
     expect(job.data.descriptionMd).toBe('# Full posting');
+  });
+});
+
+describe('application documents', () => {
+  it('writes a cover letter and tailored CV from the CV and the posting, and keeps them', async () => {
+    const jobId = await scanAndGetFirstJobId();
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: profile });
+
+    const before = await app.inject({ method: 'GET', url: `/v1/jobs/${jobId}/documents` });
+    const written = await app.inject({ method: 'POST', url: `/v1/jobs/${jobId}/documents` });
+    const after = await app.inject({ method: 'GET', url: `/v1/jobs/${jobId}/documents` });
+
+    expect(before.json()).toEqual({ data: null });
+    expect(written.json()).toMatchObject({
+      data: {
+        coverLetterMd: 'Dear hiring team at Solvo Global,',
+        cvMd: '# Wanjiru Kamau',
+        model: 'fake-model',
+        createdAt: NOW.toISOString(),
+      },
+    });
+    expect(after.json()).toEqual(written.json());
+    expect(ai.requests[0]?.context).toContain('Five years editing digital video.');
+    expect(ai.requests[0]?.input).toContain('Digital Video Editor');
+    expect(ai.requests[0]?.instructions).toContain('reword, never invent');
+  });
+
+  it('asks for a CV before writing anything', async () => {
+    const jobId = await scanAndGetFirstJobId();
+    await app.inject({ method: 'PUT', url: '/v1/profile', payload: { ...profile, cvText: '' } });
+
+    const response = await app.inject({ method: 'POST', url: `/v1/jobs/${jobId}/documents` });
+
+    expect(response.statusCode).toBe(400);
+    expect((response.json() as { error: { message: string } }).error.message).toContain(
+      'Paste your CV into your profile first',
+    );
+    expect(ai.requests).toEqual([]);
   });
 });
 
