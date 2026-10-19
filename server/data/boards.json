@@ -13,7 +13,7 @@
       "feedUrl": "https://jobwebkenya.com/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "corporate-staffing",
@@ -29,7 +29,7 @@
       "feedUrl": "https://www.corporatestaffing.co.ke/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Feed mixes vacancies with career articles."
   },
   {
@@ -46,7 +46,7 @@
       "feedUrl": "https://www.careerpointkenya.co.ke/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Feed mixes vacancies with career articles."
   },
   {
@@ -63,7 +63,7 @@
       "feedUrl": "https://summitrecruitment-search.com/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "opportunities-young-kenyans",
@@ -79,7 +79,7 @@
       "feedUrl": "https://opportunitiesforyoungkenyans.co.ke/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Internships, fellowships and entry-level roles."
   },
   {
@@ -95,7 +95,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "myjobmag-ke",
@@ -110,7 +110,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "myjobs-in-kenya",
@@ -125,7 +125,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobs-in-kenya",
@@ -140,7 +140,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "fuzu",
@@ -157,7 +157,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "kenyajob",
@@ -172,7 +172,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "psc-kenya",
@@ -187,7 +187,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "ajira-digital",
@@ -202,7 +202,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Government programme for online work."
   },
   {
@@ -218,7 +218,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "great-uganda-jobs",
@@ -233,7 +233,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "everjobs-ug",
@@ -247,8 +247,8 @@
     "access": {
       "type": "listing"
     },
-    "status": "live",
-    "checkedAt": "2026-10-06"
+    "status": "blocked",
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "ugandajob",
@@ -263,7 +263,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "zoom-tanzania",
@@ -278,7 +278,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "ajira-tanzania",
@@ -293,7 +293,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Public Service Recruitment Secretariat."
   },
   {
@@ -309,7 +309,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "job-in-rwanda",
@@ -324,7 +324,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "ethiojobs",
@@ -339,7 +339,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "hahu-jobs",
@@ -354,7 +354,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "afriwork",
@@ -369,7 +369,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "somali-jobs",
@@ -384,7 +384,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "sudan-careers",
@@ -399,7 +399,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "hot-nigerian-jobs",
@@ -415,7 +415,7 @@
       "feedUrl": "https://www.hotnigerianjobs.com/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobzilla-ng",
@@ -430,8 +430,8 @@
       "type": "rss",
       "feedUrl": "https://www.jobzilla.ng/feed/"
     },
-    "status": "live",
-    "checkedAt": "2026-10-06"
+    "status": "blocked",
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobgurus",
@@ -447,7 +447,7 @@
       "feedUrl": "https://jobgurus.com.ng/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobberman-ng",
@@ -462,7 +462,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Ngcareers now redirects here."
   },
   {
@@ -478,7 +478,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobweb-ghana",
@@ -494,7 +494,7 @@
       "feedUrl": "https://jobwebghana.com/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobberman-gh",
@@ -509,7 +509,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobs-in-ghana",
@@ -524,7 +524,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "ghanajob",
@@ -539,7 +539,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "gamjobs",
@@ -555,7 +555,7 @@
       "feedUrl": "https://gamjobs.com/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "senjob",
@@ -570,7 +570,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "educarriere",
@@ -585,7 +585,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "emploi-ci",
@@ -600,7 +600,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobinfocamer",
@@ -615,7 +615,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "emploi-cm",
@@ -630,7 +630,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "emploi-cd",
@@ -645,7 +645,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "mediacongo",
@@ -660,7 +660,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "News site with a large jobs section."
   },
   {
@@ -677,7 +677,7 @@
       "feedUrl": "https://www.novojob.com/rss"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Francophone Africa."
   },
   {
@@ -693,7 +693,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Francophone aggregator."
   },
   {
@@ -709,7 +709,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "careers24",
@@ -724,7 +724,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "pnet",
@@ -739,7 +739,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "career-junction",
@@ -754,7 +754,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "job-mail",
@@ -769,7 +769,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "job-placements",
@@ -784,7 +784,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "myjobmag-za",
@@ -799,7 +799,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "bizcommunity",
@@ -814,7 +814,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Media, marketing and retail roles."
   },
   {
@@ -830,7 +830,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "indeed-za",
@@ -845,7 +845,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobvine",
@@ -860,7 +860,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "dpsa",
@@ -875,7 +875,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Weekly public service vacancy circular."
   },
   {
@@ -892,7 +892,7 @@
       "feedUrl": "https://vacancymail.co.zw/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "iharare-jobs",
@@ -908,7 +908,7 @@
       "feedUrl": "https://ihararejobs.com/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "careers-malawi",
@@ -924,7 +924,7 @@
       "feedUrl": "https://careersmw.com/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "job-search-malawi",
@@ -940,7 +940,7 @@
       "feedUrl": "https://jobsearchmalawi.com/?feed=job_feed"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "job-search-zambia",
@@ -956,7 +956,7 @@
       "feedUrl": "https://jobsearchzm.com/?feed=job_feed"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "go-zambia-jobs",
@@ -971,7 +971,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobs-botswana",
@@ -987,7 +987,7 @@
       "feedUrl": "https://jobsbotswana.info/jobs/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobartis",
@@ -1002,7 +1002,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "emprego-mz",
@@ -1017,7 +1017,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "myjob-mu",
@@ -1032,7 +1032,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "wuzzuf",
@@ -1047,7 +1047,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "forasna",
@@ -1062,7 +1062,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "bayt",
@@ -1082,7 +1082,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Middle East and North Africa."
   },
   {
@@ -1103,7 +1103,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Answers automated checks with HTTP 202."
   },
   {
@@ -1119,7 +1119,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "emploi-ma",
@@ -1134,7 +1134,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "emploitic",
@@ -1149,7 +1149,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "keejob",
@@ -1164,7 +1164,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "tanitjobs",
@@ -1179,7 +1179,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "libyan-jobs",
@@ -1194,7 +1194,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jobnet-africa",
@@ -1210,7 +1210,7 @@
       "feedUrl": "https://jobnetafrica.com/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "careers-in-africa",
@@ -1225,7 +1225,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "shortlist",
@@ -1240,7 +1240,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "ngo-jobs-in-africa",
@@ -1255,7 +1255,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Its feed last updated in May 2026, so it is not scanned."
   },
   {
@@ -1271,7 +1271,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Has a public API, but it only serves approved app names; not scanned yet."
   },
   {
@@ -1286,8 +1286,8 @@
     "access": {
       "type": "listing"
     },
-    "status": "live",
-    "checkedAt": "2026-10-06"
+    "status": "blocked",
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "impactpool",
@@ -1302,7 +1302,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "devex",
@@ -1317,7 +1317,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "development-aid",
@@ -1332,7 +1332,7 @@
       "type": "listing"
     },
     "status": "blocked",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "opportunities-for-africans",
@@ -1348,7 +1348,7 @@
       "feedUrl": "https://www.opportunitiesforafricans.com/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Fellowships, scholarships and graduate programmes."
   },
   {
@@ -1365,7 +1365,7 @@
       "feedUrl": "https://opportunitydesk.org/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Global opportunities, many open to Africans."
   },
   {
@@ -1382,7 +1382,7 @@
       "feedUrl": "https://www.globalsouthopportunities.com/feed/"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "after-school-africa",
@@ -1396,8 +1396,8 @@
     "access": {
       "type": "listing"
     },
-    "status": "live",
-    "checkedAt": "2026-10-06"
+    "status": "blocked",
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "gebeya",
@@ -1412,7 +1412,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Pan-African tech talent marketplace."
   },
   {
@@ -1428,7 +1428,7 @@
       "type": "listing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "remotive",
@@ -1444,7 +1444,7 @@
       "provider": "remotive"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
@@ -1461,7 +1461,7 @@
       "provider": "himalayas"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
@@ -1478,7 +1478,7 @@
       "provider": "remoteok"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
@@ -1495,7 +1495,7 @@
       "feedUrl": "https://weworkremotely.com/remote-jobs.rss"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote roles worldwide; each is scored against your countries."
   },
   {
@@ -1513,7 +1513,7 @@
       "slug": "andela"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "m-kopa",
@@ -1534,7 +1534,7 @@
       "slug": "m-kopa"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "lemfi",
@@ -1551,7 +1551,7 @@
       "slug": "lemfi"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "moniepoint",
@@ -1568,7 +1568,7 @@
       "slug": "moniepoint"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "jumia",
@@ -1585,7 +1585,7 @@
       "slug": "jumia"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "one-acre-fund",
@@ -1602,7 +1602,7 @@
       "slug": "oneacrefund"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "apollo-agriculture",
@@ -1620,7 +1620,7 @@
       "slug": "apolloagriculture"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "zipline",
@@ -1637,7 +1637,7 @@
       "slug": "flyzipline"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Operates in Rwanda, Ghana, Nigeria, Kenya and Cote d'Ivoire. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1655,7 +1655,7 @@
       "slug": "givedirectly"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1673,7 +1673,7 @@
       "slug": "tala"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1691,7 +1691,7 @@
       "slug": "wikimedia"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1709,7 +1709,7 @@
       "slug": "canonical"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1727,7 +1727,7 @@
       "slug": "gitlab"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1745,7 +1745,7 @@
       "slug": "grafanalabs"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1763,7 +1763,7 @@
       "slug": "mozilla"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1781,7 +1781,7 @@
       "slug": "turing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1799,7 +1799,7 @@
       "slug": "toptal"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1817,7 +1817,7 @@
       "slug": "supabase"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1835,7 +1835,7 @@
       "slug": "posthog"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1853,7 +1853,7 @@
       "slug": "zapier"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1871,7 +1871,7 @@
       "slug": "buffer"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote-first. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1889,7 +1889,7 @@
       "slug": "burnmanufacturing"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "palmpay",
@@ -1906,7 +1906,7 @@
       "slug": "palmpay"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "canva",
@@ -1923,7 +1923,7 @@
       "slug": "canva"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1941,7 +1941,7 @@
       "slug": "wise"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Only the 100 newest roles are read. Hires in many countries; each role is scored against your countries."
   },
   {
@@ -1959,7 +1959,7 @@
       "slug": "kuda"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "helium-health",
@@ -1976,7 +1976,7 @@
       "slug": "helium-health"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "carry1st",
@@ -1993,7 +1993,7 @@
       "slug": "carry1st"
     },
     "status": "live",
-    "checkedAt": "2026-10-06"
+    "checkedAt": "2026-10-19"
   },
   {
     "id": "paystack",
@@ -2009,7 +2009,7 @@
       "feedUrl": "https://paystack.teamtailor.com/jobs.rss"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Read from its Teamtailor career feed."
   },
   {
@@ -2026,7 +2026,7 @@
       "feedUrl": "https://tunga.teamtailor.com/jobs.rss"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote software work for African developers. Read from its Teamtailor career feed."
   },
   {
@@ -2045,7 +2045,7 @@
       "site": "ABSAcareersite"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
   },
   {
@@ -2064,7 +2064,7 @@
       "site": "External"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Posts in many countries. Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
   },
   {
@@ -2083,7 +2083,7 @@
       "site": "FHI_360_External_Career_Portal"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Posts in many countries. Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
   },
   {
@@ -2102,7 +2102,7 @@
       "site": "CorporateCareers"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Posts in many countries. Only the 20 newest roles are read, without descriptions; use \"Fetch full posting\" on a role."
   },
   {
@@ -2120,7 +2120,7 @@
       "slug": "timedoctor"
     },
     "status": "live",
-    "checkedAt": "2026-10-06",
+    "checkedAt": "2026-10-19",
     "note": "Remote company; each role is scored against your countries."
   }
 ]
